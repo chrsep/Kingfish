@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="match_parent"  android:layout_width="match_parent">
+
+    <item
+        android:drawable="@color/colorAccent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <item android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <bitmap
+            android:gravity="center"
+            android:src="@mipmap/ic_launcher"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </item>
+
+</layer-list>
