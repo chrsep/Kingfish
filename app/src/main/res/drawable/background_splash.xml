@@ -2,7 +2,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="match_parent"  android:layout_width="match_parent">
 
     <item
-        android:drawable="@color/colorAccent"
+        android:drawable="@color/colorSecondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
@@ -10,7 +10,7 @@
         android:layout_height="wrap_content">
         <bitmap
             android:gravity="center"
-            android:src="@mipmap/ic_launcher"
+            android:src="@drawable/portal_splash"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </item>
