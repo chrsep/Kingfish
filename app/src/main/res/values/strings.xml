@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Portal</string>
+
+    //Variables
+    <string name="username">acc_username</string>
+    <string name="password">acc_password</string>
 </resources>
