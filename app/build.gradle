@@ -76,11 +76,11 @@ dependencies {
         transitive = true;
     }
 
-    compile 'org.jetbrains.anko:anko-sdk15:0.9'
-    compile 'org.jetbrains.anko:anko-appcompat-v7:0.9'
-    compile 'org.jetbrains.anko:anko-design:0.9'
-    compile 'org.jetbrains.anko:anko-recyclerview-v7:0.9'
-    compile 'org.jetbrains.anko:anko-cardview-v7:0.9'
+//    compile 'org.jetbrains.anko:anko-sdk15:0.9'
+//    compile 'org.jetbrains.anko:anko-appcompat-v7:0.9'
+//    compile 'org.jetbrains.anko:anko-design:0.9'
+//    compile 'org.jetbrains.anko:anko-recyclerview-v7:0.9'
+//    compile 'org.jetbrains.anko:anko-cardview-v7:0.9'
 }
 repositories {
     mavenCentral()
