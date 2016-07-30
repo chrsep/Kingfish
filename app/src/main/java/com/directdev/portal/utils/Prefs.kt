@@ -4,7 +4,7 @@ import android.content.Context
 import android.support.annotation.StringRes
 
 object Prefs{
-    val PREF_ID = "kingfish"
+    val PREF_ID = "com.kingfish"
     fun save(ctx: Context, key: String , value: Any) {
         val sp = ctx.getSharedPreferences(PREF_ID, Context.MODE_PRIVATE)
         val editor = sp.edit()
