@@ -43,7 +43,6 @@ object BinusDataService {
                     schedules: List<ScheduleModel>,
                     exams: List<ExamModel>,
                     grade: GradeModel ->
-                    isActive = false
                     grade.credit.term = grade.term
                     val dates = mutableListOf<ActivityDate>()
                     finances.forEach {
@@ -75,6 +74,7 @@ object BinusDataService {
                         it.delete(ActivityDate::class.java)
                         it.copyToRealmOrUpdate(dates)
                     }
+                    isActive = false
                     true
                 })
                 .subscribeOn(Schedulers.io())
