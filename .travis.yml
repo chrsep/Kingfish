@@ -26,4 +26,4 @@ cache:
     - $HOME/.gradle/native
     - $HOME/.gradle/wrapper
 
-install: travis_wait 30
+install: travis_wait 60
