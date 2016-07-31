@@ -17,4 +17,4 @@ before_install:
     - android-wait-for-emulator
     - adb shell input keyevent 82 &
 env:
-    - GRADLE_OPTS="-Xmx512m -XX:MaxPermSize=512m"
+    - GRADLE_OPTS="-Xmx2048M -XX:MaxPermSize=512m"
