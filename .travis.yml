@@ -18,3 +18,4 @@ before_install:
     - adb shell input keyevent 82 &
 env:
     - GRADLE_OPTS="-Xmx2048M -XX:MaxPermSize=512m"
+install: travis_wait mvn install
