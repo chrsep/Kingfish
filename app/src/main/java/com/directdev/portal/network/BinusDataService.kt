@@ -19,7 +19,7 @@ object BinusDataService {
     private val api = Retrofit.Builder()
             .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create())
-            //TODO: Delete this if timeout takes too long
+            //TODO: (NOTE) Delete OkHttpClient if timeout takes too long
             .client(OkHttpClient()
                     .newBuilder()
                     .connectTimeout(20, TimeUnit.SECONDS)

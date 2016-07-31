@@ -7,6 +7,7 @@ buildscript {
     }
 
     dependencies {
+        //noinspection GradleDynamicVersion
         classpath 'io.fabric.tools:gradle:1.+'
     }
 }
@@ -18,9 +19,6 @@ apply plugin: 'io.fabric'
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
-    dataBinding {
-        enabled = true
-    }
     defaultConfig {
         applicationId "com.directdev.portal"
         minSdkVersion 16
@@ -31,7 +29,8 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
+            //TODO: (ON_RELEASE) Turn on minifier
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -81,7 +80,7 @@ dependencies {
     compile 'org.jetbrains.anko:anko-design:0.9'
     compile 'org.jetbrains.anko:anko-recyclerview-v7:0.9'
     compile 'org.jetbrains.anko:anko-cardview-v7:0.9'
-    //TODO: For debug only, remove on release
+    //TODO: (ON_RELEASE) Remove stetho
     compile 'com.facebook.stetho:stetho:1.3.1'
     compile 'com.uphyca:stetho_realm:0.9.0'
     compile 'com.facebook.stetho:stetho-okhttp3:1.3.1'
