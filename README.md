@@ -1,5 +1,4 @@
 # Kingfish
-Second iteration of Portal
 
 This code currently uses the listed libraries and language below extensively. Basic knowledge on the function and design of the libraries and language listed below will probably be required to understand this codebase.
 
@@ -14,4 +13,3 @@ A recently released database built from the ground up for mobile application
 2. [Anko](https://github.com/Kotlin/anko), a DSL to handle layouts based on kotlin
 3. [Retrofit](http://square.github.io/retrofit/), for handling network calls
 4. [Joda-Time](http://www.joda.org/joda-time/) for handling date and time
-5. [Spek](https://jetbrains.github.io/spek/), for doing tests
