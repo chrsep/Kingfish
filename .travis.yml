@@ -24,9 +24,7 @@ before_cache:
     - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
-    - $HOME/.gradle/wrapper
-    - $HOME/.gradle/native
-    - $HOME/.gradle/daemon
-    - $HOME/.gradle/caches/jars-1
-    - $HOME/.gradle/caches/2.1.2
-install: travis_wait 60 ./gradlew build connectedCheck
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
+script: travis_wait 60 ./gradlew build connectedCheck
