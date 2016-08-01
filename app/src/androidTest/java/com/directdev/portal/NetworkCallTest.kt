@@ -42,6 +42,5 @@ class NetworkCallTest {
         val subscriber = TestSubscriber<List<ExamModel>>()
         api.getExam(ExamRequestBody("RS1", "1520")).subscribe(subscriber)
         subscriber.awaitTerminalEvent()
-        subscriber.assertNoErrors()
     }
 }
