@@ -19,11 +19,14 @@ before_install:
 env:
     - GRADLE_OPTS="-Xmx2048M -XX:MaxPermSize=512m"
 
+before_cache:
+    - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+    - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
-    - $HOME/.gradle/caches
-    - $HOME/.gradle/daemon
-    - $HOME/.gradle/native
-    - $HOME/.gradle/wrapper
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/daemon/
+    - $HOME/.gradle/native/
+    - $HOME/.gradle/wrapper/
 
 install: travis_wait 60
