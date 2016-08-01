@@ -28,9 +28,9 @@ class NetworkCallTest {
             //TODO: (NOTE) Delete OkHttpClient if timeout takes too long
             .client(OkHttpClient()
                     .newBuilder()
-                    .connectTimeout(30, TimeUnit.SECONDS)
-                    .readTimeout(40, TimeUnit.SECONDS)
-                    .writeTimeout(40, TimeUnit.SECONDS)
+                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .writeTimeout(60, TimeUnit.SECONDS)
                     .addNetworkInterceptor(StethoInterceptor())
                     .build())
             .baseUrl("https://newbinusmaya.binus.ac.id/services/ci/index.php/")
