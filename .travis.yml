@@ -29,4 +29,4 @@ cache:
     - $HOME/.gradle/native/
     - $HOME/.gradle/wrapper/
 
-install: travis_wait 60
+install: travis_wait 60 ./gradlew build connectedCheck
