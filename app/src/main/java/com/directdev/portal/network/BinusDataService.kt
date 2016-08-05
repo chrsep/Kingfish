@@ -4,22 +4,24 @@ import com.directdev.portal.model.*
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import io.realm.Realm
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
+import retrofit2.Converter
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import rx.Observable
+import rx.Single
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+import java.lang.reflect.Type
 import java.util.concurrent.TimeUnit
 
 object BinusDataService {
     private var isActive = false
     private val api = Retrofit.Builder()
-            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-            .addConverterFactory(MoshiConverterFactory.create())
-            //TODO: (NOTE) Delete OkHttpClient if timeout takes too long
             .client(OkHttpClient()
                     .newBuilder()
                     .connectTimeout(30, TimeUnit.SECONDS)
@@ -27,6 +29,14 @@ object BinusDataService {
                     .writeTimeout(30, TimeUnit.SECONDS)
                     .addNetworkInterceptor(StethoInterceptor())
                     .build())
+            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+            .addConverterFactory(object : Converter.Factory() {
+                override fun responseBodyConverter(type: Type, annotations: Array<out Annotation>, retrofit: Retrofit) = Converter<ResponseBody, Any> {
+                    if (it.contentLength() != 0L) retrofit.nextResponseBodyConverter<Any>(this, type, annotations).convert(it) else null
+                }
+            })
+            .addConverterFactory(MoshiConverterFactory.create())
+            //TODO: (NOTE) Delete OkHttpClient if timeout takes too long
             .baseUrl("https://newbinusmaya.binus.ac.id/services/ci/index.php/")
             .build()
             .create(BinusApi::class.java)
@@ -88,5 +98,11 @@ object BinusDataService {
                 .toDate()
         item.id = string
         return item
+    }
+
+    fun login(): Single<Response<String>> {
+        return api.login("chrisep8@binus.ac.id", "b!Nu$26041996", "Login")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
     }
 }

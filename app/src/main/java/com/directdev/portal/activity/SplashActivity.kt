@@ -12,6 +12,7 @@ import rx.Observer
 
 class SplashActivity : AppCompatActivity() {
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Fabric.with(this, Answers())
@@ -31,13 +32,13 @@ class SplashActivity : AppCompatActivity() {
                 onClick { update() }
                 textSize = 26f
             }
-        }
+            }
 //        if(Prefs.read(this, R.string.username, "") == "")
 //            startActivity(intentFor<LoginActivity>().singleTop())
 //        else startActivity(intentFor<MainActivity>().singleTop())
     }
 
-    fun update(){
+    fun update() {
         Log.d("Update", "Starts")
         BinusDataService.initiateUpdate()
                 .subscribe(
