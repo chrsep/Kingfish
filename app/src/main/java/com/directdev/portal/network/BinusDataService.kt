@@ -28,7 +28,8 @@ object BinusDataService {
     private val api = Retrofit.Builder()
             .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
             .addConverterFactory(NullConverterFactory())
-            .client(buildOkHttpClient())//TODO: (NOTE) Delete OkHttpClient if timeout takes too long
+            //TODO: (NOTE) Delete OkHttpClient if timeout takes too long
+            .client(buildOkHttpClient())
             .addConverterFactory(MoshiConverterFactory.create())
             .baseUrl(baseUrl)
             .build()
@@ -43,6 +44,7 @@ object BinusDataService {
         }
     }
 
+    //TODO: (NOTE) put cookie to each login request when ready
     private fun login(ctx: Context, cookie: String) =
             api.login(ctx.readPref(R.string.username, "") as String, ctx.readPref(R.string.password, "") as String)
                     .subscribeOn(Schedulers.io())
