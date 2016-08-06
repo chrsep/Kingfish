@@ -3,9 +3,10 @@ package com.directdev.portal.activity
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import com.directdev.portal.R
 import com.directdev.portal.network.BinusDataService
+import com.directdev.portal.utils.savePref
 import org.jetbrains.anko.*
-import retrofit2.Response
 import rx.SingleSubscriber
 
 class LoginActivity : AppCompatActivity() {
@@ -15,37 +16,34 @@ class LoginActivity : AppCompatActivity() {
         //For testing Purposes
         verticalLayout {
             padding = dip(30)
-            editText {
+            val username = editText {
                 hint = "Name"
                 textSize = 24f
             }
-            editText {
+            val password = editText {
                 hint = "Password"
                 textSize = 24f
             }
             button("Login") {
-                onClick { update() }
+                onClick { update(username.text.toString(), password.text.toString()) }
                 textSize = 26f
             }
         }
     }
 
-    fun update() {
+    fun update(username: String, password: String) {
         Log.d("Update", "Starts")
-        BinusDataService.login()
-                .subscribe(object : SingleSubscriber<Response<String>>() {
-                    override fun onSuccess(value: Response<String>) {
-                        Log.d("Update", value.headers().get("Set-Cookie"))
-//                        Log.d("Update", value.headers().get("Location"))
-                        Log.d("Update", value.headers().get("Content-Type"))
-
+        username.savePref(this, R.string.username)
+        password.savePref(this, R.string.password)
+        BinusDataService.initiateUpdate(this)
+                .subscribe(object : SingleSubscriber<Boolean>() {
+                    override fun onSuccess(value: Boolean) {
+                        Log.d("Update", value.toString())
                     }
 
                     override fun onError(error: Throwable?) {
-                        Log.d("Update", "asd")
-                        throw error as Throwable
+                        Log.d("Update", error.toString())
                     }
-
                 })
     }
 }

@@ -1,108 +1,110 @@
 package com.directdev.portal.network
 
+import android.content.Context
+import com.directdev.portal.R
 import com.directdev.portal.model.*
+import com.directdev.portal.utils.NullConverterFactory
+import com.directdev.portal.utils.readPref
+import com.directdev.portal.utils.savePref
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import io.realm.Realm
+import io.realm.RealmModel
+import io.realm.RealmObject
 import okhttp3.OkHttpClient
-import okhttp3.ResponseBody
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import retrofit2.Converter
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
-import rx.Observable
 import rx.Single
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
-import java.lang.reflect.Type
 import java.util.concurrent.TimeUnit
+import kotlin.reflect.KClass
 
 object BinusDataService {
     private var isActive = false
+    private val baseUrl = "https://newbinusmaya.binus.ac.id/services/ci/index.php/"
     private val api = Retrofit.Builder()
-            .client(OkHttpClient()
-                    .newBuilder()
+            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+            .addConverterFactory(NullConverterFactory())
+            .client(buildOkHttpClient())//TODO: (NOTE) Delete OkHttpClient if timeout takes too long
+            .addConverterFactory(MoshiConverterFactory.create())
+            .baseUrl(baseUrl)
+            .build()
+            .create(BinusApi::class.java)
+
+    fun initiateUpdate(ctx: Context): Single<Boolean> {
+        isActive = true
+        val cookie = ctx.readPref(R.string.cookie, "") as String
+        return login(ctx, cookie).flatMap {
+            it.headers().get("Set-Cookie").savePref(ctx, R.string.cookie)
+            updateAllData(cookie)
+        }
+    }
+
+    private fun login(ctx: Context, cookie: String) =
+            api.login(ctx.readPref(R.string.username, "") as String, ctx.readPref(R.string.password, "") as String)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+
+
+    private fun updateAllData(cookie: String) =
+            Single.zip(
+                    api.getFinances(cookie).subscribeOn(Schedulers.io()),
+                    api.getSchedules(cookie).subscribeOn(Schedulers.io()),
+                    api.getExam(ExamRequestBody("RS1", "1510"), cookie).subscribeOn(Schedulers.io()),
+                    api.getGrades("1520", cookie).subscribeOn(Schedulers.io()),
+                    {
+                        fData: List<FinanceModel>,
+                        sData: List<ScheduleModel>,
+                        eData: List<ExamModel>,
+                        gData: GradeModel ->
+                        val dData = mutableListOf<ActivityDate>()
+                        fData.forEach {
+                            dData.add(parseDate(it.postedDate))
+                            dData.add(parseDate(it.dueDate))
+                        }
+                        eData.forEach { dData.add(parseDate(it.date, "yyyy-MM-dd")) }
+                        sData.forEach { dData.add(parseDate(it.date)) }
+
+                        gData.credit.term = gData.term
+
+                        Realm.getDefaultInstance().executeTransaction {
+                            it.insertToDb(fData, FinanceModel::class)
+                            it.insertToDb(sData, ScheduleModel::class)
+                            it.insertToDb(eData, ExamModel::class)
+                            it.insertToDb(gData.gradings, GradingModel::class)
+                            it.insertToDb(gData.scores, ScoreModel::class)
+                            it.copyToRealmOrUpdate(gData.credit)
+                            it.insertToDb(dData, ActivityDate::class, true)
+                        }
+                        isActive = false
+                        true
+                    })
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+
+
+    private fun buildOkHttpClient() =
+            OkHttpClient().newBuilder()
                     .connectTimeout(30, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS)
                     .writeTimeout(30, TimeUnit.SECONDS)
                     .addNetworkInterceptor(StethoInterceptor())
-                    .build())
-            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-            .addConverterFactory(object : Converter.Factory() {
-                override fun responseBodyConverter(type: Type, annotations: Array<out Annotation>, retrofit: Retrofit) = Converter<ResponseBody, Any> {
-                    if (it.contentLength() != 0L) retrofit.nextResponseBodyConverter<Any>(this, type, annotations).convert(it) else null
-                }
-            })
-            .addConverterFactory(MoshiConverterFactory.create())
-            //TODO: (NOTE) Delete OkHttpClient if timeout takes too long
-            .baseUrl("https://newbinusmaya.binus.ac.id/services/ci/index.php/")
-            .build()
-            .create(BinusApi::class.java)
+                    .followRedirects(false)
+                    .build()
 
-    fun initiateUpdate(): Observable<Boolean?> {
-        isActive = true
-        return Observable.zip(
-                api.getFinances().subscribeOn(Schedulers.io()),
-                api.getSchedules().subscribeOn(Schedulers.io()),
-                api.getExam(ExamRequestBody("RS1", "1510")).subscribeOn(Schedulers.io()),
-                api.getGrades("1520").subscribeOn(Schedulers.io()),
-                {
-                    finances: List<FinanceModel>,
-                    schedules: List<ScheduleModel>,
-                    exams: List<ExamModel>,
-                    grade: GradeModel ->
-                    grade.credit.term = grade.term
-                    val dates = mutableListOf<ActivityDate>()
-                    finances.forEach {
-                        dates.add(parseDate(it.postedDate))
-                        dates.add(parseDate(it.dueDate))
-                    }
-                    exams.forEach { dates.add(parseDate(it.date, "yyyy-MM-dd")) }
-                    schedules.forEach { dates.add(parseDate(it.date)) }
-
-                    val realm = Realm.getDefaultInstance()
-                    realm.executeTransaction {
-                        it.delete(FinanceModel::class.java)
-                        it.copyToRealm(finances)
-
-                        it.delete(ScheduleModel::class.java)
-                        it.copyToRealm(schedules)
-
-                        it.delete(ExamModel::class.java)
-                        it.copyToRealm(exams)
-
-                        it.delete(GradingModel::class.java)
-                        it.copyToRealm(grade.gradings)
-
-                        it.delete(ScoreModel::class.java)
-                        it.copyToRealm(grade.scores)
-
-                        it.copyToRealmOrUpdate(grade.credit)
-
-                        it.delete(ActivityDate::class.java)
-                        it.copyToRealmOrUpdate(dates)
-                    }
-                    isActive = false
-                    true
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+    private fun parseDate(input: String, pattern: String = "yyyy-MM-dd HH:mm:ss.SSS"): ActivityDate {
+        val parsedInput = ActivityDate()
+        parsedInput.date = DateTime.parse(input, DateTimeFormat.forPattern(pattern)).toDate()
+        parsedInput.id = input
+        return parsedInput
     }
 
-    fun parseDate(string: String, pattern: String = "yyyy-MM-dd HH:mm:ss.SSS"): ActivityDate {
-        val item = ActivityDate()
-        item.date = DateTime.parse(string, DateTimeFormat
-                .forPattern(pattern))
-                .toDate()
-        item.id = string
-        return item
-    }
-
-    fun login(): Single<Response<String>> {
-        return api.login("chrisep8@binus.ac.id", "b!Nu$26041996", "Login")
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+    private fun Realm.insertToDb(finances: List<RealmObject>, type: KClass<out RealmModel>, copyOrUpdate: Boolean = false) {
+        this.delete(type.java)
+        if (copyOrUpdate) this.copyToRealmOrUpdate(finances)
+        else this.copyToRealm(finances)
     }
 }

@@ -4,38 +4,34 @@ import com.directdev.portal.model.*
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
-import rx.Observable
 import rx.Single
 
 interface BinusApi {
     @FormUrlEncoded
-    @Headers("Referer: https://newbinusmaya.binus.ac.id/login/",
-            "Origin: https://newbinusmaya.binus.ac.id")
+    @Headers("Referer: https://newbinusmaya.binus.ac.id/login/", "Origin: https://newbinusmaya.binus.ac.id")
     @POST("https://newbinusmaya.binus.ac.id/login/sys_login.php")
-    fun login(@Field("uid") uid: String, @Field("pass") pass: String, @Field("ctl00\$ContentPlaceHolder1\$SubmitButtonBM") button: String): Single<Response<String>>
+    fun login(@Field("uid") uid: String,
+              @Field("pass") pass: String,
+              @Field("ctl00\$ContentPlaceHolder1\$SubmitButtonBM") button: String = "Login")
+            : Single<Response<String>>
 
-    @Headers("Referer: https://newbinusmaya.binus.ac.id/newStudent/",
-            "Cookie: PHPSESSID=53epm48lsc141ag4cn2iavune0")
+    @Headers("Referer: https://newbinusmaya.binus.ac.id/newStudent/")
     @GET("student/profile/profileStudent")
-    fun getProfile(): Observable<ResponseBody>
+    fun getProfile(@Header("Cookie") cookie: String): Single<ResponseBody>
 
-    @Headers("Referer: https://newbinusmaya.binus.ac.id/newStudent/",
-            "Cookie: PHPSESSID=53epm48lsc141ag4cn2iavune0")
+    @Headers("Referer: https://newbinusmaya.binus.ac.id/newStudent/")
     @GET("financial/getFinancialSummary")
-    fun getFinances(): Observable<List<FinanceModel>>
+    fun getFinances(@Header("Cookie") cookie: String): Single<List<FinanceModel>>
 
-    @Headers("Referer: https://newbinusmaya.binus.ac.id/newStudent/index.html",
-            "Cookie: PHPSESSID=53epm48lsc141ag4cn2iavune0")
+    @Headers("Referer: https://newbinusmaya.binus.ac.id/newStudent/index.html")
     @GET("student/class_schedule/classScheduleGetStudentClassSchedule")
-    fun getSchedules(): Observable<List<ScheduleModel>>
+    fun getSchedules(@Header("Cookie") cookie: String): Single<List<ScheduleModel>>
 
-    @Headers("Referer: https://newbinusmaya.binus.ac.id/newstudent/",
-            "Cookie: PHPSESSID=53epm48lsc141ag4cn2iavune0")
+    @Headers("Referer: https://newbinusmaya.binus.ac.id/newstudent/")
     @POST("newExam/Schedule/getOwnScheduleStudent")
-    fun getExam(@Body data: ExamRequestBody): Observable<List<ExamModel>>
+    fun getExam(@Body data: ExamRequestBody, @Header("Cookie") cookie: String): Single<List<ExamModel>>
 
-    @Headers("Referer: https://newbinusmaya.binus.ac.id/newstudent/",
-            "Cookie: PHPSESSID=53epm48lsc141ag4cn2iavune0")
+    @Headers("Referer: https://newbinusmaya.binus.ac.id/newstudent/")
     @POST("scoring/ViewGrade/getStudentScore/{term}")
-    fun getGrades(@Path("term") term: String): Observable<GradeModel>
+    fun getGrades(@Path("term") term: String, @Header("Cookie") cookie: String): Single<GradeModel>
 }

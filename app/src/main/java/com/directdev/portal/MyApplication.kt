@@ -1,4 +1,4 @@
-package com.directdev.portal.utils
+package com.directdev.portal
 
 import android.app.Application
 import com.facebook.stetho.Stetho
