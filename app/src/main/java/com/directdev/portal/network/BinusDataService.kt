@@ -97,16 +97,14 @@ object BinusDataService {
                     .followRedirects(false)
                     .build()
 
-    private fun parseDate(input: String, pattern: String = "yyyy-MM-dd HH:mm:ss.SSS"): ActivityDate {
-        val parsedInput = ActivityDate()
-        parsedInput.date = DateTime.parse(input, DateTimeFormat.forPattern(pattern)).toDate()
-        parsedInput.id = input
-        return parsedInput
-    }
+    private fun parseDate(input: String, pattern: String = "yyyy-MM-dd HH:mm:ss.SSS") =
+            ActivityDate(DateTime.parse(input, DateTimeFormat.forPattern(pattern)).toDate(), input)
 
-    private fun Realm.insertToDb(finances: List<RealmObject>, type: KClass<out RealmModel>, copyOrUpdate: Boolean = false) {
+    private fun Realm.insertToDb(data: List<RealmObject>, type: KClass<out RealmModel>, UpdateOnly: Boolean = false) {
         this.delete(type.java)
-        if (copyOrUpdate) this.copyToRealmOrUpdate(finances)
-        else this.copyToRealm(finances)
+        if (UpdateOnly)
+            this.copyToRealmOrUpdate(data)
+        else
+            this.copyToRealm(data)
     }
 }

@@ -17,8 +17,8 @@ class SplashActivity : AppCompatActivity() {
         Fabric.with(this, Answers())
         Fabric.with(this, Crashlytics())
 
-        if (this.readPref(R.string.username, "") == "")
-            startActivity(intentFor<LoginActivity>().singleTop())
-        else startActivity(intentFor<MainActivity>().singleTop())
+        if (this.readPref(R.string.isLoggedIn, false) as Boolean)
+            startActivity(intentFor<MainActivity>().singleTop())
+        else startActivity(intentFor<LoginActivity>().singleTop())
     }
 }

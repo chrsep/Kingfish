@@ -3,8 +3,6 @@ package com.directdev.portal
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.directdev.portal.activity.SplashActivity
-import com.directdev.portal.model.ExamModel
-import com.directdev.portal.model.ExamRequestBody
 import com.directdev.portal.network.BinusApi
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import okhttp3.OkHttpClient
@@ -14,7 +12,6 @@ import org.junit.runner.RunWith
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
-import rx.observers.TestSubscriber
 import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
@@ -39,8 +36,6 @@ class NetworkCallTest {
 
     @Test
     fun serviceTest() {
-        val subscriber = TestSubscriber<List<ExamModel>>()
-        api.getExam(ExamRequestBody("RS1", "1520")).subscribe(subscriber)
-        subscriber.awaitTerminalEvent()
+
     }
 }

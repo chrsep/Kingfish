@@ -5,4 +5,5 @@
     <string name="username">acc_username</string>
     <string name="password">acc_password</string>
     <string name="cookie">cookie</string>
+    <string name="isLoggedIn">isLoggedIn</string>
 </resources>
