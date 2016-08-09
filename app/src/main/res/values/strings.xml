@@ -1,9 +1,14 @@
 <resources>
     <string name="app_name">Portal</string>
 
-    //Variables
+    //Shared Preference Variables
     <string name="username">acc_username</string>
     <string name="password">acc_password</string>
     <string name="cookie">cookie</string>
     <string name="isLoggedIn">isLoggedIn</string>
+    <string name="major">major</string>
+    <string name="degree">degree</string>
+    <string name="birthday">birthday</string>
+    <string name="name">name</string>
+    <string name="nim">nim</string>
 </resources>

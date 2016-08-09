@@ -19,10 +19,12 @@ class LoginActivity : AppCompatActivity() {
             val username = editText {
                 hint = "Name"
                 textSize = 24f
+                setText("chrisep8@binus.ac.id")
             }
             val password = editText {
                 hint = "Password"
                 textSize = 24f
+                setText("b!Nu$26041996")
             }
             button("Login") {
                 onClick { update(username.text.toString(), password.text.toString()) }
@@ -35,14 +37,19 @@ class LoginActivity : AppCompatActivity() {
         Log.d("Update", "Starts")
         username.savePref(this, R.string.username)
         password.savePref(this, R.string.password)
-        BinusDataService.initiateUpdate(this)
+        BinusDataService.firstLoginSetup(this)
                 .subscribe(object : SingleSubscriber<Boolean>() {
                     override fun onSuccess(value: Boolean) {
-                        Log.d("Update", value.toString())
+                        Log.d("Update", "Success")
+                        value.savePref(this@LoginActivity, R.string.isLoggedIn)
+//                        startActivity(intentFor<MainActivity>().singleTop())
                     }
 
                     override fun onError(error: Throwable?) {
                         Log.d("Update", error.toString())
+                        throw(error as Throwable)
+                        toast("Login Failed")
+                        false.savePref(this@LoginActivity, R.string.isLoggedIn)
                     }
                 })
     }
