@@ -1,7 +1,7 @@
 # Kingfish
 [![Build Status](https://travis-ci.org/chrisep8/Kingfish.svg?branch=0.3-dev)](https://travis-ci.org/chrisep8/Kingfish)
 
-This code currently uses the listed libraries and language below extensively. Basic knowledge on the function and design of the libraries and language listed below will probably be required to understand this codebase.
+This code currently uses the libraries and language listed below extensively. Basic knowledge on the functionality and design of these libraries and language will be required to understand this codebase.
 
 ####[Kotlin (Programming language)](https://kotlinlang.org/)
 A relatively new Programming language developed by jetbrains, the team behind Intellij and Android Studio. To learn or try kotlin, you can use the the [Kotlin Koans](http://try.kotlinlang.org/)

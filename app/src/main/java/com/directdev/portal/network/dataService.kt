@@ -6,7 +6,7 @@ import retrofit2.Response
 import retrofit2.http.*
 import rx.Single
 
-interface BinusApi {
+interface DataService {
     @FormUrlEncoded
     @Headers("Referer: https://newbinusmaya.binus.ac.id/login/", "Origin: https://newbinusmaya.binus.ac.id")
     @POST("https://newbinusmaya.binus.ac.id/login/sys_login.php")

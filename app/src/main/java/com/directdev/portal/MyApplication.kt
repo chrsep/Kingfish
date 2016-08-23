@@ -11,7 +11,7 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         JodaTimeAndroid.init(this)
-        val realmConfiguration = RealmConfiguration.Builder(this).build()
+        val realmConfiguration = RealmConfiguration.Builder(this).deleteRealmIfMigrationNeeded().build()
         Realm.setDefaultConfiguration(realmConfiguration)
 
         Stetho.initialize(

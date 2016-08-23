@@ -2,6 +2,8 @@ package com.directdev.portal.utils
 
 import android.content.Context
 import android.support.annotation.StringRes
+import android.support.design.widget.Snackbar
+import android.view.View
 
 fun Any.savePref(ctx: Context, @StringRes id: Int) {
     val key = ctx.getString(id)
@@ -28,5 +30,16 @@ fun Context.readPref(@StringRes id: Int, defaultValue: Any): Any {
         is Long -> sp.getLong(key, defaultValue)
         else -> 0
     }
+}
+
+fun View.snack(msg: String, length: Int = Snackbar.LENGTH_SHORT, option: Snackbar.() -> Unit = {}) {
+    val snack = Snackbar.make(this, msg, length)
+    snack.option()
+    snack.show()
+}
+
+fun Snackbar.action(action: String, color: Int? = null, listener: (View) -> Unit) {
+    setAction(action, listener)
+    color?.let { setActionTextColor(color) }
 }
 

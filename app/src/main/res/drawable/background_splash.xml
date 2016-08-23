@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="match_parent"  android:layout_width="match_parent">
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <item
-        android:drawable="@color/colorSecondary"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:drawable="@color/colorSecondary" />
 
-    <item android:layout_width="wrap_content"
+    <item
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content">
         <bitmap
-            android:gravity="center"
-            android:src="@drawable/portal_splash"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:src="@drawable/portal_splash" />
     </item>
 
 </layer-list>

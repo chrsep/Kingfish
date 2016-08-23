@@ -11,6 +11,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activity.SplashActivity"
+            android:noHistory="true"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,8 +24,12 @@
             android:name="io.fabric.ApiKey"
             android:value="e2f91483c94217ff3e141cda751f285d0415b76f" />
 
-        <activity android:name=".activity.LoginActivity" />
-        <activity android:name=".activity.MainActivity"></activity>
+        <activity
+            android:name=".activity.SigninActivity"
+            android:launchMode="singleTop" />
+        <activity
+            android:name=".activity.MainActivity"
+            android:launchMode="singleTop" />
     </application>
 
 </manifest>
