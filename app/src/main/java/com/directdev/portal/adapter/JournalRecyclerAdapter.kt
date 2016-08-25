@@ -27,10 +27,9 @@ class JournalRecyclerAdapter(val realm: Realm, context: Context, data: OrderedRe
                 .equalTo("date", data?.get(position)?.id)
                 .findAll()
 
-        if (holder != null) {
-            holder.bindData(getItem(position) as ActivityDateModel)
-            holder.listSchedules(context, schedules)
-        }
+        holder?.bindData(getItem(position) as ActivityDateModel)
+        holder?.listSchedules(context, schedules)
+
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {

@@ -12,7 +12,7 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/tabanim_toolbar"
+            android:id="@+id/journalToolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimary"
@@ -24,9 +24,7 @@
         android:id="@+id/recyclerContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-    </android.support.v7.widget.RecyclerView>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -36,5 +34,5 @@
         android:layout_margin="16dp"
         android:src="@drawable/ic_add"
         android:tint="@color/colorPrimary"
-        app:fabSize="normal"></android.support.design.widget.FloatingActionButton>
+        app:fabSize="normal" />
 </android.support.design.widget.CoordinatorLayout>
