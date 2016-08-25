@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/bb_darkBackgroundColor"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:longClickable="true"
+    android:orientation="horizontal"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/journalCourse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxWidth="350dp"
+        android:textColor="@color/colorPrimary" />
+
+    <TextView
+        android:id="@+id/journalMode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/journalCourse"
+        android:textColor="@color/colorPrimary" />
+
+    <TextView
+        android:id="@+id/journalRoom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/journalCourse"
+        android:layout_toEndOf="@+id/journalMode"
+        android:layout_toRightOf="@+id/journalMode"
+        android:alpha="0.8"
+        android:paddingLeft="16dp"
+        android:textColor="@color/colorPrimary" />
+
+    <TextView
+        android:id="@+id/journalShift"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:textColor="@color/colorPrimary" />
+
+</RelativeLayout>

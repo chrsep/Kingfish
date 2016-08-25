@@ -116,7 +116,7 @@ object DataApi {
                             it.insertToDb(fData, FinanceModel::class)
                             it.insertToDb(sData, ScheduleModel::class)
                             it.insertToDb(eData, ExamModel::class)
-                            it.insertToDb(dData, ActivityDate::class, true)
+                            it.insertToDb(dData, ActivityDateModel::class, true)
                         }
                         realm.close()
                         isActive = false
@@ -127,11 +127,11 @@ object DataApi {
 
 
     private fun parseDate(input: String, pattern: String = "yyyy-MM-dd HH:mm:ss.SSS") =
-            ActivityDate(DateTime.parse(input, DateTimeFormat.forPattern(pattern)).toDate(), input)
+            ActivityDateModel(DateTime.parse(input, DateTimeFormat.forPattern(pattern)).toDate(), input)
 
 
-    private fun getDates(eData: List<ExamModel>, fData: List<FinanceModel>, sData: List<ScheduleModel>): MutableList<ActivityDate> {
-        val data = mutableListOf<ActivityDate>()
+    private fun getDates(eData: List<ExamModel>, fData: List<FinanceModel>, sData: List<ScheduleModel>): MutableList<ActivityDateModel> {
+        val data = mutableListOf<ActivityDateModel>()
         fData.forEach {
             data.add(parseDate(it.postedDate))
             data.add(parseDate(it.dueDate))

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tabs>
+    <tab
+        icon="@drawable/ic_journal"
+        id="@+id/tab_journal"
+        title="Journal" />
+    <tab
+        icon="@drawable/ic_resources"
+        id="@+id/tab_resources"
+        title="Resources" />
+    <tab
+        icon="@drawable/ic_grades"
+        id="@+id/tab_grades"
+        title="Grades" />
+    <tab
+        icon="@drawable/ic_finances"
+        id="@+id/tab_finances"
+        title="Finances" />
+    <tab
+        icon="@drawable/ic_info"
+        id="@+id/tab_info"
+        title="Info" />
+</tabs>
