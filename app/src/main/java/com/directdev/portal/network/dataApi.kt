@@ -114,7 +114,7 @@ object DataApi {
                         realm.executeTransaction {
                             saveGradeToDb(it, gData)
                             it.insertToDb(fData, FinanceModel::class)
-                            it.insertToDb(sData, ScheduleModel::class)
+                            it.insertToDb(sData, SessionModel::class)
                             it.insertToDb(eData, ExamModel::class)
                             it.insertToDb(dData, ActivityDateModel::class, true)
                         }
@@ -130,7 +130,7 @@ object DataApi {
             ActivityDateModel(DateTime.parse(input, DateTimeFormat.forPattern(pattern)).toDate(), input)
 
 
-    private fun getDates(eData: List<ExamModel>, fData: List<FinanceModel>, sData: List<ScheduleModel>): MutableList<ActivityDateModel> {
+    private fun getDates(eData: List<ExamModel>, fData: List<FinanceModel>, sData: List<SessionModel>): MutableList<ActivityDateModel> {
         val data = mutableListOf<ActivityDateModel>()
         fData.forEach {
             data.add(parseDate(it.postedDate))

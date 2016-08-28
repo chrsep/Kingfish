@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.directdev.portal.R
 import com.directdev.portal.model.ActivityDateModel
-import com.directdev.portal.model.ScheduleModel
+import com.directdev.portal.model.SessionModel
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
@@ -23,7 +23,7 @@ class JournalRecyclerAdapter(val realm: Realm, context: Context, data: OrderedRe
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         val schedules = realm
-                .where(ScheduleModel::class.java)
+                .where(SessionModel::class.java)
                 .equalTo("date", data?.get(position)?.id)
                 .findAll()
 
@@ -38,7 +38,7 @@ class JournalRecyclerAdapter(val realm: Realm, context: Context, data: OrderedRe
             itemView.txtDay.text = DateTime(item.date).dayOfWeek().getAsText(Locale.US)
         }
 
-        fun listSchedules(ctx: Context, item: RealmResults<ScheduleModel>) {
+        fun listSchedules(ctx: Context, item: RealmResults<SessionModel>) {
             itemView.recyclerSchedule.layoutManager = LinearLayoutManager(ctx)
             itemView.recyclerSchedule.adapter = ScheduleRecycleradapter(ctx, item, true)
         }

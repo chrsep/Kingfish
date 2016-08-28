@@ -3,7 +3,7 @@ package com.directdev.portal.model
 import com.squareup.moshi.Json
 import io.realm.RealmObject
 
-open class ScheduleModel(
+open class SessionModel(
         @Json(name = "CLASS_SECTION")
         open var classId: String = "N/A", //"LB02"
 

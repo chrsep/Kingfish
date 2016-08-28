@@ -124,6 +124,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     android:background="@color/colorAccent"
+                    android:backgroundTint="@color/colorAccent"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?android:attr/selectableItemBackground"
