@@ -1,6 +1,7 @@
 package com.directdev.portal.network
 
 import android.content.Context
+import android.util.Log
 import com.directdev.portal.R
 import com.directdev.portal.model.*
 import com.directdev.portal.utils.NullConverterFactory
@@ -11,8 +12,6 @@ import io.realm.Realm
 import io.realm.RealmModel
 import io.realm.RealmObject
 import okhttp3.OkHttpClient
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
 import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
@@ -26,7 +25,6 @@ import kotlin.reflect.KClass
 object DataApi {
     var isActive = false
     private val baseUrl = "https://newbinusmaya.binus.ac.id/services/ci/index.php/"
-
     private val api = Retrofit.Builder()
             .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
             .addConverterFactory(NullConverterFactory())
@@ -38,7 +36,7 @@ object DataApi {
             .create(DataService::class.java)
 
 
-    fun fetchData(ctx: Context, firstTime: Boolean = false): Single<Boolean> {
+    fun fetchData(ctx: Context, firstTime: Boolean = false): Single<Unit> {
         isActive = true
         val cookie = ctx.readPref(R.string.cookie, "") as String
         if (firstTime) return signIn(ctx, cookie).flatMap {
@@ -54,7 +52,7 @@ object DataApi {
 
 
     private fun signIn(ctx: Context, cookie: String = "") =
-            api.login(
+            api.signIn(
                     ctx.readPref(R.string.username, "") as String,
                     ctx.readPref(R.string.password, "") as String,
                     cookie)
@@ -62,12 +60,12 @@ object DataApi {
                     .observeOn(AndroidSchedulers.mainThread())
 
 
-    private fun fetchAll(ctx: Context, cookie: String): Single<Boolean> {
+    private fun fetchAll(ctx: Context, cookie: String): Single<Unit> {
         return api.getTerms(cookie)
                 .flatMap {
                     termResponses ->
                     Single.zip(
-                            callGradesForEveryTerm(cookie, termResponses),
+                            fetchEveryGradeInTerm(cookie, termResponses),
                             {
                                 gradeResponses ->
                                 val realm = Realm.getDefaultInstance()
@@ -80,7 +78,6 @@ object DataApi {
                             .zipWith(fetchRecent(cookie, termResponses[0].value), {
                                 a, response ->
                                 isActive = false
-                                true
                             })
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
@@ -90,15 +87,18 @@ object DataApi {
                     val profile = JSONObject(response.string())
                             .getJSONArray("Profile")
                             .getJSONObject(0)
-                    profile.getString("ACAD_PROG_DESCR").savePref(ctx, R.string.major)
-                    profile.getString("ACAD_CAREER_DESCR").savePref(ctx, R.string.degree)
-                    profile.getString("BIRTHDATE").savePref(ctx, R.string.birthday)
-                    profile.getString("NAMA").savePref(ctx, R.string.name)
-                    profile.getString("NIM").savePref(ctx, R.string.nim)
+                    saveProfile(ctx, profile)
                     isActive = false
-                    true
                 })
                 .subscribeOn(Schedulers.io())
+    }
+
+    private fun saveProfile(ctx: Context, profile: JSONObject) {
+        profile.getString("ACAD_PROG_DESCR").savePref(ctx, R.string.major)
+        profile.getString("ACAD_CAREER_DESCR").savePref(ctx, R.string.degree)
+        profile.getString("BIRTHDATE").savePref(ctx, R.string.birthday)
+        profile.getString("NAMA").savePref(ctx, R.string.name)
+        profile.getString("NIM").savePref(ctx, R.string.nim)
     }
 
 
@@ -108,40 +108,38 @@ object DataApi {
                     api.getSchedules(cookie).subscribeOn(Schedulers.io()),
                     api.getExam(ExamRequestBody("RS1", term.toString()), cookie).subscribeOn(Schedulers.io()),
                     api.getGrades(term.toString(), cookie).subscribeOn(Schedulers.io()),
-                    { fData, sData, eData, gData ->
-                        val dData = getDates(eData, fData, sData)
+                    { finance, session, exam, grade ->
+                        Log.d("Update", "Start")
                         val realm = Realm.getDefaultInstance()
                         realm.executeTransaction {
-                            saveGradeToDb(it, gData)
-                            it.insertToDb(fData, FinanceModel::class)
-                            it.insertToDb(sData, SessionModel::class)
-                            it.insertToDb(eData, ExamModel::class)
-                            it.insertToDb(dData, ActivityDateModel::class, true)
+                            saveGradeToDb(it, grade)
+                            it.delete(JournalModel::class.java)
+                            it.delete(ExamModel::class.java)
+                            it.delete(FinanceModel::class.java)
+                            it.delete(SessionModel::class.java)
+                            it.copyToRealmOrUpdate(mapToJournal(exam, finance, session))
                         }
                         realm.close()
+                        Log.d("Update", "End")
                         isActive = false
-                        true
                     })
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
 
-
-    private fun parseDate(input: String, pattern: String = "yyyy-MM-dd HH:mm:ss.SSS") =
-            ActivityDateModel(DateTime.parse(input, DateTimeFormat.forPattern(pattern)).toDate(), input)
-
-
-    private fun getDates(eData: List<ExamModel>, fData: List<FinanceModel>, sData: List<SessionModel>): MutableList<ActivityDateModel> {
-        val data = mutableListOf<ActivityDateModel>()
-        fData.forEach {
-            data.add(parseDate(it.postedDate))
-            data.add(parseDate(it.dueDate))
+    private fun mapToJournal(exam: List<ExamModel>, finance: List<FinanceModel>, session: List<SessionModel>): MutableList<JournalModel> {
+        val item = mutableListOf<JournalModel>()
+        finance.forEach { item.add(JournalModel(it.dueDate).setDate()) }
+        exam.forEach { item.add(JournalModel(it.date).setDate("yyyy-MM-dd")) }
+        session.forEach { item.add(JournalModel(it.date).setDate()) }
+        item.forEach { date ->
+            session.map { if (it.date == date.id) date.session.add(it) }
+            finance.map { if (it.dueDate == date.id) date.finance.add(it) }
+            exam.map { if (it.date == date.id) date.exam.add(it) }
         }
-        eData.forEach { data.add(parseDate(it.date, "yyyy-MM-dd")) }
-        sData.forEach { data.add(parseDate(it.date)) }
-        return data
+        return item
     }
 
-    private fun callGradesForEveryTerm(cookie: String, terms: List<TermModel>) = terms.map {
+    private fun fetchEveryGradeInTerm(cookie: String, terms: List<TermModel>) = terms.map {
         api.getGrades(it.value.toString(), cookie).subscribeOn(Schedulers.io())
     }
 
@@ -153,10 +151,9 @@ object DataApi {
     }
 
 
-    private fun Realm.insertToDb(data: List<RealmObject>, type: KClass<out RealmModel>, Update: Boolean = false) {
+    private fun Realm.insertToDb(data: List<RealmObject>, type: KClass<out RealmModel>) {
         this.delete(type.java)
-        if (Update) this.copyToRealmOrUpdate(data)
-        else this.copyToRealm(data)
+        this.copyToRealm(data)
     }
 
 

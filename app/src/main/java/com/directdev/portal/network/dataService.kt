@@ -10,10 +10,10 @@ interface DataService {
     @FormUrlEncoded
     @Headers("Referer: https://newbinusmaya.binus.ac.id/login/", "Origin: https://newbinusmaya.binus.ac.id")
     @POST("https://newbinusmaya.binus.ac.id/login/sys_login.php")
-    fun login(@Field("uid") uid: String,
-              @Field("pass") pass: String,
-              @Header("Cookie") cookie: String,
-              @Field("ctl00\$ContentPlaceHolder1\$SubmitButtonBM") button: String = "Login")
+    fun signIn(@Field("uid") uid: String,
+               @Field("pass") pass: String,
+               @Header("Cookie") cookie: String,
+               @Field("ctl00\$ContentPlaceHolder1\$SubmitButtonBM") button: String = "Login")
             : Single<Response<String>>
 
     @Headers("Referer: https://newbinusmaya.binus.ac.id/newStudent/")

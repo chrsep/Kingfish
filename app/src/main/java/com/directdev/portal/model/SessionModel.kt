@@ -4,6 +4,7 @@ import com.squareup.moshi.Json
 import io.realm.RealmObject
 
 open class SessionModel(
+
         @Json(name = "CLASS_SECTION")
         open var classId: String = "N/A", //"LB02"
 
@@ -44,5 +45,6 @@ open class SessionModel(
         open var typeName: String = "N/A", //""COMP6060""
 
         @Json(name = "SessionIDNum")
-        open var sessionCount: String = "N/A"       //""COMP6060""
+        open var sessionCount: String = "N/A" //""COMP6060""
+
 ) : RealmObject()

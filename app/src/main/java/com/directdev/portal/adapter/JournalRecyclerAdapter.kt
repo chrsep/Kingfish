@@ -6,41 +6,30 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import com.directdev.portal.R
-import com.directdev.portal.model.ActivityDateModel
-import com.directdev.portal.model.SessionModel
+import com.directdev.portal.model.JournalModel
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
-import io.realm.RealmResults
 import kotlinx.android.synthetic.main.recycler_journal.view.*
 import org.joda.time.DateTime
 import java.util.*
 
-class JournalRecyclerAdapter(val realm: Realm, context: Context, data: OrderedRealmCollection<ActivityDateModel>?, autoUpdate: Boolean) : RealmRecyclerViewAdapter<ActivityDateModel, JournalRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
+class JournalRecyclerAdapter(val realm: Realm, context: Context, data: OrderedRealmCollection<JournalModel>?, autoUpdate: Boolean) : RealmRecyclerViewAdapter<JournalModel, JournalRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
         return ViewHolder(inflater.inflate(R.layout.recycler_journal, parent, false))
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        val schedules = realm
-                .where(SessionModel::class.java)
-                .equalTo("date", data?.get(position)?.id)
-                .findAll()
-
-        holder?.bindData(getItem(position) as ActivityDateModel)
-        holder?.listSchedules(context, schedules)
-
+        holder?.bindData(context, getItem(position) as JournalModel)
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        fun bindData(item: ActivityDateModel) {
+        fun bindData(ctx: Context, item: JournalModel) {
             itemView.txtDate.text = item.id.substring(0, 10)
             itemView.txtDay.text = DateTime(item.date).dayOfWeek().getAsText(Locale.US)
-        }
 
-        fun listSchedules(ctx: Context, item: RealmResults<SessionModel>) {
             itemView.recyclerSchedule.layoutManager = LinearLayoutManager(ctx)
-            itemView.recyclerSchedule.adapter = ScheduleRecycleradapter(ctx, item, true)
+            itemView.recyclerSchedule.adapter = ScheduleRecycleradapter(ctx, item.session, true)
         }
     }
 }

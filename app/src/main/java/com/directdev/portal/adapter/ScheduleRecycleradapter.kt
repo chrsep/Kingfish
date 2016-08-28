@@ -29,6 +29,7 @@ class ScheduleRecycleradapter(context: Context, data: OrderedRealmCollection<Ses
             itemView.journalShift.text = session.startTime
             if (session.deliveryMode == "GSLC") {
                 itemView.journalMode.text = "GSLC"
+                itemView.journalShift.visibility = View.GONE
                 color = "#f44336"
             } else {
                 itemView.journalMode.text = session.typeId

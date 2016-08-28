@@ -38,8 +38,8 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
         formEmail.text.toString().savePref(this, R.string.username)
         formPass.text.toString().savePref(this, R.string.password)
         DataApi.fetchData(this, true)
-                .subscribe(object : SingleSubscriber<Boolean>() {
-                    override fun onSuccess(value: Boolean) {
+                .subscribe(object : SingleSubscriber<Unit>() {
+                    override fun onSuccess(value: Unit) {
                         value.savePref(this@SigninActivity, R.string.isLoggedIn)
                         startActivity<MainActivity>()
                         textSwitch.showNext()

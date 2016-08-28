@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.directdev.portal.R
 import com.directdev.portal.adapter.JournalRecyclerAdapter
-import com.directdev.portal.model.ActivityDateModel
+import com.directdev.portal.model.JournalModel
 import com.directdev.portal.network.DataApi
 import com.directdev.portal.utils.snack
 import io.realm.Realm
@@ -26,12 +26,12 @@ class JournalFragment : Fragment() {
 
     override fun onStart() {
         fab.onClick {
-            DataApi.fetchData(ctx).subscribe(object : SingleSubscriber<Boolean>() {
+            DataApi.fetchData(ctx).subscribe(object : SingleSubscriber<Unit>() {
                 override fun onError(error: Throwable?) {
-
+                    throw error as Throwable
                 }
 
-                override fun onSuccess(value: Boolean?) {
+                override fun onSuccess(value: Unit?) {
                     view.snack("SUCCESS")
                 }
 
@@ -41,7 +41,7 @@ class JournalFragment : Fragment() {
         journalToolbar.setTitleTextColor(ContextCompat.getColor(ctx, R.color.colorSecondaryDark))
         journalToolbar.title = "Today - Holyday"
         val realm = Realm.getDefaultInstance()
-        val data = realm.where(ActivityDateModel::class.java)
+        val data = realm.where(JournalModel::class.java)
                 .findAllSortedAsync("date")
         recyclerContent.layoutManager = LinearLayoutManager(ctx)
         recyclerContent.adapter = JournalRecyclerAdapter(realm, ctx, data, true)
