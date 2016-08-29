@@ -3,6 +3,7 @@ package com.directdev.portal.activity
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.directdev.portal.R
+import com.directdev.portal.fragment.GradesFragment
 import com.directdev.portal.fragment.JournalFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -17,8 +18,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.tab_journal -> {
                     transaction.replace(R.id.fragmentContainer, JournalFragment()).commit()
                 }
-                R.id.tab_info -> {
-
+                R.id.tab_grades -> {
+                    transaction.replace(R.id.fragmentContainer, GradesFragment()).commit()
                 }
             }
         }

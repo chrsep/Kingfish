@@ -26,7 +26,7 @@ class JournalFragment : Fragment() {
 
     override fun onStart() {
         fab.onClick {
-            DataApi.fetchData(ctx).subscribe(object : SingleSubscriber<Unit>() {
+            DataApi.fetchData(ctx, true).subscribe(object : SingleSubscriber<Unit>() {
                 override fun onError(error: Throwable?) {
                     throw error as Throwable
                 }

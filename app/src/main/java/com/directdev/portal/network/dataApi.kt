@@ -146,6 +146,7 @@ object DataApi {
     }
 
     private fun Realm.cleanInsert(data: List<RealmObject>) {
+        if (data.size == 0) return
         delete(data[0].javaClass)
         copyToRealm(data)
     }
