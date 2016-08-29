@@ -26,11 +26,11 @@ interface DataService {
 
     @Headers("Referer: https://newbinusmaya.binus.ac.id/newStudent/index.html")
     @GET("student/class_schedule/classScheduleGetStudentClassSchedule")
-    fun getSchedules(@Header("Cookie") cookie: String): Single<List<SessionModel>>
+    fun getSessions(@Header("Cookie") cookie: String): Single<List<SessionModel>>
 
     @Headers("Referer: https://newbinusmaya.binus.ac.id/newstudent/")
     @POST("newExam/Schedule/getOwnScheduleStudent")
-    fun getExam(@Body data: ExamRequestBody, @Header("Cookie") cookie: String): Single<List<ExamModel>>
+    fun getExams(@Body data: ExamRequestBody, @Header("Cookie") cookie: String): Single<List<ExamModel>>
 
     @Headers("Referer: https://newbinusmaya.binus.ac.id/newstudent/")
     @POST("scoring/ViewGrade/getStudentScore/{term}")
