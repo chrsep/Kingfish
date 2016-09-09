@@ -6,4 +6,7 @@
     <color name="colorSecondaryDark">#212121</color>
     <color name="colorAccent">#00BFA5</color>
     <color name="colorAccentDark">#009688</color>
+
+    <color name="colorJournalDate">#EEEEEE</color>
+    <color name="colorJournalBackground">#FAFAFA</color>
 </resources>

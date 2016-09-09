@@ -16,7 +16,7 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_journal.*
 import org.jetbrains.anko.ctx
 import org.jetbrains.anko.onClick
-import rx.SingleSubscriber
+import java.util.*
 
 class JournalFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -25,26 +25,23 @@ class JournalFragment : Fragment() {
     }
 
     override fun onStart() {
+        super.onStart()
         fab.onClick {
-            DataApi.fetchData(ctx, true).subscribe(object : SingleSubscriber<Unit>() {
-                override fun onError(error: Throwable?) {
-                    throw error as Throwable
-                }
-
-                override fun onSuccess(value: Unit?) {
-                    view.snack("SUCCESS")
-                }
-
+            DataApi.fetchData(ctx).subscribe({
+                view.snack("Success")
+            }, {
+                view.snack("Failed")
             })
-            view.snack("FAILED")
         }
-        journalToolbar.setTitleTextColor(ContextCompat.getColor(ctx, R.color.colorSecondaryDark))
-        journalToolbar.title = "Today - Holyday"
+
+        journalToolbar.title = "Today - Holiday"
+        journalToolbar.inflateMenu(R.menu.menu_journal)
+
         val realm = Realm.getDefaultInstance()
         val data = realm.where(JournalModel::class.java)
+                .greaterThan("date", Date())
                 .findAllSortedAsync("date")
         recyclerContent.layoutManager = LinearLayoutManager(ctx)
         recyclerContent.adapter = JournalRecyclerAdapter(realm, ctx, data, true)
-        super.onStart()
     }
 }

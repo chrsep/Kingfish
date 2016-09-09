@@ -9,6 +9,10 @@
         id="@+id/tab_resources"
         title="Resources" />
     <tab
+        icon="@drawable/ic_assignment"
+        id="@+id/tab_assignments"
+        title="Assignments" />
+    <tab
         icon="@drawable/ic_grades"
         id="@+id/tab_grades"
         title="Grades" />
@@ -16,8 +20,4 @@
         icon="@drawable/ic_finances"
         id="@+id/tab_finances"
         title="Finances" />
-    <tab
-        icon="@drawable/ic_info"
-        id="@+id/tab_info"
-        title="Info" />
 </tabs>

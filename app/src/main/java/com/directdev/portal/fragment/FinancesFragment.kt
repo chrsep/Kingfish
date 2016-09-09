@@ -2,22 +2,22 @@ package com.directdev.portal.fragment
 
 import android.app.Fragment
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ArrayAdapter
 import com.directdev.portal.R
+import com.directdev.portal.activity.MainActivity
 import com.directdev.portal.model.TermModel
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_grades.*
+import kotlinx.android.synthetic.main.fragment_journal.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.ctx
 import org.jetbrains.anko.info
 
-class GradesFragment : Fragment() , AnkoLogger{
+class FinancesFragment : Fragment() , AnkoLogger {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater?.inflate(R.layout.fragment_grades, container, false)
+        val view = inflater?.inflate(R.layout.fragment_finances, container, false)
         return view
     }
 
@@ -35,7 +35,13 @@ class GradesFragment : Fragment() , AnkoLogger{
             info(counter)
             counter.toString()
         }
-        val adapter = ArrayAdapter<String>(ctx, R.xml.spinner_item, terms)
-        termSpinner.adapter = adapter
+        termSpinner.adapter = ArrayAdapter<String>(ctx, R.xml.spinner_item, terms)
+
+        (ctx as MainActivity).setSupportActionBar(journalToolbar)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        (ctx as MainActivity).menuInflater.inflate(R.menu.menu_main, menu)
     }
 }

@@ -9,15 +9,15 @@ import com.directdev.portal.R
 import com.directdev.portal.model.SessionModel
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter
-import kotlinx.android.synthetic.main.recycler_schedule.view.*
+import kotlinx.android.synthetic.main.item_sessions.view.*
 
-class ScheduleRecycleradapter(context: Context, data: OrderedRealmCollection<SessionModel>?, autoUpdate: Boolean) : RealmRecyclerViewAdapter<SessionModel, ScheduleRecycleradapter.ViewHolder>(context, data, autoUpdate) {
+class SessionRecyclerAdapter(context: Context, data: OrderedRealmCollection<SessionModel>?, autoUpdate: Boolean) : RealmRecyclerViewAdapter<SessionModel, SessionRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         holder?.bindData(data?.get(position) as SessionModel)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        return ViewHolder(inflater.inflate(R.layout.recycler_schedule, parent, false))
+        return ViewHolder(inflater.inflate(R.layout.item_sessions, parent, false))
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {

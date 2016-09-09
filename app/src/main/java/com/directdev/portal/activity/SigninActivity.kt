@@ -35,12 +35,12 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
         inputMethodManager.hideSoftInputFromWindow(signInCard.windowToken, 0)
         textSwitch.showNext()
         iconSwitch.showNext()
-        formEmail.text.toString().savePref(this, R.string.username)
+        formUsername.text.toString().savePref(this, R.string.username)
         formPass.text.toString().savePref(this, R.string.password)
-        DataApi.fetchData(this, true)
+        DataApi.fetchData(this)
                 .subscribe(object : SingleSubscriber<Unit>() {
                     override fun onSuccess(value: Unit) {
-                        value.savePref(this@SigninActivity, R.string.isLoggedIn)
+                        true.savePref(this@SigninActivity, R.string.isLoggedIn)
                         startActivity<MainActivity>()
                         textSwitch.showNext()
                         iconSwitch.showNext()
