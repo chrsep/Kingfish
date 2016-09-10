@@ -22,6 +22,10 @@ interface DataService {
     fun getProfile(@Header("Cookie") cookie: String): Single<ResponseBody>
 
     @Headers("Referer: https://binusmaya.binus.ac.id/newStudent/")
+    @GET("financial/virtualaccount/")
+    fun getFinanceSummary(@Header("Cookie") cookie: String): Single<ResponseBody>
+
+    @Headers("Referer: https://binusmaya.binus.ac.id/newStudent/")
     @GET("financial/getFinancialSummary")
     fun getFinances(@Header("Cookie") cookie: String): Single<List<FinanceModel>>
 

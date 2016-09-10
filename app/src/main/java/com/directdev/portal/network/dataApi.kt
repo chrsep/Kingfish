@@ -11,6 +11,7 @@ import io.realm.Realm
 import io.realm.RealmObject
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
+import org.json.JSONArray
 import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
@@ -24,19 +25,12 @@ object DataApi {
     var isActive = false
     private val baseUrl = "https://binusmaya.binus.ac.id/services/ci/index.php/"
     //TODO: (NOTE) Delete OkHttpClient if timeout takes too long
-    private val client = OkHttpClient().newBuilder()
-            .connectTimeout(60, TimeUnit.SECONDS)
-            .readTimeout(60, TimeUnit.SECONDS)
-            .writeTimeout(60, TimeUnit.SECONDS)
-            .addNetworkInterceptor(StethoInterceptor())
-            .followRedirects(false)
-            .build()
     private val api = Retrofit.Builder()
-            .client(client)
-            .baseUrl(baseUrl)
             .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
             .addConverterFactory(NullConverterFactory())
             .addConverterFactory(MoshiConverterFactory.create())
+            .client(buildClient())
+            .baseUrl(baseUrl)
             .build().create(DataService::class.java)
 
 
@@ -69,7 +63,8 @@ object DataApi {
             api.getExams(ExamRequestBody(term), cookie).subscribeOn(Schedulers.io()),
             api.getGrades(term.toString(), cookie).subscribeOn(Schedulers.io()),
             api.getProfile(cookie).subscribeOn(Schedulers.io()),
-            { finance, session, exam, grade, profile ->
+            api.getFinanceSummary(cookie).subscribeOn(Schedulers.io()),
+            { finance, session, exam, grade, profile, financeSummary ->
                 val realm = Realm.getDefaultInstance()
                 realm.executeTransaction {
                     it.delete(JournalModel::class.java)
@@ -79,6 +74,8 @@ object DataApi {
                     it.copyToRealmOrUpdate(mapToJournal(exam, finance, session))
                     it.insertGrade(grade)
                     saveProfile(ctx, profile)
+                    saveFinanceSummary(ctx, financeSummary)
+                    profile.close()
                 }
                 realm.close()
                 isActive = false
@@ -108,6 +105,12 @@ object DataApi {
         profile.getString("NIM").savePref(ctx, R.string.nim)
     }
 
+    private fun saveFinanceSummary(ctx: Context, response: ResponseBody) {
+        val summary = JSONArray(response.string()).getJSONObject(0)
+        summary.getInt("charge").savePref(ctx, R.string.finance_charge)
+        summary.getInt("payment").savePref(ctx, R.string.finance_payment)
+    }
+
     private fun Realm.insertGrade(data: GradeModel) {
         data.credit.term = data.term
         cleanInsert(data.gradings)
@@ -120,4 +123,12 @@ object DataApi {
         delete(data[0].javaClass)
         copyToRealm(data)
     }
+
+    private fun buildClient() = OkHttpClient().newBuilder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .addNetworkInterceptor(StethoInterceptor())
+            .followRedirects(false)
+            .build()
 }

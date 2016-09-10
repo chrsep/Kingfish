@@ -13,6 +13,7 @@
         android:id="@+id/finance_description"
         android:layout_width="180dp"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
         android:textSize="16sp" />
 
     <TextView

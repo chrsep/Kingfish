@@ -11,4 +11,6 @@
     <string name="birthday">birthday</string>
     <string name="name">name</string>
     <string name="nim">nim</string>
+    <string name="finance_charge">charge</string>
+    <string name="finance_payment">payment</string>
 </resources>
