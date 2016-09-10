@@ -27,6 +27,7 @@ class JournalFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         fab.onClick {
+            if (DataApi.isActive) return@onClick
             DataApi.fetchData(ctx).subscribe({
                 view.snack("Success")
             }, {

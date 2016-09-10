@@ -37,24 +37,21 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
         iconSwitch.showNext()
         formUsername.text.toString().savePref(this, R.string.username)
         formPass.text.toString().savePref(this, R.string.password)
-        DataApi.fetchData(this)
-                .subscribe(object : SingleSubscriber<Unit>() {
-                    override fun onSuccess(value: Unit) {
-                        true.savePref(this@SigninActivity, R.string.isLoggedIn)
-                        startActivity<MainActivity>()
-                        textSwitch.showNext()
-                        iconSwitch.showNext()
-                    }
-
-                    override fun onError(error: Throwable?) {
-                        signinActivity.snack("Wrong email or password", Snackbar.LENGTH_INDEFINITE)
-                        false.savePref(this@SigninActivity, R.string.isLoggedIn)
-                        runOnUiThread {
-                            textSwitch.showNext()
-                            iconSwitch.showNext()
-                        }
-                        DataApi.isActive = false
-                    }
-                })
+        DataApi.initializeApp(this).subscribe ({
+            true.savePref(this@SigninActivity, R.string.isLoggedIn)
+            startActivity<MainActivity>()
+            textSwitch.showNext()
+            iconSwitch.showNext()
+            DataApi.isActive = false
+        }, {
+            signinActivity.snack("Wrong email or password", Snackbar.LENGTH_INDEFINITE)
+            false.savePref(this@SigninActivity, R.string.isLoggedIn)
+            runOnUiThread {
+                textSwitch.showNext()
+                iconSwitch.showNext()
+            }
+            DataApi.isActive = false
+            throw it
+        })
     }
 }

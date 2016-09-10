@@ -21,21 +21,26 @@ class GradesFragment : Fragment() , AnkoLogger{
         return view
     }
 
+//    override fun onStart() {
+//        super.onStart()
+//        val realm = Realm.getDefaultInstance()
+//        var counter = 0
+//        val terms = realm.where(TermModel::class.java).findAll().map {
+//            when(it.value.toString().substring(2)){
+//                "10" -> counter++
+//                "20" -> counter++
+//                else -> return@map counter.toString() + " (SP)"
+//            }
+//            info(it.value.toString().substring(2))
+//            info(counter)
+//            counter.toString()
+//        }
+//        val adapter = ArrayAdapter<String>(ctx, R.xml.spinner_item, terms)
+//        termSpinner.adapter = adapter
+//    }
+
     override fun onStart() {
         super.onStart()
-        val realm = Realm.getDefaultInstance()
-        var counter = 0
-        val terms = realm.where(TermModel::class.java).findAll().map {
-            when(it.value.toString().substring(2)){
-                "10" -> counter++
-                "20" -> counter++
-                else -> return@map counter.toString() + " (SP)"
-            }
-            info(it.value.toString().substring(2))
-            info(counter)
-            counter.toString()
-        }
-        val adapter = ArrayAdapter<String>(ctx, R.xml.spinner_item, terms)
-        termSpinner.adapter = adapter
+
     }
 }

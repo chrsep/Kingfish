@@ -94,9 +94,13 @@ dependencies {
     compile 'com.github.rahatarmanahmed:circularprogressview:2.5.0'
     compile 'com.roughike:bottom-bar:2.0.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha7'
+
+    compile 'com.github.PhilJay:MPAndroidChart-Realm:v1.1.0@aar'
+    compile 'com.github.PhilJay:MPAndroidChart:v3.0.0-beta1'
 }
 repositories {
     mavenCentral()
+    maven { url "https://jitpack.io" }
     maven { url 'https://maven.fabric.io/public' }
     maven { url "http://repository.jetbrains.com/all" }
     maven { url 'https://github.com/uPhyca/stetho-realm/raw/master/maven-repo' }

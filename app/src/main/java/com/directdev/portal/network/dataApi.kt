@@ -33,6 +33,34 @@ object DataApi {
             .baseUrl(baseUrl)
             .build().create(DataService::class.java)
 
+    fun initializeApp(ctx: Context): Single<Unit> {
+        isActive = true
+        val cookie = ctx.readPref(R.string.cookie, "") as String
+        return signIn(ctx, cookie).flatMap {
+            it.headers().get("Set-Cookie")?.savePref(ctx, R.string.cookie)
+            api.getTerms(cookie).subscribeOn(Schedulers.io())
+        }.flatMap {
+            terms ->
+            Single.zip(terms.drop(1).map {
+                api.getGrades(it.value.toString(), cookie).subscribeOn(Schedulers.io())
+            }, {
+                grades ->
+                val realm = Realm.getDefaultInstance()
+                realm.executeTransaction {
+                    realm ->
+                    realm.insertOrUpdate(terms)
+                    grades.forEach { realm.insertGrade(it as GradeModel) }
+                }
+                realm.close()
+                terms[0]
+            })
+        }.zipWith(api.getProfile(cookie).subscribeOn(Schedulers.io()), {
+            term, profile ->
+            saveProfile(ctx, profile)
+            profile.close()
+            term
+        }).flatMap { fetchRecent(ctx, cookie, it.value.toString()) }
+    }
 
     fun fetchData(ctx: Context): Single<Unit> {
         isActive = true
@@ -42,12 +70,11 @@ object DataApi {
             api.getTerms(cookie).subscribeOn(Schedulers.io())
         }.flatMap { terms ->
             val realm = Realm.getDefaultInstance()
-            realm.executeTransaction { it.copyToRealmOrUpdate(terms) }
+            realm.executeTransaction { it.insertOrUpdate(terms) }
             realm.close()
             fetchRecent(ctx, cookie, terms[0].value.toString())
         }
     }
-
 
     private fun signIn(ctx: Context, cookie: String = "") = api.signIn(
             ctx.readPref(R.string.username, "") as String,
@@ -62,20 +89,17 @@ object DataApi {
             api.getSessions(cookie).subscribeOn(Schedulers.io()),
             api.getExams(ExamRequestBody(term), cookie).subscribeOn(Schedulers.io()),
             api.getGrades(term.toString(), cookie).subscribeOn(Schedulers.io()),
-            api.getProfile(cookie).subscribeOn(Schedulers.io()),
             api.getFinanceSummary(cookie).subscribeOn(Schedulers.io()),
-            { finance, session, exam, grade, profile, financeSummary ->
+            { finance, session, exam, grade, financeSummary ->
                 val realm = Realm.getDefaultInstance()
                 realm.executeTransaction {
                     it.delete(JournalModel::class.java)
                     it.delete(ExamModel::class.java)
                     it.delete(FinanceModel::class.java)
                     it.delete(SessionModel::class.java)
-                    it.copyToRealmOrUpdate(mapToJournal(exam, finance, session))
+                    it.insertOrUpdate(mapToJournal(exam, finance, session))
                     it.insertGrade(grade)
-                    saveProfile(ctx, profile)
                     saveFinanceSummary(ctx, financeSummary)
-                    profile.close()
                 }
                 realm.close()
                 isActive = false
@@ -111,24 +135,24 @@ object DataApi {
         summary.getInt("payment").savePref(ctx, R.string.finance_payment)
     }
 
+    private fun buildClient() = OkHttpClient().newBuilder()
+            .connectTimeout(20, TimeUnit.SECONDS)
+            .readTimeout(20, TimeUnit.SECONDS)
+            .writeTimeout(20, TimeUnit.SECONDS)
+            .addNetworkInterceptor(StethoInterceptor())
+            .followRedirects(false)
+            .build()
+
     private fun Realm.insertGrade(data: GradeModel) {
         data.credit.term = data.term
         cleanInsert(data.gradings)
         cleanInsert(data.scores)
-        copyToRealmOrUpdate(data.credit)
+        insertOrUpdate(data.credit)
     }
 
     private fun Realm.cleanInsert(data: List<RealmObject>) {
         if (data.size == 0) return
         delete(data[0].javaClass)
-        copyToRealm(data)
+        insert(data)
     }
-
-    private fun buildClient() = OkHttpClient().newBuilder()
-            .connectTimeout(60, TimeUnit.SECONDS)
-            .readTimeout(60, TimeUnit.SECONDS)
-            .writeTimeout(60, TimeUnit.SECONDS)
-            .addNetworkInterceptor(StethoInterceptor())
-            .followRedirects(false)
-            .build()
 }

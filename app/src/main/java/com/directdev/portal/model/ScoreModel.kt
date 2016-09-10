@@ -22,7 +22,7 @@ open class ScoreModel(
         @Json(name = "lam")
         open var scoreType: String = "N/A", //"ASSIGNMENT"
 
-        open var score: Int = 0, //"100"
+        open var score: String = "N/A", //"100"
 
         open var scu: String = "N/A", //"2"
 
