@@ -7,19 +7,23 @@ import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
 import com.directdev.portal.R
 import com.directdev.portal.network.DataApi
+import com.directdev.portal.utils.readPref
 import com.directdev.portal.utils.savePref
 import com.directdev.portal.utils.snack
+import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.activity_signin.*
 import org.jetbrains.anko.*
-import rx.SingleSubscriber
+import kotlin.properties.Delegates
 
 class SigninActivity : AppCompatActivity(), AnkoLogger {
+    private var mFirebaseAnalytics : FirebaseAnalytics by Delegates.notNull()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val font = Typeface.createFromAsset(assets, "fonts/SpaceMono-BoldItalic.ttf")
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
+
+        mainBanner.typeface = Typeface.createFromAsset(assets, "fonts/SpaceMono-BoldItalic.ttf")
         setContentView(R.layout.activity_signin)
-        mainBanner.typeface = font
         formSignIn.onClick { signIn() }
         formPass.onKey {
             view, i, event ->
@@ -32,25 +36,27 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
 
     fun signIn() {
         if (DataApi.isActive) return
+        formPass.text.toString().savePref(this, R.string.password)
+        formUsername.text.toString().savePref(this, R.string.username)
+
         inputMethodManager.hideSoftInputFromWindow(signInCard.windowToken, 0)
         textSwitch.showNext()
         iconSwitch.showNext()
-        formUsername.text.toString().savePref(this, R.string.username)
-        formPass.text.toString().savePref(this, R.string.password)
+
         DataApi.initializeApp(this).subscribe ({
+            DataApi.isActive = false
+            mFirebaseAnalytics.setUserProperty("degree",this.readPref(R.string.major,"") as String)
+            mFirebaseAnalytics.setUserProperty("major",this.readPref(R.string.degree,"") as String)
             true.savePref(this@SigninActivity, R.string.isLoggedIn)
             startActivity<MainActivity>()
-            textSwitch.showNext()
-            iconSwitch.showNext()
-            DataApi.isActive = false
         }, {
-            signinActivity.snack("Wrong email or password", Snackbar.LENGTH_INDEFINITE)
+            DataApi.isActive = false
+            signinActivity.snack("Wrong email or password", Snackbar.LENGTH_LONG)
             false.savePref(this@SigninActivity, R.string.isLoggedIn)
             runOnUiThread {
                 textSwitch.showNext()
                 iconSwitch.showNext()
             }
-            DataApi.isActive = false
             throw it
         })
     }

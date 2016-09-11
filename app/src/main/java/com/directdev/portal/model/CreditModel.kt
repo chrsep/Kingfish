@@ -6,7 +6,7 @@ import io.realm.annotations.PrimaryKey
 
 open class CreditModel(
         @PrimaryKey
-        open var term: String = "N/A",
+        open var term: Int = 0,
 
         @Json(name = "GPA_CUR")
         open var gpaCurrent: String = "N/A", //3.370

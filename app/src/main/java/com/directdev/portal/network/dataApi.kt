@@ -53,13 +53,13 @@ object DataApi {
                 }
                 realm.close()
                 terms[0]
+            }).zipWith(api.getProfile(cookie).subscribeOn(Schedulers.io()), {
+                term, profile ->
+                saveProfile(ctx, profile)
+                profile.close()
+                term
             })
-        }.zipWith(api.getProfile(cookie).subscribeOn(Schedulers.io()), {
-            term, profile ->
-            saveProfile(ctx, profile)
-            profile.close()
-            term
-        }).flatMap { fetchRecent(ctx, cookie, it.value.toString()) }
+        }.flatMap { fetchRecent(ctx, cookie, it.value.toString()) }
     }
 
     fun fetchData(ctx: Context): Single<Unit> {
@@ -144,7 +144,7 @@ object DataApi {
             .build()
 
     private fun Realm.insertGrade(data: GradeModel) {
-        data.credit.term = data.term
+        data.credit.term = data.term.toInt()
         cleanInsert(data.gradings)
         cleanInsert(data.scores)
         insertOrUpdate(data.credit)

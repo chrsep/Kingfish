@@ -17,8 +17,11 @@ import kotlinx.android.synthetic.main.fragment_journal.*
 import org.jetbrains.anko.ctx
 import org.jetbrains.anko.onClick
 import java.util.*
+import kotlin.properties.Delegates
 
 class JournalFragment : Fragment() {
+    private var realm: Realm by Delegates.notNull()
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater?.inflate(R.layout.fragment_journal, container, false)
         return view
@@ -38,11 +41,16 @@ class JournalFragment : Fragment() {
         journalToolbar.title = "Today - Holiday"
         journalToolbar.inflateMenu(R.menu.menu_journal)
 
-        val realm = Realm.getDefaultInstance()
+        realm = Realm.getDefaultInstance()
         val data = realm.where(JournalModel::class.java)
                 .greaterThan("date", Date())
                 .findAllSortedAsync("date")
         recyclerContent.layoutManager = LinearLayoutManager(ctx)
         recyclerContent.adapter = JournalRecyclerAdapter(realm, ctx, data, true)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        realm.close()
     }
 }
