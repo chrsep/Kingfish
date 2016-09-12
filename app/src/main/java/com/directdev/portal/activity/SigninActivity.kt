@@ -22,7 +22,7 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
         super.onCreate(savedInstanceState)
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
 
-        mainBanner.typeface = Typeface.createFromAsset(assets, "fonts/SpaceMono-BoldItalic.ttf")
+        val font = Typeface.createFromAsset(assets, "fonts/SpaceMono-BoldItalic.ttf")
         setContentView(R.layout.activity_signin)
         formSignIn.onClick { signIn() }
         formPass.onKey {
@@ -32,6 +32,7 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
             }
             false
         }
+        mainBanner.typeface = font
     }
 
     fun signIn() {

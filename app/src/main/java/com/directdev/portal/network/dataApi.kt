@@ -35,10 +35,16 @@ object DataApi {
 
     fun initializeApp(ctx: Context): Single<Unit> {
         isActive = true
-        val cookie = ctx.readPref(R.string.cookie, "") as String
+        var cookie = ctx.readPref(R.string.cookie, "") as String
         return signIn(ctx, cookie).flatMap {
-            it.headers().get("Set-Cookie")?.savePref(ctx, R.string.cookie)
-            api.getTerms(cookie).subscribeOn(Schedulers.io())
+            val headerCookie = it.headers().get("Set-Cookie")
+            if(headerCookie == null){
+                api.getTerms(cookie).subscribeOn(Schedulers.io())
+            }else{
+                cookie = headerCookie
+                cookie.savePref(ctx, R.string.cookie)
+                api.getTerms(cookie).subscribeOn(Schedulers.io())
+            }
         }.flatMap {
             terms ->
             Single.zip(terms.drop(1).map {
@@ -58,8 +64,16 @@ object DataApi {
                 saveProfile(ctx, profile)
                 profile.close()
                 term
-            })
-        }.flatMap { fetchRecent(ctx, cookie, it.value.toString()) }
+            }).zipWith(fetchRecent(ctx, cookie, terms[0].value.toString()),{ a,b -> })
+
+//            Single.zip(terms.drop(1).map {
+//                api.getCourse(it.value.toString(), cookie).doOnSuccess {
+//
+//                }.subscribeOn(Schedulers.io())
+//            },{
+//                a ->
+//            })
+        }
     }
 
     fun fetchData(ctx: Context): Single<Unit> {
@@ -136,9 +150,9 @@ object DataApi {
     }
 
     private fun buildClient() = OkHttpClient().newBuilder()
-            .connectTimeout(20, TimeUnit.SECONDS)
-            .readTimeout(20, TimeUnit.SECONDS)
-            .writeTimeout(20, TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
             .addNetworkInterceptor(StethoInterceptor())
             .followRedirects(false)
             .build()
