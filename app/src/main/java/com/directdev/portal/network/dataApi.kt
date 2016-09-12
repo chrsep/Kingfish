@@ -38,43 +38,60 @@ object DataApi {
         var cookie = ctx.readPref(R.string.cookie, "") as String
         return signIn(ctx, cookie).flatMap {
             val headerCookie = it.headers().get("Set-Cookie")
-            if(headerCookie == null){
+            if (headerCookie == null) {
                 api.getTerms(cookie).subscribeOn(Schedulers.io())
-            }else{
+            } else {
                 cookie = headerCookie
                 cookie.savePref(ctx, R.string.cookie)
                 api.getTerms(cookie).subscribeOn(Schedulers.io())
             }
         }.flatMap {
             terms ->
-            Single.zip(terms.drop(1).map {
-                api.getGrades(it.value.toString(), cookie).subscribeOn(Schedulers.io())
-            }, {
-                grades ->
+            Single.zip(fetchGrades(terms, cookie), {
+                grades -> grades
+            }).zipWith(api.getProfile(cookie).subscribeOn(Schedulers.io()), {
+                grades, profile ->
+                saveProfile(ctx, profile)
+                profile.close()
+                grades
+            }).zipWith(fetchCourses(terms, cookie), {
+                grades, courses ->
                 val realm = Realm.getDefaultInstance()
                 realm.executeTransaction {
                     realm ->
                     realm.insertOrUpdate(terms)
+                    realm.insertOrUpdate(courses)
                     grades.forEach { realm.insertGrade(it as GradeModel) }
                 }
                 realm.close()
-                terms[0]
-            }).zipWith(api.getProfile(cookie).subscribeOn(Schedulers.io()), {
-                term, profile ->
-                saveProfile(ctx, profile)
-                profile.close()
-                term
-            }).zipWith(fetchRecent(ctx, cookie, terms[0].value.toString()),{ a,b -> })
-
-//            Single.zip(terms.drop(1).map {
-//                api.getCourse(it.value.toString(), cookie).doOnSuccess {
-//
-//                }.subscribeOn(Schedulers.io())
-//            },{
-//                a ->
-//            })
+            }).zipWith(fetchRecent(ctx, cookie, terms[0].value.toString()), {
+                a, b ->
+            })
         }
     }
+
+    private fun fetchGrades(terms: List<TermModel>, cookie: String): List<Single<GradeModel>> =
+            terms.drop(1).map {
+                api.getGrades(it.value.toString(), cookie).subscribeOn(Schedulers.io())
+            }
+
+    private fun fetchCourses(terms: List<TermModel>, cookie: String) =
+            Single.zip(
+                    terms.drop(1).map({ term ->
+                        api.getCourse(term.value.toString(), cookie)
+                                .subscribeOn(Schedulers.io())
+                                .map {
+                                    it.courses.forEach { it.term = term.value }
+                                    it.courses
+                                }
+                    }),
+                    {
+                        val listOfCourses = mutableListOf<CourseModel>()
+                        val itList = it.filterIsInstance<List<CourseModel>>()
+                        itList.forEach { listOfCourses.addAll(it) }
+                        listOfCourses
+                    }
+            )
 
     fun fetchData(ctx: Context): Single<Unit> {
         isActive = true
@@ -104,7 +121,8 @@ object DataApi {
             api.getExams(ExamRequestBody(term), cookie).subscribeOn(Schedulers.io()),
             api.getGrades(term.toString(), cookie).subscribeOn(Schedulers.io()),
             api.getFinanceSummary(cookie).subscribeOn(Schedulers.io()),
-            { finance, session, exam, grade, financeSummary ->
+            api.getCourse(term, cookie).subscribeOn(Schedulers.io()),
+            { finance, session, exam, grade, financeSummary, course ->
                 val realm = Realm.getDefaultInstance()
                 realm.executeTransaction {
                     it.delete(JournalModel::class.java)
@@ -114,12 +132,20 @@ object DataApi {
                     it.insertOrUpdate(mapToJournal(exam, finance, session))
                     it.insertGrade(grade)
                     saveFinanceSummary(ctx, financeSummary)
+                    saveCourse(course, term, it)
                 }
                 realm.close()
                 isActive = false
             })
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+
+    private fun saveCourse(course: CourseWrapperModel, term: String, realm: Realm) {
+        course.courses.forEach {
+            it.term = term.toInt()
+        }
+        realm.insertOrUpdate(course.courses)
+    }
 
     private fun mapToJournal(exam: List<ExamModel>, finance: List<FinanceModel>, session: List<SessionModel>): MutableList<JournalModel> {
         val items = mutableListOf<JournalModel>()

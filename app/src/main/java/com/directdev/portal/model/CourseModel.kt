@@ -20,7 +20,7 @@ open class CourseModel(
 
         @Json(name = "SSR_COMPONENT")
         open var ssrComponent: String = "N/A",                    //146
-        open var term: String = "N/A"
+        open var term: Int = 0
 
 ) : RealmObject()
 

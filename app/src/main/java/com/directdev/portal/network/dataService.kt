@@ -47,5 +47,5 @@ interface DataService {
 
     @Headers("Referer: https://binusmaya.binus.ac.id/newstudent/")
     @GET("student/init/getCoursesBySTRMAndAcad/{term}")
-    fun getCourse(@Path("term") term: String, @Header("Cookie") cookie: String): Single<List<CourseModel>>
+    fun getCourse(@Path("term") term: String, @Header("Cookie") cookie: String): Single<CourseWrapperModel>
 }

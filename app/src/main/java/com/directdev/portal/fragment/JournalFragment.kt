@@ -31,7 +31,7 @@ class JournalFragment : Fragment() {
         super.onStart()
         fab.onClick {
             if (DataApi.isActive) return@onClick
-            DataApi.fetchData(ctx).subscribe({
+            DataApi.initializeApp(ctx).subscribe({
                 view.snack("Success")
             }, {
                 view.snack("Failed")

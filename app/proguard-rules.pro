@@ -50,3 +50,5 @@
 
 # for RxJava:
 -dontwarn sun.misc.Unsafe
+
+-dontwarn kotlin.**
