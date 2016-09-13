@@ -61,6 +61,7 @@ object DataApi {
                     realm ->
                     realm.insertOrUpdate(terms)
                     realm.insertOrUpdate(courses)
+                    realm.delete(ScoreModel::class.java)
                     grades.forEach { realm.insertGrade(it as GradeModel) }
                 }
                 realm.close()
@@ -186,7 +187,7 @@ object DataApi {
     private fun Realm.insertGrade(data: GradeModel) {
         data.credit.term = data.term.toInt()
         cleanInsert(data.gradings)
-        cleanInsert(data.scores)
+        insert(data.scores)
         insertOrUpdate(data.credit)
     }
 

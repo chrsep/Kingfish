@@ -9,4 +9,7 @@
 
     <color name="colorJournalDate">#EEEEEE</color>
     <color name="colorJournalBackground">#FAFAFA</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="inactive_white">#57FFFFFF</color>
 </resources>
