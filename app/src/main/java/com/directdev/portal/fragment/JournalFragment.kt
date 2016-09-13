@@ -14,6 +14,7 @@ import com.directdev.portal.network.DataApi
 import com.directdev.portal.utils.snack
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_journal.*
+import org.jetbrains.anko.appcompat.v7.onMenuItemClick
 import org.jetbrains.anko.ctx
 import org.jetbrains.anko.onClick
 import java.util.*
@@ -27,19 +28,31 @@ class JournalFragment : Fragment() {
         return view
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+
     override fun onStart() {
         super.onStart()
-        fab.onClick {
-            if (DataApi.isActive) return@onClick
-            DataApi.initializeApp(ctx).subscribe({
-                view.snack("Success")
-            }, {
-                view.snack("Failed")
-            })
-        }
-
-        journalToolbar.title = "Today - Holiday"
         journalToolbar.inflateMenu(R.menu.menu_journal)
+        journalToolbar.onMenuItemClick {
+            when(it?.itemId){
+                R.id.action_refresh -> {
+                    if (DataApi.isActive) return@onMenuItemClick true
+                    DataApi.initializeApp(ctx).subscribe({
+                        view?.snack("Success")
+                    }, {
+                        view?.snack("Failed")
+                    })
+                    true
+                }
+                R.id.action_setting -> {
+                    true
+                }
+                else -> return@onMenuItemClick true
+            }
+        }
+        journalToolbar.title = "Today - Holiday"
 
         realm = Realm.getDefaultInstance()
         val data = realm.where(JournalModel::class.java)
