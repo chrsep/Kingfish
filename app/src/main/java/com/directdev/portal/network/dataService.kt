@@ -48,4 +48,13 @@ interface DataService {
     @Headers("Referer: https://binusmaya.binus.ac.id/newstudent/")
     @GET("student/init/getCoursesBySTRMAndAcad/{term}")
     fun getCourse(@Path("term") term: String, @Header("Cookie") cookie: String): Single<CourseWrapperModel>
+
+    @Headers("Referer: https://binusmaya.binus.ac.id/newstudent/")
+    @GET("student/classes/resources/{courseId}/{crseId}/{term}/{ssrComponent}/{classNumber}")
+    fun getResources(@Path("courseId") courseId: String,
+                     @Path("crseId") crseId: String,
+                     @Path("term") term: String,
+                     @Path("ssrComponent") ssrComponent: String,
+                     @Path("classNumber") classNumber: String,
+                     @Header("Cookie") cookie: String): Single<ResModelIntermidiary>
 }

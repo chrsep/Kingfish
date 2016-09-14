@@ -57,7 +57,8 @@
             android:layout_below="@id/journalMode"
             android:layout_marginTop="7dp"
             android:src="@drawable/label"
-            android:tint="@color/colorAccent" />
+            android:tint="@color/colorAccent"
+            android:visibility="invisible"/>
     </RelativeLayout>
 
     <View

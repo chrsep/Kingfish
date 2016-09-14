@@ -9,8 +9,10 @@ import com.directdev.portal.utils.savePref
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import io.realm.Realm
 import io.realm.RealmObject
+import io.realm.RealmResults
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
+import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 import retrofit2.Retrofit
@@ -48,7 +50,8 @@ object DataApi {
         }.flatMap {
             terms ->
             Single.zip(fetchGrades(terms, cookie), {
-                grades -> grades
+                grades ->
+                grades
             }).zipWith(api.getProfile(cookie).subscribeOn(Schedulers.io()), {
                 grades, profile ->
                 saveProfile(ctx, profile)
@@ -71,6 +74,57 @@ object DataApi {
         }
     }
 
+    fun fetchData(ctx: Context): Single<Unit> {
+        isActive = true
+        val cookie = ctx.readPref(R.string.cookie, "") as String
+        return signIn(ctx, cookie).flatMap {
+            it.headers().get("Set-Cookie")?.savePref(ctx, R.string.cookie)
+            api.getTerms(cookie).subscribeOn(Schedulers.io())
+        }.flatMap { terms ->
+            val realm = Realm.getDefaultInstance()
+            realm.executeTransaction { it.insertOrUpdate(terms) }
+            realm.close()
+            fetchRecent(ctx, cookie, terms[0].value.toString())
+        }
+    }
+
+    fun fetchResource(ctx: Context, data: RealmResults<CourseModel>): Single<Unit> {
+        isActive = true
+        var cookie = ctx.readPref(R.string.cookie, "") as String
+        return signIn(ctx, cookie).flatMap {
+            Single.zip(data.map {
+                val classNumber = it.classNumber
+                api.getResources(
+                        it.courseId,
+                        it.crseId,
+                        it.term.toString(),
+                        it.ssrComponent,
+                        it.classNumber.toString(),
+                        cookie
+                ).map { data ->
+                    data.classNumber = classNumber
+                    data
+                }.subscribeOn(Schedulers.io())
+            }, {
+                resources ->
+                val realm = Realm.getDefaultInstance()
+                realm.executeTransaction { realm ->
+                    resources.forEach {
+                        val resModel = ResModel()
+                        resModel.book.addAll((it as ResModelIntermidiary).book)
+                        resModel.path.addAll(it.path)
+                        resModel.resources.addAll(it.resources)
+                        resModel.url.addAll(it.url)
+                        resModel.webContent = it.webContent
+                        resModel.classNumber = it.classNumber
+                        realm.insertOrUpdate(resModel)
+                    }
+
+                }
+            })
+        }
+    }
+
     private fun fetchGrades(terms: List<TermModel>, cookie: String): List<Single<GradeModel>> =
             terms.drop(1).map {
                 api.getGrades(it.value.toString(), cookie).subscribeOn(Schedulers.io())
@@ -78,7 +132,8 @@ object DataApi {
 
     private fun fetchCourses(terms: List<TermModel>, cookie: String) =
             Single.zip(
-                    terms.drop(1).map({ term ->
+                    terms.drop(1).map({
+                        term ->
                         api.getCourse(term.value.toString(), cookie)
                                 .subscribeOn(Schedulers.io())
                                 .map {
@@ -93,20 +148,6 @@ object DataApi {
                         listOfCourses
                     }
             )
-
-    fun fetchData(ctx: Context): Single<Unit> {
-        isActive = true
-        val cookie = ctx.readPref(R.string.cookie, "") as String
-        return signIn(ctx, cookie).flatMap {
-            it.headers().get("Set-Cookie")?.savePref(ctx, R.string.cookie)
-            api.getTerms(cookie).subscribeOn(Schedulers.io())
-        }.flatMap { terms ->
-            val realm = Realm.getDefaultInstance()
-            realm.executeTransaction { it.insertOrUpdate(terms) }
-            realm.close()
-            fetchRecent(ctx, cookie, terms[0].value.toString())
-        }
-    }
 
     private fun signIn(ctx: Context, cookie: String = "") = api.signIn(
             ctx.readPref(R.string.username, "") as String,
@@ -177,9 +218,9 @@ object DataApi {
     }
 
     private fun buildClient() = OkHttpClient().newBuilder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(240, TimeUnit.SECONDS)
+            .readTimeout(240, TimeUnit.SECONDS)
+            .writeTimeout(240, TimeUnit.SECONDS)
             .addNetworkInterceptor(StethoInterceptor())
             .followRedirects(false)
             .build()
