@@ -12,7 +12,6 @@ import io.realm.RealmObject
 import io.realm.RealmResults
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
-import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 import retrofit2.Retrofit
@@ -119,7 +118,6 @@ object DataApi {
                         resModel.classNumber = it.classNumber
                         realm.insertOrUpdate(resModel)
                     }
-
                 }
             })
         }

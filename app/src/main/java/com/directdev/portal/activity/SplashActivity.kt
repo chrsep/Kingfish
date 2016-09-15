@@ -13,9 +13,7 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Fabric.with(this, Answers())
-        Fabric.with(this, Crashlytics())
-
+        Fabric.with(this, Answers(), Crashlytics())
         if (readPref(R.string.isLoggedIn, false) as Boolean) startActivity<MainActivity>()
         else startActivity<SigninActivity>()
     }

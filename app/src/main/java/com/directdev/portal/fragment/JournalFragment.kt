@@ -2,7 +2,6 @@ package com.directdev.portal.fragment
 
 import android.app.Fragment
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
@@ -16,7 +15,6 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_journal.*
 import org.jetbrains.anko.appcompat.v7.onMenuItemClick
 import org.jetbrains.anko.ctx
-import org.jetbrains.anko.onClick
 import java.util.*
 import kotlin.properties.Delegates
 
