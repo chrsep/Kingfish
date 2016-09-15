@@ -1,6 +1,7 @@
 package com.directdev.portal.network
 
 import android.content.Context
+import com.directdev.portal.BuildConfig
 import com.directdev.portal.R
 import com.directdev.portal.model.*
 import com.directdev.portal.utils.NullConverterFactory
@@ -25,14 +26,7 @@ import java.util.concurrent.TimeUnit
 object DataApi {
     var isActive = false
     private val baseUrl = "https://binusmaya.binus.ac.id/services/ci/index.php/"
-    //TODO: (NOTE) Delete OkHttpClient if timeout takes too long
-    private val api = Retrofit.Builder()
-            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-            .addConverterFactory(NullConverterFactory())
-            .addConverterFactory(MoshiConverterFactory.create())
-            .client(buildClient())
-            .baseUrl(baseUrl)
-            .build().create(DataService::class.java)
+    private val api = buildRetrofit()
 
     fun initializeApp(ctx: Context): Single<Unit> {
         isActive = true
@@ -215,14 +209,6 @@ object DataApi {
         summary.getInt("payment").savePref(ctx, R.string.finance_payment)
     }
 
-    private fun buildClient() = OkHttpClient().newBuilder()
-            .connectTimeout(240, TimeUnit.SECONDS)
-            .readTimeout(240, TimeUnit.SECONDS)
-            .writeTimeout(240, TimeUnit.SECONDS)
-            .addNetworkInterceptor(StethoInterceptor())
-            .followRedirects(false)
-            .build()
-
     private fun Realm.insertGrade(data: GradeModel) {
         data.credit.term = data.term.toInt()
         cleanInsert(data.gradings)
@@ -235,4 +221,33 @@ object DataApi {
         delete(data[0].javaClass)
         insert(data)
     }
+
+    private fun buildRetrofit(): DataService {
+        val client: OkHttpClient
+        if (BuildConfig.DEBUG) client = buildDebugClient()
+        else client = buildClient()
+
+        return Retrofit.Builder()
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(NullConverterFactory())
+                .addConverterFactory(MoshiConverterFactory.create())
+                .client(client)
+                .baseUrl(baseUrl)
+                .build().create(DataService::class.java)
+    }
+
+    private fun buildDebugClient() = OkHttpClient().newBuilder()
+            .connectTimeout(240, TimeUnit.SECONDS)
+            .readTimeout(240, TimeUnit.SECONDS)
+            .writeTimeout(240, TimeUnit.SECONDS)
+            .addNetworkInterceptor(StethoInterceptor())
+            .followRedirects(false)
+            .build()
+
+    private fun buildClient() = OkHttpClient().newBuilder()
+            .connectTimeout(240, TimeUnit.SECONDS)
+            .readTimeout(240, TimeUnit.SECONDS)
+            .writeTimeout(240, TimeUnit.SECONDS)
+            .followRedirects(false)
+            .build()
 }

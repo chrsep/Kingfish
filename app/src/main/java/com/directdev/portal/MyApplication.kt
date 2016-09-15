@@ -14,6 +14,7 @@ class MyApplication : Application() {
         val realmConfiguration = RealmConfiguration.Builder(this).deleteRealmIfMigrationNeeded().build()
         Realm.setDefaultConfiguration(realmConfiguration)
 
+        if (BuildConfig.DEBUG)
         Stetho.initialize(
                 Stetho.newInitializerBuilder(this)
                         .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
