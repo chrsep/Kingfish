@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:id="@+id/assignmentItem"
@@ -8,50 +9,55 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground"
-    android:longClickable="true">
+    android:longClickable="true"
+    android:paddingBottom="16dp">
 
     <TextView
         android:id="@+id/resSession"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="sdfgsdfg"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="16dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_constraintBottom_creator="1"
         android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:layout_constraintLeft_creator="1"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginLeft="16dp" />
+        android:layout_marginLeft="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/resTopic" />
 
     <TextView
         android:id="@+id/resTopic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="22dp"
         android:text="sdfgds"
-        android:layout_marginStart="8dp"
-        app:layout_constraintLeft_toRightOf="@+id/resSession"
-        android:layout_marginLeft="8dp"
+        android:textStyle="normal|bold"
         app:layout_constraintRight_toLeftOf="@+id/presentationDownload"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        android:layout_marginStart="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintHorizontal_bias="0.11"
-        app:layout_constraintVertical_bias="0.53" />
+        android:layout_marginEnd="17dp"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="17dp"
+        android:textSize="18sp" />
 
-    <android.support.v7.widget.AppCompatButton
+    <android.support.v7.widget.AppCompatImageButton
         android:id="@+id/presentationDownload"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
-        android:text="Presentation"
+        android:src="@drawable/ic_file_download"
+        android:tint="@color/white"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toBottomOf="@+id/resTopic"
         android:layout_marginEnd="16dp"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="16dp" />
+        app:layout_constraintTop_toBottomOf="@+id/resTopic"
+        android:layout_marginRight="16dp" />
 </android.support.constraint.ConstraintLayout>

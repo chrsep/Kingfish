@@ -48,6 +48,7 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
             DataApi.isActive = false
             mFirebaseAnalytics.setUserProperty("degree",this.readPref(R.string.major,"") as String)
             mFirebaseAnalytics.setUserProperty("major",this.readPref(R.string.degree,"") as String)
+            mFirebaseAnalytics.setUserProperty("generation", (this.readPref(R.string.nim, "") as String).substring(0, 1))
             true.savePref(this@SigninActivity, R.string.isLoggedIn)
             startActivity<MainActivity>()
         }, {
