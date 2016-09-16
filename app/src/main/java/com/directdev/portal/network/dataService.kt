@@ -57,4 +57,13 @@ interface DataService {
                      @Path("ssrComponent") ssrComponent: String,
                      @Path("classNumber") classNumber: String,
                      @Header("Cookie") cookie: String): Single<ResModelIntermidiary>
+
+    @Headers("Referer: https://binusmaya.binus.ac.id/newstudent/")
+    @GET("student/classes/assignmentType/{courseId}/{crseId}/{term}/{ssrComponent}/{classNumber}/01")
+    fun getAssignment(@Path("courseId") courseId: String,
+                      @Path("crseId") crseId: String,
+                      @Path("term") term: String,
+                      @Path("ssrComponent") ssrComponent: String,
+                      @Path("classNumber") classNumber: String,
+                      @Header("Cookie") cookie: String): Single<List<AssignmentIndividualModel>>
 }

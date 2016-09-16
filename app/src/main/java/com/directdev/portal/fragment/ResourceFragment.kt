@@ -14,7 +14,6 @@ import com.directdev.portal.adapter.ResourcesRecyclerAdapter
 import com.directdev.portal.model.CourseModel
 import com.directdev.portal.model.ResModel
 import com.directdev.portal.model.TermModel
-import com.directdev.portal.network.DataApi
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_resources.*
 import org.jetbrains.anko.AnkoLogger
@@ -43,14 +42,14 @@ class ResourceFragment : Fragment(), AnkoLogger {
         val courseName = courses.map { it.courseName }.toSet()
         val spinnerAdapter = ArrayAdapter(ctx, android.R.layout.simple_spinner_dropdown_item, courseName.toList())
         courseResourceSpinner.adapter = spinnerAdapter
-        DataApi.fetchResource(ctx, courses).subscribe({}, {})
         courseResourceSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {
             }
 
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                emptyResourceText.text = "We can't find any resource data on " + (p1 as TextView).text
                 if (realm.isClosed) return
-                val selected = courses.filter { it.courseName == (p1 as TextView).text }
+                val selected = courses.filter { it.courseName == p1.text }
                 val resources = realm.where(ResModel::class.java)
                         .equalTo("classNumber", selected[0].classNumber)
                         .findFirst() ?: return

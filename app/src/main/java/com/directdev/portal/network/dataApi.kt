@@ -86,7 +86,7 @@ object DataApi {
         }
     }
 
-    fun fetchResource(ctx: Context, data: RealmResults<CourseModel>): Single<Unit> {
+    fun fetchResources(ctx: Context, data: RealmResults<CourseModel>): Single<Unit> {
         isActive = true
         var cookie = ctx.readPref(R.string.cookie, "") as String
         return signIn(ctx, cookie).flatMap {
@@ -117,6 +117,37 @@ object DataApi {
                         resModel.classNumber = it.classNumber
                         realm.insertOrUpdate(resModel)
                     }
+                }
+            })
+        }
+    }
+
+    fun fetchAssignment(ctx: Context, data: RealmResults<CourseModel>): Single<Unit> {
+        isActive = true
+        val cookie = ctx.readPref(R.string.cookie, "") as String
+        return signIn(ctx, cookie).flatMap {
+            Single.zip(data.map {
+                val classNumber = it.classNumber
+                api.getAssignment(
+                        it.courseId,
+                        it.crseId,
+                        it.term.toString(),
+                        it.ssrComponent,
+                        it.classNumber.toString(),
+                        cookie
+                ).map { data ->
+                    data.forEach { it.classNumber = classNumber }
+                    data
+                }.subscribeOn(Schedulers.io())
+            }, {
+                assignment ->
+                val realm = Realm.getDefaultInstance()
+                realm.executeTransaction { realm ->
+                    val list = mutableListOf<AssignmentIndividualModel>()
+                    (assignment.filterIsInstance<List<AssignmentIndividualModel>>()).forEach {
+                        list.addAll(it)
+                    }
+                    realm.cleanInsert(list)
                 }
             })
         }

@@ -24,10 +24,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <android.support.v7.widget.AppCompatSpinner
-                android:id="@+id/typeSpinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
         </android.support.v7.widget.Toolbar>
 
         <View
@@ -44,12 +40,29 @@
         android:visibility="gone"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/resourceEmptyPlaceholder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorSecondary"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/emptyResourceText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="sdafasf"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            android:textSize="24sp" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:layout_below="@id/emptyResourceText"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Refresh Data" />
+    </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

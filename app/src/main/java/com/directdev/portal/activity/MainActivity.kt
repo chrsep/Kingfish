@@ -3,7 +3,10 @@ package com.directdev.portal.activity
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.directdev.portal.R
-import com.directdev.portal.fragment.*
+import com.directdev.portal.fragment.FinancesFragment
+import com.directdev.portal.fragment.GradesFragment
+import com.directdev.portal.fragment.JournalFragment
+import com.directdev.portal.fragment.ResourceFragment
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlin.properties.Delegates
@@ -28,9 +31,9 @@ class MainActivity : AppCompatActivity() {
                 R.id.tab_finances -> {
                     transaction.replace(R.id.fragmentContainer, FinancesFragment()).commit()
                 }
-                R.id.tab_assignments -> {
-                    transaction.replace(R.id.fragmentContainer, AssignmentFragment()).commit()
-                }
+//                R.id.tab_assignments -> {
+//                    transaction.replace(R.id.fragmentContainer, AssignmentFragment()).commit()
+//                }
                 R.id.tab_resources -> {
                     transaction.replace(R.id.fragmentContainer, ResourceFragment()).commit()
                 }

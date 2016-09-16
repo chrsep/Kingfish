@@ -8,10 +8,10 @@
         icon="@drawable/ic_resources"
         id="@+id/tab_resources"
         title="Resources" />
-    <tab
-        icon="@drawable/ic_assignment"
-        id="@+id/tab_assignments"
-        title="Assignments" />
+    <!--<tab-->
+    <!--icon="@drawable/ic_assignment"-->
+    <!--id="@+id/tab_assignments"-->
+    <!--title="Assignments" />-->
     <tab
         icon="@drawable/ic_grades"
         id="@+id/tab_grades"
