@@ -49,11 +49,14 @@ class ResourceFragment : Fragment(), AnkoLogger {
             }
 
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                if (realm.isClosed) return
                 val selected = courses.filter { it.courseName == (p1 as TextView).text }
                 val resources = realm.where(ResModel::class.java)
                         .equalTo("classNumber", selected[0].classNumber)
                         .findFirst() ?: return
                 val outlineMap = resources.resources.map { it.courseOutlineTopicID }.toSet()
+                resourceRecycler.visibility = View.VISIBLE
+                resourceEmptyPlaceholder.visibility = View.GONE
                 resourceRecycler.layoutManager = LinearLayoutManager(ctx)
                 resourceRecycler.adapter = ResourcesRecyclerAdapter(ctx, outlineMap.toList(), resources)
             }

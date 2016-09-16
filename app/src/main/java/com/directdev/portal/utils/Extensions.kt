@@ -1,6 +1,7 @@
 package com.directdev.portal.utils
 
 import android.content.Context
+import android.net.ConnectivityManager
 import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
 import android.view.View
@@ -43,3 +44,6 @@ fun Snackbar.action(action: String, color: Int? = null, listener: (View) -> Unit
     color?.let { setActionTextColor(color) }
 }
 
+fun ConnectivityManager.isNetworkAvailable(): Boolean {
+    return activeNetworkInfo != null && activeNetworkInfo.isConnected
+}

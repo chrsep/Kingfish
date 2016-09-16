@@ -150,9 +150,9 @@
                             android:id="@+id/lbLoading"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Please wait..."
+                            android:text="This may take a minute..."
                             android:textColor="@color/colorPrimary"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:textStyle="bold" />
                     </ViewSwitcher>
 
@@ -195,7 +195,7 @@
                     android:layout_alignRight="@+id/tilFormPassword"
                     android:layout_alignEnd="@+id/tilFormPassword"
                     android:layout_alignBottom="@+id/tilFormUsername"
-                    android:textSize="14sp"
+                    android:textSize="16sp"
                     android:layout_alignParentRight="true"
                     android:textAlignment="center"
                     android:layout_marginBottom="14dp"

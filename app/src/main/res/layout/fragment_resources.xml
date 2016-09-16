@@ -41,5 +41,15 @@
         android:id="@+id/resourceRecycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <LinearLayout
+        android:id="@+id/resourceEmptyPlaceholder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorSecondary"
+        android:orientation="vertical">
+
+    </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>
