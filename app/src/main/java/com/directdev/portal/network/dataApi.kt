@@ -69,15 +69,20 @@ object DataApi {
 
     fun fetchData(ctx: Context): Single<Unit> {
         isActive = true
-        val cookie = ctx.readPref(R.string.cookie, "") as String
+        var cookie = ctx.readPref(R.string.cookie, "") as String
+        val realm = Realm.getDefaultInstance()
         return signIn(ctx, cookie).flatMap {
-            it.headers().get("Set-Cookie")?.savePref(ctx, R.string.cookie)
-            api.getTerms(cookie).subscribeOn(Schedulers.io())
-        }.flatMap { terms ->
-            val realm = Realm.getDefaultInstance()
-            realm.executeTransaction { it.insertOrUpdate(terms) }
+            val headerCookie = it.headers().get("Set-Cookie")
+            val term = realm.where(TermModel::class.java).max("value")
+            if (headerCookie == null) {
+                fetchRecent(ctx, cookie, term.toString())
+            } else {
+                cookie = headerCookie
+                cookie.savePref(ctx, R.string.cookie)
+                fetchRecent(ctx, cookie, term.toString())
+            }
+        }.map { terms ->
             realm.close()
-            fetchRecent(ctx, cookie, terms[0].value.toString())
         }
     }
 

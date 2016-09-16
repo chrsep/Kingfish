@@ -26,11 +26,23 @@ class JournalRecyclerAdapter(val realm: Realm, context: Context, data: OrderedRe
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         fun bindData(ctx: Context, item: JournalModel) {
-            itemView.txtDate.text = DateTime.parse(item.id.substring(0, 10)).toString(DateTimeFormat.forPattern("dd MMM ''yy"))
-            itemView.txtDay.text = DateTime(item.date).dayOfWeek().getAsText(Locale.US)
-
+            setHeader(item)
             itemView.recyclerSchedule.layoutManager = LinearLayoutManager(ctx)
+            itemView.recyclerSchedule.isNestedScrollingEnabled = false
             itemView.recyclerSchedule.adapter = SessionRecyclerAdapter(ctx, item.session, true)
+        }
+
+        private fun setHeader(item: JournalModel) {
+            val today = DateTime.now().withTimeAtStartOfDay()
+            if (item.date == today.toDate()) {
+                itemView.header.visibility = View.GONE
+                return
+            }
+
+            itemView.header.visibility = View.VISIBLE
+            if (item.date == today.plusDays(1).toDate()) itemView.txtDay.text = "Tomorrow"
+            else itemView.txtDay.text = DateTime(item.date).dayOfWeek().getAsText(Locale.US)
+            itemView.txtDate.text = DateTime.parse(item.id.substring(0, 10)).toString(DateTimeFormat.forPattern("dd MMM ''yy"))
         }
     }
 }

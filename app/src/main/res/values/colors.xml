@@ -13,4 +13,6 @@
     <color name="white">#FFFFFF</color>
     <color name="inactive_white">#57FFFFFF</color>
     <color name="black">#000000</color>
+
+    <color name="toolbarBorder">#1f000000</color>
 </resources>

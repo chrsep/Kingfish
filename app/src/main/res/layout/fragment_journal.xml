@@ -13,9 +13,15 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/journalToolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
             android:theme="@style/ThemeOverlay.AppCompat.Light"
+            app:layout_scrollFlags="scroll|enterAlways" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/toolbarBorder"
             app:layout_scrollFlags="scroll|enterAlways" />
     </android.support.design.widget.AppBarLayout>
 
@@ -34,4 +40,5 @@
         android:src="@drawable/ic_add"
         android:tint="@color/colorPrimary"
         app:fabSize="normal" />
+
 </android.support.design.widget.CoordinatorLayout>

@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         setContentView(R.layout.activity_main)
         bottomBar.setOnTabSelectListener {
             val transaction = fragmentManager.beginTransaction()
@@ -36,5 +36,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    fun showAddAssignment() {
+        bottomSheet.showWithSheetView(layoutInflater.inflate(R.layout.bottomsheet_assignment, bottomSheet, false))
     }
 }

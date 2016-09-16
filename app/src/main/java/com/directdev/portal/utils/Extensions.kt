@@ -32,8 +32,8 @@ fun Context.readPref(@StringRes id: Int, defaultValue: Any): Any {
     }
 }
 
-fun View.snack(msg: String, length: Int = Snackbar.LENGTH_SHORT, option: Snackbar.() -> Unit = {}) {
-    val snack = Snackbar.make(this, msg, length)
+fun View.snack(msg: Any, length: Int = Snackbar.LENGTH_SHORT, option: Snackbar.() -> Unit = {}) {
+    val snack = Snackbar.make(this, msg.toString(), length)
     snack.option()
     snack.show()
 }

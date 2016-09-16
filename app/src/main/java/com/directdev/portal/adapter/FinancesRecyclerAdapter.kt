@@ -50,7 +50,7 @@ class FinancesRecyclerAdapter(val realm: Realm, context: Context, data: OrderedR
     class NormalViewHolder(view: View) : FinancesRecyclerAdapter.ViewHolder(view) {
         override fun bindData(item: FinanceModel) {
             itemView.finance_description.text = item.description
-            itemView.finance_date.text = "Due: " + DateTime.parse(item.dueDate.substring(0, 10)).toString(DateTimeFormat.forPattern("dd MMM ''yy"))
+            itemView.finance_date.text = DateTime.parse(item.dueDate.substring(0, 10)).toString(DateTimeFormat.forPattern("dd MMM ''yy"))
             itemView.finance_amount.text = "Rp. " + NumberFormat.getNumberInstance(Locale.US).format(item.chargeAmount.toFloat())
             if (DateTime.parse(item.dueDate.substring(0, 10)).isAfterNow) {
                 itemView.finance_passed.visibility = View.GONE

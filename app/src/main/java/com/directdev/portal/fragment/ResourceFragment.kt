@@ -3,26 +3,28 @@ package com.directdev.portal.fragment
 import android.app.Fragment
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.TextView
 import com.directdev.portal.R
-import com.directdev.portal.activity.MainActivity
-import com.directdev.portal.adapter.FinancesRecyclerAdapter
+import com.directdev.portal.adapter.ResourcesRecyclerAdapter
 import com.directdev.portal.model.CourseModel
-import com.directdev.portal.model.FinanceModel
+import com.directdev.portal.model.ResModel
+import com.directdev.portal.model.TermModel
 import com.directdev.portal.network.DataApi
-import com.directdev.portal.utils.snack
 import io.realm.Realm
-import kotlinx.android.synthetic.main.fragment_finances.*
 import kotlinx.android.synthetic.main.fragment_resources.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.ctx
-import org.jetbrains.anko.onClick
 import kotlin.properties.Delegates
 
 /**
  * Created by chris on 9/14/2016.
  */
-class ResourceFragment : Fragment(), AnkoLogger{
+class ResourceFragment : Fragment(), AnkoLogger {
     private var realm: Realm by Delegates.notNull()
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -33,18 +35,29 @@ class ResourceFragment : Fragment(), AnkoLogger{
     override fun onStart() {
         super.onStart()
         realm = Realm.getDefaultInstance()
-        val courses = realm.where(CourseModel::class.java).findAll()
-        fab.onClick {
-            DataApi.fetchResource(ctx, courses).subscribe ({
-                view.snack("Suckses")
-            },{
-                throw it
-            })
-        }
-    }
+        val term = realm.where(TermModel::class.java).max("value")
+        val courses = realm.where(CourseModel::class.java)
+                .equalTo("term", term as Long)
+                .equalTo("ssrComponent", "LEC")
+                .findAll()
+        val courseName = courses.map { it.courseName }.toSet()
+        val spinnerAdapter = ArrayAdapter(ctx, android.R.layout.simple_spinner_dropdown_item, courseName.toList())
+        courseResourceSpinner.adapter = spinnerAdapter
+        DataApi.fetchResource(ctx, courses).subscribe({}, {})
+        courseResourceSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+            }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        (ctx as MainActivity).menuInflater.inflate(R.menu.menu_main, menu)
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                val selected = courses.filter { it.courseName == (p1 as TextView).text }
+                val resources = realm.where(ResModel::class.java)
+                        .equalTo("classNumber", selected[0].classNumber)
+                        .findFirst() ?: return
+                val outlineMap = resources.resources.map { it.courseOutlineTopicID }.toSet()
+                resourceRecycler.layoutManager = LinearLayoutManager(ctx)
+                resourceRecycler.adapter = ResourcesRecyclerAdapter(ctx, outlineMap.toList(), resources)
+            }
+        }
     }
 
     override fun onStop() {

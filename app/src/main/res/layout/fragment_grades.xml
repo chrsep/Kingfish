@@ -30,25 +30,24 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@android:color/transparent"
             android:theme="@style/ThemeOverlay.AppCompat.Light"
-            app:layout_scrollFlags="scroll|enterAlways">
-
-        </android.support.v7.widget.Toolbar>
+            app:layout_scrollFlags="scroll|enterAlways" />
     </android.support.design.widget.AppBarLayout>
+
     <LinearLayout
         android:id="@+id/empty_placeholder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="75dp"
-        android:paddingStart="50dp"
         android:paddingLeft="50dp"
+        android:paddingStart="50dp"
+        android:paddingTop="75dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <ImageView
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@drawable/ic_sad"
-            android:tint="@color/inactive_white"/>
+            android:tint="@color/inactive_white" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -62,12 +61,13 @@
             android:layout_height="wrap_content"
             android:text="Choose other semester with the chart on top" />
     </LinearLayout>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/gradesRecycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="8dp"
         android:clipToPadding="false"
+        android:paddingTop="8dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </android.support.design.widget.CoordinatorLayout>
