@@ -42,7 +42,8 @@ class JournalRecyclerAdapter(val realm: Realm, context: Context, data: OrderedRe
             itemView.header.visibility = View.VISIBLE
             if (item.date == today.plusDays(1).toDate()) itemView.txtDay.text = "Tomorrow"
             else itemView.txtDay.text = DateTime(item.date).dayOfWeek().getAsText(Locale.US)
-            itemView.txtDate.text = DateTime.parse(item.id.substring(0, 10)).toString(DateTimeFormat.forPattern("dd MMM ''yy"))
+            itemView.txtDate.text = DateTime.parse(item.id.substring(0, 10))
+                    .toString(DateTimeFormat.forPattern("dd MMM ''yy"))
         }
     }
 }

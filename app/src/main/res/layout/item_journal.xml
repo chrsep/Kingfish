@@ -33,6 +33,5 @@
         android:id="@+id/recyclerSchedule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/header"
-        android:nestedScrollingEnabled="false" />
+        android:layout_below="@id/header" />
 </RelativeLayout>
