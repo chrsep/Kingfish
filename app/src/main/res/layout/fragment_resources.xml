@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/journal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -31,38 +32,79 @@
             android:layout_height="1dp"
             android:background="@color/toolbarBorder"
             app:layout_scrollFlags="scroll|enterAlways"/>
+
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/resourceRecycler"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:visibility="gone"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <RelativeLayout
+    <android.support.constraint.ConstraintLayout
         android:id="@+id/resourceEmptyPlaceholder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/confused_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_confused_emoticon"
+            android:tint="@color/inactive_white"
+            android:layout_marginStart="16dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginLeft="16dp"
+            tools:layout_constraintTop_creator="1"
+            android:layout_marginTop="32dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintVertical_bias="0.0" />
 
         <TextView
             android:id="@+id/emptyResourceText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:text="sdafasf"
-            android:textAlignment="center"
             android:textStyle="bold"
-            android:textSize="24sp" />
+            android:textSize="24sp"
+            android:text="asdas"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/confused_image"
+            android:layout_marginStart="16dp"
+            tools:layout_constraintLeft_creator="1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginLeft="16dp" />
 
-        <android.support.v7.widget.AppCompatButton
-            android:layout_below="@id/emptyResourceText"
-            android:layout_centerHorizontal="true"
+        <TextView
+            android:id="@+id/emptyResourceExplain"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Refresh Data" />
-    </RelativeLayout>
+            android:text="asdasd"
+            app:layout_constraintTop_toBottomOf="@+id/emptyResourceText"
+            android:layout_marginStart="16dp"
+            tools:layout_constraintLeft_creator="1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginLeft="16dp" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/refreshresourceButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:text="Refresh Data"
+            app:layout_constraintTop_toTopOf="@+id/emptyResourceText"
+            app:layout_constraintBottom_toBottomOf="@+id/emptyResourceExplain"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginRight="16dp"
+            tools:layout_constraintTop_creator="1"
+            tools:layout_constraintBottom_creator="1"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp" />
+    </android.support.constraint.ConstraintLayout>
+
 </android.support.design.widget.CoordinatorLayout>

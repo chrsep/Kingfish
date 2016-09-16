@@ -1,7 +1,10 @@
 package com.directdev.portal.fragment
 
 import android.app.Fragment
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
@@ -14,10 +17,15 @@ import com.directdev.portal.adapter.ResourcesRecyclerAdapter
 import com.directdev.portal.model.CourseModel
 import com.directdev.portal.model.ResModel
 import com.directdev.portal.model.TermModel
+import com.directdev.portal.network.DataApi
+import com.directdev.portal.utils.snack
 import io.realm.Realm
+import io.realm.RealmResults
 import kotlinx.android.synthetic.main.fragment_resources.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.ctx
+import org.jetbrains.anko.onClick
+import org.jetbrains.anko.runOnUiThread
 import kotlin.properties.Delegates
 
 /**
@@ -39,6 +47,20 @@ class ResourceFragment : Fragment(), AnkoLogger {
                 .equalTo("term", term as Long)
                 .equalTo("ssrComponent", "LEC")
                 .findAll()
+        emptyResourceText.text = "No resources yet"
+        emptyResourceExplain.text = "Try refreshing the data"
+        refreshresourceButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(ctx.getString(R.color.colorAccent)))
+        refreshresourceButton.onClick {
+            view.snack("Refreshing data, please wait...", Snackbar.LENGTH_INDEFINITE)
+            DataApi.fetchResources(ctx, courses).subscribe({
+                view.snack("Success")
+                runOnUiThread {
+                    setRecycler(courseResourceSpinner.selectedView as TextView, courses)
+                }
+            }, {
+                view.snack("Failed")
+            })
+        }
         val courseName = courses.map { it.courseName }.toSet()
         val spinnerAdapter = ArrayAdapter(ctx, android.R.layout.simple_spinner_dropdown_item, courseName.toList())
         courseResourceSpinner.adapter = spinnerAdapter
@@ -47,17 +69,7 @@ class ResourceFragment : Fragment(), AnkoLogger {
             }
 
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                emptyResourceText.text = "We can't find any resource data on " + (p1 as TextView).text
-                if (realm.isClosed) return
-                val selected = courses.filter { it.courseName == p1.text }
-                val resources = realm.where(ResModel::class.java)
-                        .equalTo("classNumber", selected[0].classNumber)
-                        .findFirst() ?: return
-                val outlineMap = resources.resources.map { it.courseOutlineTopicID }.toSet()
-                resourceRecycler.visibility = View.VISIBLE
-                resourceEmptyPlaceholder.visibility = View.GONE
-                resourceRecycler.layoutManager = LinearLayoutManager(ctx)
-                resourceRecycler.adapter = ResourcesRecyclerAdapter(ctx, outlineMap.toList(), resources)
+                setRecycler(p1, courses)
             }
         }
     }
@@ -65,5 +77,18 @@ class ResourceFragment : Fragment(), AnkoLogger {
     override fun onStop() {
         super.onStop()
         realm.close()
+    }
+
+    private fun setRecycler(p1: View?, courses: RealmResults<CourseModel>) {
+        if (realm.isClosed) return
+        val selected = courses.filter { it.courseName == (p1 as TextView).text }
+        val resources = realm.where(ResModel::class.java)
+                .equalTo("classNumber", selected[0].classNumber)
+                .findFirst() ?: return
+        val outlineMap = resources.resources.map { it.courseOutlineTopicID }.toSet()
+        resourceRecycler.visibility = View.VISIBLE
+        resourceEmptyPlaceholder.visibility = View.GONE
+        resourceRecycler.layoutManager = LinearLayoutManager(ctx)
+        resourceRecycler.adapter = ResourcesRecyclerAdapter(ctx, outlineMap.toList(), resources)
     }
 }

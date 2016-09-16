@@ -43,7 +43,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="17dp"
-        android:textSize="18sp" />
+        android:textSize="14sp" />
 
     <android.support.v7.widget.AppCompatImageButton
         android:id="@+id/presentationDownload"

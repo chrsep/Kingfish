@@ -21,6 +21,7 @@ import kotlin.properties.Delegates
 
 class JournalFragment : Fragment() {
     private var realm: Realm by Delegates.notNull()
+    private var menuInflated = false
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
             inflater?.inflate(R.layout.fragment_journal, container, false)
@@ -37,6 +38,7 @@ class JournalFragment : Fragment() {
         setupToolbar(journalDates)
     }
 
+
     private fun setupToolbar(journalDates: RealmResults<JournalModel>?) {
         val today = DateTime.now().withTimeAtStartOfDay()
         val journalToday = journalDates?.filter {
@@ -47,8 +49,10 @@ class JournalFragment : Fragment() {
                 journalToolbar.title = "Today"
             }
         } else journalToolbar.title = "Today - holiday"
-
-        journalToolbar.inflateMenu(R.menu.menu_journal)
+        if (!menuInflated) {
+            journalToolbar.inflateMenu(R.menu.menu_journal)
+            menuInflated = true
+        }
         journalToolbar.onMenuItemClick {
             when (it?.itemId) {
                 R.id.action_refresh -> {

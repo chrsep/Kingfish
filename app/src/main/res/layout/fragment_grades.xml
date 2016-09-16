@@ -21,7 +21,7 @@
                 android:id="@+id/chart"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
-                android:layout_margin="16dp" />
+                android:layout_margin="4dp" />
         </android.support.design.widget.CollapsingToolbarLayout>
 
         <android.support.v7.widget.Toolbar
@@ -43,7 +43,7 @@
         android:paddingTop="75dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <ImageView
+        <android.support.v7.widget.AppCompatImageView
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@drawable/ic_sad"
@@ -59,7 +59,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Choose other semester with the chart on top" />
+            android:text="Click the dots on top to change semester" />
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView

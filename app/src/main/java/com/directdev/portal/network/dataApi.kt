@@ -119,7 +119,7 @@ object DataApi {
                     }
                 }
             })
-        }
+        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
     }
 
     fun fetchAssignment(ctx: Context, data: RealmResults<CourseModel>): Single<Unit> {
