@@ -44,7 +44,7 @@ object DataApi {
             }
         }.flatMap {
             terms ->
-            Crashlytics.log("initializeApp Term Size " + terms.size)
+            Crashlytics.log("initializeApp Term Data " + terms.toString())
             val single: Single<Array<Any>>
             if (terms.size == 1) {
                 single = fetchGrades(terms, cookie)[0].map {
@@ -183,7 +183,7 @@ object DataApi {
 
     private fun fetchCourses(terms: List<TermModel>, cookie: String): Single<List<CourseModel>> {
         val single: Single<List<CourseModel>>
-        Crashlytics.log("fetchCourses Term Size " + terms.size)
+        Crashlytics.log("fetchCourses Term Data " + terms.toString())
         if (terms.size == 1) {
             single = api.getCourse(terms[0].value.toString(), cookie)
                     .subscribeOn(Schedulers.io())

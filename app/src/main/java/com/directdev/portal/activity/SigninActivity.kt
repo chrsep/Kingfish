@@ -70,7 +70,7 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
     private fun setAnalyticsUserProperties() {
         mFirebaseAnalytics.setUserProperty("degree", this.readPref(R.string.major, "") as String)
         mFirebaseAnalytics.setUserProperty("major", this.readPref(R.string.degree, "") as String)
-        mFirebaseAnalytics.setUserProperty("generation", (this.readPref(R.string.nim, "") as String).substring(0, 1))
+        mFirebaseAnalytics.setUserProperty("generation", (this.readPref(R.string.nim, "") as String).substring(0, 3))
     }
 
     private fun callToServer() {
@@ -78,7 +78,11 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
             true.savePref(ctx, R.string.isLoggedIn)
             DataApi.isActive = false
             setAnalyticsUserProperties()
-            Answers.getInstance().logLogin(LoginEvent().putSuccess(true))
+            Answers.getInstance().logLogin(LoginEvent()
+                    .putSuccess(true)
+                    .putCustomAttribute("Degree", this.readPref(R.string.major, "") as String)
+                    .putCustomAttribute("Major", this.readPref(R.string.degree, "") as String)
+                    .putCustomAttribute("Generation", (this.readPref(R.string.nim, "") as String).substring(0, 3)))
             startActivity<MainActivity>()
         }, {
             false.savePref(ctx, R.string.isLoggedIn)
