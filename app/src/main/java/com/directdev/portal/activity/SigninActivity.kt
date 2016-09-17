@@ -7,6 +7,8 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
 import com.crashlytics.android.Crashlytics
+import com.crashlytics.android.answers.Answers
+import com.crashlytics.android.answers.LoginEvent
 import com.directdev.portal.R
 import com.directdev.portal.network.DataApi
 import com.directdev.portal.utils.*
@@ -76,22 +78,27 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
             true.savePref(ctx, R.string.isLoggedIn)
             DataApi.isActive = false
             setAnalyticsUserProperties()
+            Answers.getInstance().logLogin(LoginEvent().putSuccess(true))
             startActivity<MainActivity>()
         }, {
             false.savePref(ctx, R.string.isLoggedIn)
             DataApi.isActive = false
             switchButtonText()
-            info { it }
+            Answers.getInstance().logLogin(LoginEvent()
+                    .putSuccess(false)
+                    .putCustomAttribute("Error Message", it.message)
+                    .putCustomAttribute("Error Log", it.toString()))
             when (it) {
                 is TimeoutException -> {
-                    signinActivity.snack("Request Timed Out", Snackbar.LENGTH_LONG) {
+                    signinActivity?.snack("Request Timed Out", Snackbar.LENGTH_LONG) {
                         action("retry", Color.YELLOW, { callToServer() })
                     }
                 }
-                is UnknownHostException -> signinActivity.snack("Failed to connect, try again later", Snackbar.LENGTH_LONG)
-                is IOException -> signinActivity.snack("Wrong email or password", Snackbar.LENGTH_LONG)
+                is UnknownHostException -> signinActivity?.snack("Failed to connect, try again later", Snackbar.LENGTH_LONG)
+                is IOException -> signinActivity?.snack("Wrong email or password", Snackbar.LENGTH_LONG)
                 else -> {
-                    signinActivity.snack("We have no idea what went wrong, but we have received the error log, please try again", Snackbar.LENGTH_INDEFINITE)
+                    signinActivity.snack("We have no idea what went wrong, but we have received the error log, we'll look into this", Snackbar.LENGTH_INDEFINITE)
+                    Crashlytics.log("Unknown CrashOnSignIn")
                     Crashlytics.logException(it)
                 }
             }

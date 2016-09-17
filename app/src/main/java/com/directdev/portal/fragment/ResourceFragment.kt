@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
+import com.crashlytics.android.Crashlytics
 import com.directdev.portal.R
 import com.directdev.portal.adapter.ResourcesRecyclerAdapter
 import com.directdev.portal.model.CourseModel
@@ -49,16 +50,20 @@ class ResourceFragment : Fragment(), AnkoLogger {
                 .findAll()
         emptyResourceText.text = "No resources yet"
         emptyResourceExplain.text = "Try refreshing the data"
-        refreshresourceButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(ctx.getString(R.color.colorAccent)))
+        try {
+            refreshresourceButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(ctx.getString(R.color.colorAccent)))
+        } catch (e: NoSuchMethodError) {
+            Crashlytics.logException(e)
+        }
         refreshresourceButton.onClick {
             view.snack("Refreshing data, please wait...", Snackbar.LENGTH_INDEFINITE)
             DataApi.fetchResources(ctx, courses).subscribe({
-                view.snack("Success")
+                view?.snack("Success")
                 runOnUiThread {
                     setRecycler(courseResourceSpinner.selectedView as TextView, courses)
                 }
             }, {
-                view.snack("Failed")
+                view?.snack("Failed")
             })
         }
         val courseName = courses.map { it.courseName }.toSet()
@@ -84,10 +89,14 @@ class ResourceFragment : Fragment(), AnkoLogger {
         val selected = courses.filter { it.courseName == (p1 as TextView).text }
         val resources = realm.where(ResModel::class.java)
                 .equalTo("classNumber", selected[0].classNumber)
-                .findFirst() ?: return
+                .findFirst()
+        if (resources == null) {
+            resourceEmptyPlaceholder.visibility = View.VISIBLE
+            return
+        }
         val outlineMap = resources.resources.map { it.courseOutlineTopicID }.toSet()
-        resourceRecycler.visibility = View.VISIBLE
         resourceEmptyPlaceholder.visibility = View.GONE
+        resourceRecycler.visibility = View.VISIBLE
         resourceRecycler.layoutManager = LinearLayoutManager(ctx)
         resourceRecycler.adapter = ResourcesRecyclerAdapter(ctx, outlineMap.toList(), resources)
     }

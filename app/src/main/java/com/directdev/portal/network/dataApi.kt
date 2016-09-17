@@ -42,10 +42,18 @@ object DataApi {
             }
         }.flatMap {
             terms ->
-            Single.zip(fetchGrades(terms, cookie), {
-                grades ->
-                grades
-            }).zipWith(api.getProfile(cookie).subscribeOn(Schedulers.io()), {
+            val single: Single<Array<Any>>
+            if (terms.size == 1) {
+                single = fetchGrades(terms, cookie)[0].map {
+                    arrayOf<Any>(it)
+                }
+            } else {
+                single = Single.zip(fetchGrades(terms, cookie), {
+                    grades ->
+                    grades
+                })
+            }
+            single.zipWith(api.getProfile(cookie).subscribeOn(Schedulers.io()), {
                 grades, profile ->
                 saveProfile(ctx, profile)
                 profile.close()
@@ -90,6 +98,11 @@ object DataApi {
         isActive = true
         var cookie = ctx.readPref(R.string.cookie, "") as String
         return signIn(ctx, cookie).flatMap {
+            val headerCookie = it.headers().get("Set-Cookie")
+            if (headerCookie != null) {
+                cookie = headerCookie
+                cookie.savePref(ctx, R.string.cookie)
+            }
             Single.zip(data.map {
                 val classNumber = it.classNumber
                 api.getResources(
@@ -153,30 +166,6 @@ object DataApi {
         }
     }
 
-    private fun fetchGrades(terms: List<TermModel>, cookie: String): List<Single<GradeModel>> =
-            terms.drop(1).map {
-                api.getGrades(it.value.toString(), cookie).subscribeOn(Schedulers.io())
-            }
-
-    private fun fetchCourses(terms: List<TermModel>, cookie: String) =
-            Single.zip(
-                    terms.drop(1).map({
-                        term ->
-                        api.getCourse(term.value.toString(), cookie)
-                                .subscribeOn(Schedulers.io())
-                                .map {
-                                    it.courses.forEach { it.term = term.value }
-                                    it.courses
-                                }
-                    }),
-                    {
-                        val listOfCourses = mutableListOf<CourseModel>()
-                        val itList = it.filterIsInstance<List<CourseModel>>()
-                        itList.forEach { listOfCourses.addAll(it) }
-                        listOfCourses
-                    }
-            )
-
     private fun signIn(ctx: Context, cookie: String = "") = api.signIn(
             ctx.readPref(R.string.username, "") as String,
             ctx.readPref(R.string.password, "") as String,
@@ -184,6 +173,37 @@ object DataApi {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 
+    private fun fetchGrades(terms: List<TermModel>, cookie: String): List<Single<GradeModel>> =
+            terms.map {
+                api.getGrades(it.value.toString(), cookie).subscribeOn(Schedulers.io())
+            }
+
+    private fun fetchCourses(terms: List<TermModel>, cookie: String): Single<List<CourseModel>> {
+        val single: Single<List<CourseModel>>
+        if (terms.size == 1) {
+            single = api.getCourse(terms[0].value.toString(), cookie)
+                    .subscribeOn(Schedulers.io())
+                    .map {
+                        it.courses.forEach { it.term = terms[0].value }
+                        it.courses
+                    }
+        } else {
+            single = Single.zip(terms.drop(1).map({ term ->
+                api.getCourse(term.value.toString(), cookie)
+                        .subscribeOn(Schedulers.io())
+                        .map {
+                            it.courses.forEach { it.term = term.value }
+                            it.courses
+                        }
+            }), {
+                val listOfCourses = mutableListOf<CourseModel>()
+                val itList = it.filterIsInstance<List<CourseModel>>()
+                itList.forEach { listOfCourses.addAll(it) }
+                listOfCourses
+            })
+        }
+        return single
+    }
 
     private fun fetchRecent(ctx: Context, cookie: String, term: String) = Single.zip(
             api.getFinances(cookie).subscribeOn(Schedulers.io()),
@@ -209,6 +229,11 @@ object DataApi {
             })
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+
+
+    /**
+     * Helper Functions for saving data
+     * */
 
     private fun saveCourse(course: CourseWrapperModel, term: String, realm: Realm) {
         course.courses.forEach {

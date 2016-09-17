@@ -38,7 +38,8 @@ class ResourcesRecyclerAdapter(val context: Context, val data: List<String>, val
             itemView.resSession.text = "Meeting " + item[0].sessionIDNUM
             itemView.resTopic.text = item[0].courseOutlineTopic
             try {
-                itemView.presentationDownload.backgroundTintList = ColorStateList.valueOf(Color.parseColor(ctx.getString(R.color.colorAccent)))
+                itemView.presentationDownload.backgroundTintList = ColorStateList
+                        .valueOf(Color.parseColor(ctx.getString(R.color.colorAccent)))
             } catch (e: NoSuchMethodError) {
                 Crashlytics.logException(e)
             }
@@ -49,7 +50,8 @@ class ResourcesRecyclerAdapter(val context: Context, val data: List<String>, val
                 if (selectedDownload.size == 0) return@onClick
                 val path = (selectedDownload[0].path + selectedDownload[0].location + "/" + selectedDownload[0].filename).replace("\\", "/").replace(" ", "%20")
                 Log.d("Path", path)
-                ctx.downloadManager.enqueue(DownloadManager.Request(Uri.parse(path)))
+                ctx.downloadManager.enqueue(DownloadManager.Request(Uri.parse(path))
+                        .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED))
             }
         }
     }

@@ -28,6 +28,8 @@
 -keep class retrofit2.** { *; }
 -keepattributes Signature
 -keepattributes Exceptions
+-keepattributes *Annotation*
+-keepattributes SourceFile,LineNumberTable
 
 -keepclasseswithmembers class * {
     @retrofit2.http.* <methods>;
