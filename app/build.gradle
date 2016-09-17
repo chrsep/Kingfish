@@ -24,8 +24,8 @@ android {
         applicationId "com.directdev.portal"
         minSdkVersion 17
         targetSdkVersion 24
-        versionCode 38
-        versionName "0.3.0b"
+        versionCode 39
+        versionName "0.3.0c"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

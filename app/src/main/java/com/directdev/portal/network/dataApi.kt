@@ -1,6 +1,7 @@
 package com.directdev.portal.network
 
 import android.content.Context
+import com.crashlytics.android.Crashlytics
 import com.directdev.portal.BuildConfig
 import com.directdev.portal.R
 import com.directdev.portal.model.*
@@ -14,6 +15,7 @@ import io.realm.RealmResults
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
@@ -42,6 +44,7 @@ object DataApi {
             }
         }.flatMap {
             terms ->
+            Crashlytics.log("initializeApp Term Size " + terms.size)
             val single: Single<Array<Any>>
             if (terms.size == 1) {
                 single = fetchGrades(terms, cookie)[0].map {
@@ -180,6 +183,7 @@ object DataApi {
 
     private fun fetchCourses(terms: List<TermModel>, cookie: String): Single<List<CourseModel>> {
         val single: Single<List<CourseModel>>
+        Crashlytics.log("fetchCourses Term Size " + terms.size)
         if (terms.size == 1) {
             single = api.getCourse(terms[0].value.toString(), cookie)
                     .subscribeOn(Schedulers.io())
@@ -256,18 +260,31 @@ object DataApi {
     }
 
     private fun saveProfile(ctx: Context, response: ResponseBody) {
-        val profile = JSONObject(response.string()).getJSONArray("Profile").getJSONObject(0)
-        profile.getString("ACAD_PROG_DESCR").savePref(ctx, R.string.major)
-        profile.getString("ACAD_CAREER_DESCR").savePref(ctx, R.string.degree)
-        profile.getString("BIRTHDATE").savePref(ctx, R.string.birthday)
-        profile.getString("NAMA").savePref(ctx, R.string.name)
-        profile.getString("NIM").savePref(ctx, R.string.nim)
+        try {
+            val profile = JSONObject(response.string()).getJSONArray("Profile").getJSONObject(0)
+            profile.getString("ACAD_PROG_DESCR").savePref(ctx, R.string.major)
+            profile.getString("ACAD_CAREER_DESCR").savePref(ctx, R.string.degree)
+            profile.getString("BIRTHDATE").savePref(ctx, R.string.birthday)
+            profile.getString("NAMA").savePref(ctx, R.string.name)
+            profile.getString("NIM").savePref(ctx, R.string.nim)
+        } catch (e: JSONException) {
+            Crashlytics.log(response.string())
+            Crashlytics.logException(e)
+            throw e
+        }
     }
 
     private fun saveFinanceSummary(ctx: Context, response: ResponseBody) {
-        val summary = JSONArray(response.string()).getJSONObject(0)
-        summary.getInt("charge").savePref(ctx, R.string.finance_charge)
-        summary.getInt("payment").savePref(ctx, R.string.finance_payment)
+        try {
+            val responseJson = JSONArray(response.string())
+            if (responseJson.length() == 0) return
+            val summary = responseJson.getJSONObject(0)
+            summary.getInt("charge").savePref(ctx, R.string.finance_charge)
+            summary.getInt("payment").savePref(ctx, R.string.finance_payment)
+        } catch (e: JSONException) {
+            Crashlytics.log(response.string())
+            Crashlytics.logException(e)
+        }
     }
 
     private fun Realm.insertGrade(data: GradeModel) {

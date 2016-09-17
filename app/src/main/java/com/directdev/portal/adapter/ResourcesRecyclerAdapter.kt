@@ -48,10 +48,16 @@ class ResourcesRecyclerAdapter(val context: Context, val data: List<String>, val
                     it.mediaTypeId == "01" && it.courseOutlineTopicID == item[0].courseOutlineTopicID
                 }
                 if (selectedDownload.size == 0) return@onClick
-                val path = (selectedDownload[0].path + selectedDownload[0].location + "/" + selectedDownload[0].filename).replace("\\", "/").replace(" ", "%20")
+                val path = (selectedDownload[0].path
+                        + selectedDownload[0].location
+                        + "/"
+                        + selectedDownload[0].filename)
+                        .replace("\\", "/")
+                        .replace(" ", "%20")
                 Log.d("Path", path)
                 ctx.downloadManager.enqueue(DownloadManager.Request(Uri.parse(path))
-                        .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED))
+                        .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                        .setTitle(item[0].courseOutlineTopic))
             }
         }
     }

@@ -95,7 +95,11 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
                     }
                 }
                 is UnknownHostException -> signinActivity?.snack("Failed to connect, try again later", Snackbar.LENGTH_LONG)
-                is IOException -> signinActivity?.snack("Wrong email or password", Snackbar.LENGTH_LONG)
+                is IOException -> {
+                    signinActivity?.snack("Wrong email or password", Snackbar.LENGTH_LONG)
+                    Crashlytics.log("Wrong email or password CrashOnSignIn")
+                    Crashlytics.logException(it)
+                }
                 else -> {
                     signinActivity.snack("We have no idea what went wrong, but we have received the error log, we'll look into this", Snackbar.LENGTH_INDEFINITE)
                     Crashlytics.log("Unknown CrashOnSignIn")
