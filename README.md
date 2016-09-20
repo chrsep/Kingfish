@@ -11,6 +11,7 @@ A recently released database built from the ground up for mobile application
 
 ####Libraries
 1. [ReactiveX](http://reactivex.io/), used to handle asynchronous task
-2. [Anko](https://github.com/Kotlin/anko), a DSL to handle layouts based on kotlin
+2. [Anko](https://github.com/Kotlin/anko), a library to interact with layouts based on kotlin
 3. [Retrofit](http://square.github.io/retrofit/), for handling network calls
 4. [Joda-Time](http://www.joda.org/joda-time/) for handling date and time
+

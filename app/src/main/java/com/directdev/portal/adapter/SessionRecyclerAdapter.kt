@@ -32,6 +32,7 @@ class SessionRecyclerAdapter(context: Context, data: OrderedRealmCollection<Sess
                 itemView.journalShift.visibility = View.GONE
                 color = "#f44336"
             } else {
+                itemView.journalCampus.text = session.locationId
                 itemView.journalMode.text = session.typeId
                 color = when (session.typeId) {
                     "LEC" -> "#ffeb3b"

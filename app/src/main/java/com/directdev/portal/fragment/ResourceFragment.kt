@@ -48,8 +48,6 @@ class ResourceFragment : Fragment(), AnkoLogger {
                 .equalTo("term", term as Long)
                 .equalTo("ssrComponent", "LEC")
                 .findAll()
-        emptyResourceText.text = "No resources yet"
-        emptyResourceExplain.text = "Try refreshing the data"
         try {
             refreshresourceButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(ctx.getString(R.color.colorAccent)))
         } catch (e: NoSuchMethodError) {
@@ -87,6 +85,11 @@ class ResourceFragment : Fragment(), AnkoLogger {
     private fun setRecycler(p1: View?, courses: RealmResults<CourseModel>) {
         if (realm.isClosed) return
         val selected = courses.filter { it.courseName == (p1 as TextView).text }
+        if (selected.isEmpty()) {
+            Crashlytics.setInt("course size", courses.size)
+            Crashlytics.log("setRecycler")
+            Crashlytics.log((p1 as TextView).text.toString())
+        }
         val resources = realm.where(ResModel::class.java)
                 .equalTo("classNumber", selected[0].classNumber)
                 .findFirst()
