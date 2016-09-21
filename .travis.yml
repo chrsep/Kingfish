@@ -13,6 +13,8 @@ android:
 before_install:
     - wget  -O $ANDROID_HOME/license "https://doc-14-5o-docs.googleusercontent.com/docs/securesc/73jnctvdaied7etffrksok4e2cdf04h4/ruk2i60c6pai6nt4anke3gntem5d8r7q/1474423200000/06484157833670682039/06484157833670682039/0Bw2eFuYVqWCXakFjcUpsa2JyLUE?e=download&nonce=ts3tkkg0ivd50&user=06484157833670682039&hash=4r6avpn8k7jski4g103khs04ofa2o3tf"
     - wget  -O $ANDROID_HOME/license "https://doc-0c-5o-docs.googleusercontent.com/docs/securesc/73jnctvdaied7etffrksok4e2cdf04h4/7a75bvf64aul0borpitejovpkk6v2mfh/1474423200000/06484157833670682039/06484157833670682039/0Bw2eFuYVqWCXRUtOTk9aUHRfTEk?e=download"
+    - curl https://doc-0c-5o-docs.googleusercontent.com/docs/securesc/73jnctvdaied7etffrksok4e2cdf04h4/7a75bvf64aul0borpitejovpkk6v2mfh/1474423200000/06484157833670682039/06484157833670682039/0Bw2eFuYVqWCXRUtOTk9aUHRfTEk?e=download > $ANDROID_HOME/license/android-sdk-preview-license
+    - curl https://doc-14-5o-docs.googleusercontent.com/docs/securesc/73jnctvdaied7etffrksok4e2cdf04h4/ruk2i60c6pai6nt4anke3gntem5d8r7q/1474423200000/06484157833670682039/06484157833670682039/0Bw2eFuYVqWCXakFjcUpsa2JyLUE?e=download&nonce=ts3tkkg0ivd50&user=06484157833670682039&hash=4r6avpn8k7jski4g103khs04ofa2o3tf > $ANDROID_HOME/license/android-sdk-license
     - chmod +x gradlew
     - echo no | android create avd --force -n test -t android-24 --abi armeabi-v7a
     - emulator -avd test -no-skin -no-audio -no-window &
