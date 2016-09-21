@@ -13,8 +13,8 @@ interface DataService {
     @POST("https://binusmaya.binus.ac.id/login/sys_login.php")
     fun signIn(@Field("uid") uid: String,
                @Field("pass") pass: String,
-               @Field("defaultReal") defaultReal: String,
-               @Field("defaultRealHash") defaultRealHash: String,
+               @Field("defaultLoginReal") defaultLoginReal: String,
+               @Field("defaultLoginRealHash") defaultLoginRealHash: String,
                @Header("Cookie") cookie: String,
                @Field("ctl00\$ContentPlaceHolder1\$SubmitButtonBM") button: String = "Login")
             : Single<Response<String>>

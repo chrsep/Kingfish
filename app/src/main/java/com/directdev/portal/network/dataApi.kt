@@ -36,9 +36,8 @@ object DataApi {
         var cookie = ctx.readPref(R.string.cookie, "") as String
         return signIn(ctx, cookie).flatMap {
             val headerCookie = it.headers().get("Set-Cookie")
-            if (cookie == "") cookie = headerCookie
             if (headerCookie != null) {
-                cookie = headerCookie
+                if (cookie == "") cookie = headerCookie
                 cookie.savePref(ctx, R.string.cookie)
             }
             api.getTerms(cookie).subscribeOn(Schedulers.io())
@@ -87,9 +86,8 @@ object DataApi {
         return signIn(ctx, cookie).flatMap {
             val term = realm.where(TermModel::class.java).max("value")
             val headerCookie = it.headers().get("Set-Cookie")
-            if (cookie == "") cookie = headerCookie
             if (headerCookie != null) {
-                cookie = headerCookie
+                if (cookie == "") cookie = headerCookie
                 cookie.savePref(ctx, R.string.cookie)
             }
             fetchRecent(ctx, cookie, term.toString())
