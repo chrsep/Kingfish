@@ -15,3 +15,6 @@ A recently released database built from the ground up for mobile application
 3. [Retrofit](http://square.github.io/retrofit/), for handling network calls
 4. [Joda-Time](http://www.joda.org/joda-time/) for handling date and time
 
+*To build this project, Android Studio 2.2 with the Kotlin plugin installed will be required.*
+
+
