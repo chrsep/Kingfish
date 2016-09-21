@@ -13,4 +13,5 @@
     <string name="nim">nim</string>
     <string name="finance_charge">charge</string>
     <string name="finance_payment">payment</string>
+    <string name="last_update">lastUpdate</string>
 </resources>

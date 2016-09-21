@@ -9,14 +9,15 @@ import com.directdev.portal.fragment.JournalFragment
 import com.directdev.portal.fragment.ResourceFragment
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.alert
 import kotlin.properties.Delegates
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), AnkoLogger {
     private var mFirebaseAnalytics : FirebaseAnalytics by Delegates.notNull()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         setContentView(R.layout.activity_main)
         bottomBar.setOnTabSelectListener {
@@ -39,9 +40,19 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        getNotif()
     }
 
-    fun showAddAssignment() {
+    private fun getNotif() {
+        val notifyExtra = intent.getBundleExtra("Notify")
+        if (notifyExtra != null && notifyExtra.getString("message") != null) {
+            alert(notifyExtra.getString("message"), notifyExtra.getString("title")) {
+                negativeButton("Ok, Got it")
+            }.show()
+        }
+    }
+
+    private fun showAddAssignment() {
         bottomSheet.showWithSheetView(layoutInflater.inflate(R.layout.bottomsheet_assignment, bottomSheet, false))
     }
 }

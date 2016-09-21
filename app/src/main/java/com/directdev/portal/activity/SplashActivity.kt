@@ -7,14 +7,21 @@ import com.crashlytics.android.answers.Answers
 import com.directdev.portal.R
 import com.directdev.portal.utils.readPref
 import io.fabric.sdk.android.Fabric
+import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.startActivity
 
-class SplashActivity : AppCompatActivity() {
+class SplashActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Fabric.with(this, Answers(), Crashlytics())
-        if (readPref(R.string.isLoggedIn, false) as Boolean) startActivity<MainActivity>()
-        else startActivity<SigninActivity>()
+        if (intent.extras != null) {
+            val intentExtras = intent.extras
+            if (readPref(R.string.isLoggedIn, false) as Boolean) startActivity<MainActivity>("Notify" to intentExtras)
+            else startActivity<SigninActivity>("Notify" to intentExtras)
+        } else {
+            if (readPref(R.string.isLoggedIn, false) as Boolean) startActivity<MainActivity>()
+            else startActivity<SigninActivity>()
+        }
     }
 }

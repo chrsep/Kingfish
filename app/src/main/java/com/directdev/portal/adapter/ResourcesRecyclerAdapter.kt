@@ -9,7 +9,6 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import com.crashlytics.android.Crashlytics
 import com.directdev.portal.R
 import com.directdev.portal.model.ResModel
 import com.directdev.portal.model.ResResourcesModel
@@ -41,7 +40,6 @@ class ResourcesRecyclerAdapter(val context: Context, val data: List<String>, val
                 itemView.presentationDownload.backgroundTintList = ColorStateList
                         .valueOf(Color.parseColor(ctx.getString(R.color.colorAccent)))
             } catch (e: NoSuchMethodError) {
-                Crashlytics.logException(e)
             }
             itemView.presentationDownload.onClick {
                 val selectedDownload = resources.path.filter {

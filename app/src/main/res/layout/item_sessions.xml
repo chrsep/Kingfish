@@ -73,7 +73,7 @@
 
     <View
         android:id="@+id/typeId"
-        android:layout_width="4dp"
+        android:layout_width="5dp"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/content"
         android:layout_alignParentRight="true"

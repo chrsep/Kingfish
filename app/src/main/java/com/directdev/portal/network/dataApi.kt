@@ -14,6 +14,7 @@ import io.realm.RealmObject
 import io.realm.RealmResults
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
+import org.joda.time.DateTime
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -35,13 +36,12 @@ object DataApi {
         var cookie = ctx.readPref(R.string.cookie, "") as String
         return signIn(ctx, cookie).flatMap {
             val headerCookie = it.headers().get("Set-Cookie")
-            if (headerCookie == null) {
-                api.getTerms(cookie).subscribeOn(Schedulers.io())
-            } else {
+            if (cookie == "") cookie = headerCookie
+            if (headerCookie != null) {
                 cookie = headerCookie
                 cookie.savePref(ctx, R.string.cookie)
-                api.getTerms(cookie).subscribeOn(Schedulers.io())
             }
+            api.getTerms(cookie).subscribeOn(Schedulers.io())
         }.flatMap {
             terms ->
             Crashlytics.log("initializeApp Term Data " + terms.toString())
@@ -74,7 +74,9 @@ object DataApi {
                 realm.close()
             }).zipWith(fetchRecent(ctx, cookie, terms[0].value.toString()), {
                 a, b ->
-            })
+            }).map {
+                DateTime.now().toString().savePref(ctx, R.string.last_update)
+            }
         }
     }
 
@@ -83,17 +85,17 @@ object DataApi {
         var cookie = ctx.readPref(R.string.cookie, "") as String
         val realm = Realm.getDefaultInstance()
         return signIn(ctx, cookie).flatMap {
-            val headerCookie = it.headers().get("Set-Cookie")
             val term = realm.where(TermModel::class.java).max("value")
-            if (headerCookie == null) {
-                fetchRecent(ctx, cookie, term.toString())
-            } else {
+            val headerCookie = it.headers().get("Set-Cookie")
+            if (cookie == "") cookie = headerCookie
+            if (headerCookie != null) {
                 cookie = headerCookie
                 cookie.savePref(ctx, R.string.cookie)
-                fetchRecent(ctx, cookie, term.toString())
             }
+            fetchRecent(ctx, cookie, term.toString())
         }.map { terms ->
             realm.close()
+            DateTime.now().toString().savePref(ctx, R.string.last_update)
         }
     }
 
@@ -172,6 +174,8 @@ object DataApi {
     private fun signIn(ctx: Context, cookie: String = "") = api.signIn(
             ctx.readPref(R.string.username, "") as String,
             ctx.readPref(R.string.password, "") as String,
+            "4Y32H5",
+            "2274533332",
             cookie)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -315,17 +319,17 @@ object DataApi {
     }
 
     private fun buildDebugClient() = OkHttpClient().newBuilder()
-            .connectTimeout(240, TimeUnit.SECONDS)
-            .readTimeout(240, TimeUnit.SECONDS)
-            .writeTimeout(240, TimeUnit.SECONDS)
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
             .addNetworkInterceptor(StethoInterceptor())
             .followRedirects(false)
             .build()
 
     private fun buildClient() = OkHttpClient().newBuilder()
-            .connectTimeout(240, TimeUnit.SECONDS)
-            .readTimeout(240, TimeUnit.SECONDS)
-            .writeTimeout(240, TimeUnit.SECONDS)
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
             .followRedirects(false)
             .build()
 }

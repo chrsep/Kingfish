@@ -1,6 +1,7 @@
 package com.directdev.portal.fragment
 
 import android.app.Fragment
+import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
@@ -10,6 +11,8 @@ import com.directdev.portal.R
 import com.directdev.portal.adapter.JournalRecyclerAdapter
 import com.directdev.portal.model.JournalModel
 import com.directdev.portal.network.DataApi
+import com.directdev.portal.utils.action
+import com.directdev.portal.utils.readPref
 import com.directdev.portal.utils.snack
 import io.realm.Realm
 import io.realm.RealmResults
@@ -17,6 +20,8 @@ import kotlinx.android.synthetic.main.fragment_journal.*
 import org.jetbrains.anko.appcompat.v7.onMenuItemClick
 import org.jetbrains.anko.ctx
 import org.joda.time.DateTime
+import org.joda.time.Hours
+import org.joda.time.format.DateTimeFormat
 import kotlin.properties.Delegates
 
 class JournalFragment : Fragment() {
@@ -36,6 +41,23 @@ class JournalFragment : Fragment() {
         realm = Realm.getDefaultInstance()
         val journalDates = setupRecycler()
         setupToolbar(journalDates)
+        checkLastUpdate()
+    }
+
+    private fun checkLastUpdate() {
+        val savedData = ctx.readPref(R.string.last_update, "") as String
+        var hours = "ages"
+        var hoursInt = 0
+        if (savedData != "") {
+            val lastUpdate = DateTime.parse(savedData)
+            val today = DateTime.now()
+            hoursInt = Hours.hoursBetween(lastUpdate, today).hours
+            hours = hoursInt.toString() + " hours"
+        }
+        if (hoursInt > 36)
+            view.snack("""You last updated $hours ago""", Snackbar.LENGTH_LONG) {
+                action("Update", Color.YELLOW) { update() }
+            }
     }
 
 
@@ -46,9 +68,9 @@ class JournalFragment : Fragment() {
         } ?: return
         if (journalToday.size > 0) {
             if (journalToday[0].session.size > 0) {
-                journalToolbar.title = "Today"
+                journalToolbar.title = "Today - " + today.toString(DateTimeFormat.forPattern("dd MMMM"))
             }
-        } else journalToolbar.title = "Today - holiday"
+        } else journalToolbar.title = "Today - Holiday"
         if (!menuInflated) {
             journalToolbar.inflateMenu(R.menu.menu_journal)
             menuInflated = true
@@ -56,19 +78,23 @@ class JournalFragment : Fragment() {
         journalToolbar.onMenuItemClick {
             when (it?.itemId) {
                 R.id.action_refresh -> {
-                    view?.snack("Updating", Snackbar.LENGTH_INDEFINITE)
-                    if (DataApi.isActive) return@onMenuItemClick true
-                    DataApi.fetchData(ctx).subscribe({
-                        view?.snack("Success")
-                    }, {
-                        view?.snack("Failed")
-                    })
-                    true
+                    update()
                 }
                 R.id.action_setting -> true
                 else -> return@onMenuItemClick true
             }
         }
+    }
+
+    private fun update(): Boolean {
+        view?.snack("Updating", Snackbar.LENGTH_INDEFINITE)
+        if (DataApi.isActive) return true
+        DataApi.fetchData(ctx).subscribe({
+            view?.snack("Success")
+        }, {
+            view?.snack("Failed")
+        })
+        return true
     }
 
     private fun setupRecycler(): RealmResults<JournalModel>? {

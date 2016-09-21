@@ -4,7 +4,9 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
+import android.view.KeyEvent
 import android.view.View
+import org.jetbrains.anko.onKey
 
 fun Any.savePref(ctx: Context, @StringRes id: Int) {
     val key = ctx.getString(id)
@@ -37,6 +39,15 @@ fun View.snack(msg: Any, length: Int = Snackbar.LENGTH_SHORT, option: Snackbar.(
     val snack = Snackbar.make(this, msg.toString(), length)
     snack.option()
     snack.show()
+}
+
+fun View.onEnter(callback: () -> Unit) {
+    onKey { view, i, keyEvent ->
+        if (keyEvent?.action == KeyEvent.ACTION_DOWN &&
+                keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER)
+            callback()
+        false
+    }
 }
 
 fun Snackbar.action(action: String, color: Int? = null, listener: (View) -> Unit) {

@@ -16,7 +16,10 @@ import io.realm.Realm
 import io.realm.RealmResults
 import kotlinx.android.synthetic.main.fragment_grades.*
 import lecho.lib.hellocharts.listener.LineChartOnValueSelectListener
-import lecho.lib.hellocharts.model.*
+import lecho.lib.hellocharts.model.Line
+import lecho.lib.hellocharts.model.LineChartData
+import lecho.lib.hellocharts.model.PointValue
+import lecho.lib.hellocharts.model.Viewport
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.ctx
 import kotlin.properties.Delegates
@@ -41,9 +44,7 @@ class GradesFragment : Fragment(), AnkoLogger, LineChartOnValueSelectListener {
                 .setCubic(true)
                 .setColor(ContextCompat.getColor(ctx, R.color.colorAccent))
         lines.add(line)
-        val axisX = Axis()
         val data = LineChartData(lines)
-        data.axisYLeft = axisX
         setupChart(data)
         setDataByTerm(pointValues.size)
     }

@@ -51,7 +51,6 @@ class ResourceFragment : Fragment(), AnkoLogger {
         try {
             refreshresourceButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(ctx.getString(R.color.colorAccent)))
         } catch (e: NoSuchMethodError) {
-            Crashlytics.logException(e)
         }
         refreshresourceButton.onClick {
             view.snack("Refreshing data, please wait...", Snackbar.LENGTH_INDEFINITE)

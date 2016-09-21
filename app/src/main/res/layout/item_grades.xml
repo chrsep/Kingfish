@@ -38,7 +38,7 @@
             android:id="@+id/score_linear"
             android:layout_below="@id/course_name"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:orientation="vertical"
             android:padding="16dp">
 
