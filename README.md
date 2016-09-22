@@ -17,6 +17,9 @@ A recently released database built from the ground up for mobile application
 3. [Retrofit](http://square.github.io/retrofit/), for handling network calls
 4. [Joda-Time](http://www.joda.org/joda-time/) for handling date and time
 
+####Other DevTools
+1. [Stetho](http://facebook.github.io/stetho/), basically a chrome devtool for android by facebook, insanely awesome and useful
+
 *To build this project, Android Studio 2.2 with the Kotlin plugin installed will be required.*
 
 
