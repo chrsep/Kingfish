@@ -19,7 +19,6 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!(readPref(R.string.isLoggedIn, true) as Boolean)) finish()
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         setContentView(R.layout.activity_main)
         bottomBar.setOnTabSelectListener {
@@ -43,6 +42,11 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
             }
         }
         getNotif()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!(readPref(R.string.isLoggedIn, false) as Boolean)) finishAffinity()
     }
 
     private fun getNotif() {

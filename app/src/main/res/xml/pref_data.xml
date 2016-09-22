@@ -3,7 +3,7 @@
         <SwitchPreference
             android:defaultValue="false"
             android:key="campusDisabled"
-            android:summary="Campus Code (ASM, ALC) will be shown on journal"
+            android:summary="Campus Code (ASM, ALC) will not be shown on journal"
             android:title="Hide campus code" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Account">
