@@ -14,4 +14,5 @@
     <string name="finance_charge">charge</string>
     <string name="finance_payment">payment</string>
     <string name="last_update">lastUpdate</string>
+    <string name="campus_setting">campusDisabled</string>
 </resources>

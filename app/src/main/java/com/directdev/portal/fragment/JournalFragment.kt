@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.directdev.portal.R
+import com.directdev.portal.activity.SettingsActivity
 import com.directdev.portal.adapter.JournalRecyclerAdapter
 import com.directdev.portal.model.JournalModel
 import com.directdev.portal.network.DataApi
@@ -19,6 +20,7 @@ import io.realm.RealmResults
 import kotlinx.android.synthetic.main.fragment_journal.*
 import org.jetbrains.anko.appcompat.v7.onMenuItemClick
 import org.jetbrains.anko.ctx
+import org.jetbrains.anko.startActivity
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.format.DateTimeFormat
@@ -80,7 +82,10 @@ class JournalFragment : Fragment() {
                 R.id.action_refresh -> {
                     update()
                 }
-                R.id.action_setting -> true
+                R.id.action_setting -> {
+                    startActivity<SettingsActivity>()
+                    true
+                }
                 else -> return@onMenuItemClick true
             }
         }

@@ -1,6 +1,8 @@
 # Kingfish
 [![Build Status](https://travis-ci.org/chrisep8/Kingfish.svg?branch=0.3-dev)](https://travis-ci.org/chrisep8/Kingfish)
 
+Portal gives you instant and easy access to your schedules and other university-related data that are available on Binusmaya, online or offline.
+
 This code currently uses the libraries and language listed below extensively. Basic knowledge on the functionality and design of these libraries and language will be required to understand this codebase.
 
 ####[Kotlin (Programming language)](https://kotlinlang.org/)

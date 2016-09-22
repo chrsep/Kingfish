@@ -1,0 +1,36 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Behavior">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="campusDisabled"
+            android:summary="Campus Code (ASM, ALC) will be shown on journal"
+            android:title="Hide campus code" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Account">
+        <Preference
+            android:title="Sign Out"
+            android:summary="Sign Out from Portal">
+            <intent
+                android:targetPackage="com.directdev.portal"
+                android:targetClass="com.directdev.portal.activity.SigninActivity" />
+        </Preference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="About">
+        <Preference
+            android:summary="Portal Github repository"
+            android:title="Github"
+            android:icon="@drawable/ic_github_icon">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://goo.gl/a4zWqu" />
+        </Preference>
+        <Preference
+            android:summary="Updates on Portal bugs and development"
+            android:title="Info Board"
+            android:icon="@drawable/ic_trello">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://goo.gl/njyqjb" />
+        </Preference>
+    </PreferenceCategory>
+</PreferenceScreen>

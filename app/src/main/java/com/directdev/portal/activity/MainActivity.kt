@@ -7,6 +7,7 @@ import com.directdev.portal.fragment.FinancesFragment
 import com.directdev.portal.fragment.GradesFragment
 import com.directdev.portal.fragment.JournalFragment
 import com.directdev.portal.fragment.ResourceFragment
+import com.directdev.portal.utils.readPref
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.AnkoLogger
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!(readPref(R.string.isLoggedIn, true) as Boolean)) finish()
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         setContentView(R.layout.activity_main)
         bottomBar.setOnTabSelectListener {

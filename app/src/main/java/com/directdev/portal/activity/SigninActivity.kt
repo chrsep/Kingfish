@@ -12,8 +12,10 @@ import com.directdev.portal.R
 import com.directdev.portal.network.DataApi
 import com.directdev.portal.utils.*
 import com.google.firebase.analytics.FirebaseAnalytics
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_signin.*
 import org.jetbrains.anko.*
+import retrofit2.adapter.rxjava.HttpException
 import java.io.IOException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
@@ -25,6 +27,13 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val realm = Realm.getDefaultInstance()
+        if (!realm.isEmpty)
+            realm.executeTransaction {
+                it.deleteAll()
+                clearPref()
+            }
+        realm.close()
         setContentView(R.layout.activity_signin)
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         setBannerFont()
@@ -94,11 +103,14 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
                         action("retry", Color.YELLOW, { signInCallToServer() })
                     }
                 }
+                is HttpException -> {
+                    signinActivity.snack("Binusmaya's server seems to be offline, try again later", Snackbar.LENGTH_INDEFINITE)
+                    Crashlytics.log("HttpException")
+                    Crashlytics.logException(it)
+                }
                 is ConnectException -> signinActivity?.snack("Failed to connect to Binusmaya", Snackbar.LENGTH_LONG)
                 is UnknownHostException -> signinActivity?.snack("Failed to connect, try again later", Snackbar.LENGTH_LONG)
-                is IOException -> {
-                    signinActivity?.snack("Wrong email or password", Snackbar.LENGTH_LONG)
-                }
+                is IOException -> signinActivity?.snack("Wrong email or password", Snackbar.LENGTH_LONG)
                 else -> {
                     signinActivity.snack("We have no idea what went wrong, but we have received the error log, we'll look into this", Snackbar.LENGTH_INDEFINITE)
                     Crashlytics.log("Unknown CrashOnSignIn")

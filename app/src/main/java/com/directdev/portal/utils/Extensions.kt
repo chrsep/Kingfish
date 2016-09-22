@@ -22,8 +22,8 @@ fun Any.savePref(ctx: Context, @StringRes id: Int) {
     editor.commit()
 }
 
-fun Context.readPref(@StringRes id: Int, defaultValue: Any): Any {
-    val sp = this.getSharedPreferences("com.kingfish", Context.MODE_PRIVATE)
+fun Context.readPref(@StringRes id: Int, defaultValue: Any, preferenceId: String = "com.kingfish"): Any {
+    val sp = this.getSharedPreferences(preferenceId, Context.MODE_PRIVATE)
     val key = this.getString(id)
     return when (defaultValue) {
         is String -> sp.getString(key, defaultValue)
@@ -33,6 +33,12 @@ fun Context.readPref(@StringRes id: Int, defaultValue: Any): Any {
         is Long -> sp.getLong(key, defaultValue)
         else -> 0
     }
+}
+
+fun Context.clearPref() {
+    val editor = getSharedPreferences("com.kingfish", Context.MODE_PRIVATE).edit()
+    editor.clear()
+    editor.commit()
 }
 
 fun View.snack(msg: Any, length: Int = Snackbar.LENGTH_SHORT, option: Snackbar.() -> Unit = {}) {

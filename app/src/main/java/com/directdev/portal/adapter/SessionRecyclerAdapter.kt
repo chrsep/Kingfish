@@ -7,13 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import com.directdev.portal.R
 import com.directdev.portal.model.SessionModel
+import com.directdev.portal.utils.readPref
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter
 import kotlinx.android.synthetic.main.item_sessions.view.*
 
 class SessionRecyclerAdapter(context: Context, data: OrderedRealmCollection<SessionModel>?, autoUpdate: Boolean) : RealmRecyclerViewAdapter<SessionModel, SessionRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.bindData(data?.get(position) as SessionModel)
+        holder?.bindData(data?.get(position) as SessionModel, context)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
@@ -22,7 +23,7 @@ class SessionRecyclerAdapter(context: Context, data: OrderedRealmCollection<Sess
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-        fun bindData(session: SessionModel) {
+        fun bindData(session: SessionModel, ctx: Context) {
             val color: String
             itemView.journalCourse.text = session.courseName
             itemView.journalRoom.text = session.room
@@ -32,7 +33,9 @@ class SessionRecyclerAdapter(context: Context, data: OrderedRealmCollection<Sess
                 itemView.journalShift.visibility = View.GONE
                 color = "#f44336"
             } else {
-                itemView.journalCampus.text = session.locationId
+                if (!(ctx.readPref(R.string.campus_setting, false, "com.directdev.portal_preferences") as Boolean)) {
+                    itemView.journalCampus.text = session.locationId
+                }
                 itemView.journalMode.text = session.typeId
                 color = when (session.typeId) {
                     "LEC" -> "#ffeb3b"
