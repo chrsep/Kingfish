@@ -41,6 +41,7 @@ class JournalFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         realm = Realm.getDefaultInstance()
+        if (DataApi.isActive) view?.snack("Updating", Snackbar.LENGTH_INDEFINITE)
         val journalDates = setupRecycler()
         setupToolbar(journalDates)
         checkLastUpdate()
@@ -97,7 +98,7 @@ class JournalFragment : Fragment() {
         DataApi.fetchData(ctx).subscribe({
             view?.snack("Success")
         }, {
-            view?.snack("Failed")
+            view?.snack(DataApi.decideFailedString(it))
         })
         return true
     }

@@ -5,7 +5,6 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
-import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.LoginEvent
 import com.directdev.portal.R
@@ -15,11 +14,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_signin.*
 import org.jetbrains.anko.*
-import retrofit2.adapter.rxjava.HttpException
-import java.io.IOException
-import java.net.ConnectException
 import java.net.SocketTimeoutException
-import java.net.UnknownHostException
 import kotlin.properties.Delegates
 
 class SigninActivity : AppCompatActivity(), AnkoLogger {
@@ -81,7 +76,6 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
     private fun signInCallToServer() {
         DataApi.initializeApp(this).subscribe({
             true.savePref(ctx, R.string.isLoggedIn)
-            DataApi.isActive = false
             setAnalyticsUserProperties()
             Answers.getInstance().logLogin(LoginEvent()
                     .putSuccess(true)
@@ -91,31 +85,18 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
             startActivity<MainActivity>()
         }, {
             false.savePref(ctx, R.string.isLoggedIn)
-            DataApi.isActive = false
             switchLoginTextView()
             Answers.getInstance().logLogin(LoginEvent()
                     .putSuccess(false)
                     .putCustomAttribute("Error Message", it.message)
                     .putCustomAttribute("Error Log", it.toString()))
-            when (it) {
-                is SocketTimeoutException -> {
-                    signinActivity?.snack("Request Timed Out", Snackbar.LENGTH_LONG) {
-                        action("retry", Color.YELLOW, { signInCallToServer() })
-                    }
+            val snackString = DataApi.decideFailedString(it)
+            if (it is SocketTimeoutException) {
+                signinActivity?.snack(snackString, Snackbar.LENGTH_LONG) {
+                    action("retry", Color.YELLOW, { signInCallToServer() })
                 }
-                is HttpException -> {
-                    signinActivity.snack("Binusmaya's server seems to be offline, try again later", Snackbar.LENGTH_INDEFINITE)
-                    Crashlytics.log("HttpException")
-                    Crashlytics.logException(it)
-                }
-                is ConnectException -> signinActivity?.snack("Failed to connect to Binusmaya", Snackbar.LENGTH_LONG)
-                is UnknownHostException -> signinActivity?.snack("Failed to connect, try again later", Snackbar.LENGTH_LONG)
-                is IOException -> signinActivity?.snack("Wrong email or password", Snackbar.LENGTH_LONG)
-                else -> {
-                    signinActivity.snack("We have no idea what went wrong, but we have received the error log, we'll look into this", Snackbar.LENGTH_INDEFINITE)
-                    Crashlytics.log("Unknown CrashOnSignIn")
-                    Crashlytics.logException(it)
-                }
+            } else {
+                signinActivity?.snack(snackString, Snackbar.LENGTH_LONG)
             }
         })
     }

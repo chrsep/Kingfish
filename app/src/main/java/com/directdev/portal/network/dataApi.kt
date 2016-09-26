@@ -19,12 +19,18 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava.HttpException
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import rx.Single
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+import java.io.IOException
+import java.net.ConnectException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.SSLException
 
 object DataApi {
     var isActive = false
@@ -32,7 +38,6 @@ object DataApi {
     private val api = buildRetrofit()
 
     fun initializeApp(ctx: Context): Single<Unit> {
-        isActive = true
         var cookie = ctx.readPref(R.string.cookie, "") as String
         return signIn(ctx, cookie).flatMap {
             val headerCookie = it.headers().get("Set-Cookie")
@@ -76,11 +81,19 @@ object DataApi {
             }).map {
                 DateTime.now().toString().savePref(ctx, R.string.last_update)
             }
+        }.doOnSubscribe {
+
+            isActive = true
+        }.doOnError {
+
+            isActive = false
+        }.doOnSuccess {
+
+            isActive = false
         }
     }
 
     fun fetchData(ctx: Context): Single<Unit> {
-        isActive = true
         var cookie = ctx.readPref(R.string.cookie, "") as String
         val realm = Realm.getDefaultInstance()
         return signIn(ctx, cookie).flatMap {
@@ -94,6 +107,15 @@ object DataApi {
         }.map { terms ->
             realm.close()
             DateTime.now().toString().savePref(ctx, R.string.last_update)
+        }.doOnSubscribe {
+
+            isActive = true
+        }.doOnError {
+
+            isActive = false
+        }.doOnSuccess {
+
+            isActive = false
         }
     }
 
@@ -135,7 +157,13 @@ object DataApi {
                     }
                 }
             })
-        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).doOnSubscribe {
+            isActive = true
+        }.doOnError {
+            isActive = false
+        }.doOnSuccess {
+            isActive = false
+        }
     }
 
     fun fetchAssignment(ctx: Context, data: RealmResults<CourseModel>): Single<Unit> {
@@ -168,6 +196,32 @@ object DataApi {
             })
         }
     }
+
+    fun decideFailedString(it: Throwable): String {
+        return when (it) {
+            is SocketTimeoutException -> "Request Timed Out"
+            is HttpException -> {
+                Crashlytics.log("HttpException")
+                Crashlytics.logException(it)
+                "Binusmaya's server seems to be offline, try again later"
+            }
+            is ConnectException -> "Failed to connect to Binusmaya"
+            is SSLException -> "Failed to connect to Binusmaya"
+            is UnknownHostException -> "Failed to connect to Binusmaya"
+            is IOException -> "Wrong email or password"
+            is IndexOutOfBoundsException -> {
+                Crashlytics.log("IndexOutOfBoundsException")
+                Crashlytics.logException(it)
+                "Binusmaya server is acting weird, try again later"
+            }
+            else -> {
+                Crashlytics.log("Unknown CrashOnSignIn")
+                Crashlytics.logException(it)
+                "We have no idea what went wrong, but we have received the error log, we'll look into this"
+            }
+        }
+    }
+
 
     private fun signIn(ctx: Context, cookie: String = "") = api.signIn(
             ctx.readPref(R.string.username, "") as String,
