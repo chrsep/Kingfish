@@ -226,8 +226,7 @@ object DataApi {
     private fun signIn(ctx: Context, cookie: String = "") = api.signIn(
             ctx.readPref(R.string.username, "") as String,
             ctx.readPref(R.string.password, "") as String,
-            "4Y32H5",
-            "2274533332",
+            "",
             cookie)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
