@@ -16,7 +16,11 @@ open class JournalModel(
         open var exam: RealmList<ExamModel> = RealmList()
 ) : RealmObject() {
     fun setDate(pattern: String = "yyyy-MM-dd HH:mm:ss.SSS"): JournalModel {
-        date = DateTime.parse(id, DateTimeFormat.forPattern(pattern)).toDate()
+        try {
+            date = DateTime.parse(id, DateTimeFormat.forPattern(pattern)).toDate()
+        } catch(e: Exception) {
+            date = DateTime.parse(id, DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSSSSSS")).toDate()
+        }
         return this
     }
 }
