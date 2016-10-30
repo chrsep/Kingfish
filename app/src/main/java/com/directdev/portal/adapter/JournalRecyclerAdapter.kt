@@ -34,6 +34,10 @@ class JournalRecyclerAdapter(val realm: Realm, context: Context, data: OrderedRe
             itemView.recyclerJfinances.layoutManager = LinearLayoutManager(ctx)
             itemView.recyclerJfinances.isNestedScrollingEnabled = false
             itemView.recyclerJfinances.adapter = JFinanceRecyclerAdapter(ctx, item.finance, true)
+
+            itemView.recyclerJexams.layoutManager = LinearLayoutManager(ctx)
+            itemView.recyclerJexams.isNestedScrollingEnabled = false
+            itemView.recyclerJexams.adapter = JExamsRecyclerAdapter(ctx, item.exam, true)
         }
 
         private fun setHeader(item: JournalModel) {

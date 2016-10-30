@@ -11,9 +11,11 @@
     <color name="colorJournalBackground">#FAFAFA</color>
 
     <color name="white">#FFFFFF</color>
+    <color name="secondary_white">#beffffff</color>
     <color name="inactive_white">#57FFFFFF</color>
     <color name="black">#000000</color>
 
     <color name="toolbarBorder">#1f000000</color>
     <color name="jFinance">#43A047</color>
+    <color name="jExam">#1E88E5</color>
 </resources>

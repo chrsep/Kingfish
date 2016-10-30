@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/jExam"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:longClickable="true"
+    android:orientation="horizontal"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/journal_exam_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxWidth="250dp"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/journal_exam_chair"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/journal_exam_name"
+        android:textColor="@color/secondary_white" />
+
+    <TextView
+        android:id="@+id/journal_exam_room"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/journal_exam_name"
+        android:layout_marginLeft="10dp"
+        android:layout_toEndOf="@+id/journal_exam_chair"
+        android:layout_toRightOf="@+id/journal_exam_chair"
+        android:textColor="@color/secondary_white" />
+
+    <TextView
+        android:id="@+id/journal_exam_shift"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignBaseline="@+id/journal_exam_name"
+        android:textColor="@color/secondary_white" />
+</RelativeLayout>
