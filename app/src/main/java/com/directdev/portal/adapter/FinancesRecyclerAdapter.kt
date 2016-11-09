@@ -71,9 +71,9 @@ class FinancesRecyclerAdapter(val realm: Realm, context: Context, data: OrderedR
                 it.isAfterNow
             }.sortedWith(DateTimeComparator.getInstance())
             itemView.total_amount.text = "Rp. " + NumberFormat.getNumberInstance(Locale.US).format(ctx.readPref(R.string.finance_charge, 0) as Int)
-            if (closestDate.size != 0) {
+            if (closestDate.isNotEmpty()) {
                 val upcomingBill = data.filter { DateTime.parse(it.dueDate.substring(0, 10)).isAfterNow }
-                val totalBill = upcomingBill.sumBy { it.paymentAmount.toDouble().toInt() }
+                val totalBill = upcomingBill.sumBy { it.chargeAmount.toDouble().toInt() }
                 itemView.total_amount.text = "Rp. ${NumberFormat.getNumberInstance(Locale.US).format(totalBill)}"
                 val lengthFromToday = Days.daysBetween(closestDate[0], DateTime.now())
                 itemView.next_charge.text = DateTime(closestDate[0]).toString(DateTimeFormat.forPattern("dd MMMM")) + """ (${lengthFromToday.days.toString().substring(1)} days)"""
