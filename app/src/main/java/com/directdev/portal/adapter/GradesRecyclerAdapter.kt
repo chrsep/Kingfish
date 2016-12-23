@@ -42,7 +42,10 @@ class GradesRecyclerAdapter(val realm: Realm, val data: List<RealmResults<ScoreM
             itemView.mid.visibility = gone
             itemView.fin.visibility = gone
             itemView.assignment.visibility = gone
-            itemView.laboratory.visibility = gone
+            itemView.laboratory_assignment.visibility = gone
+            itemView.laboratory_quiz.visibility = gone
+            itemView.laboratory_fin.visibility = gone
+            itemView.laboratory_project.visibility = gone
             score.forEach {
                 when(it.scoreType){
                     "ASSIGNMENT" ->{
@@ -58,8 +61,39 @@ class GradesRecyclerAdapter(val realm: Realm, val data: List<RealmResults<ScoreM
                         itemView.fin.text = "Final Exam  	: " +it.score
                     }
                     "LABORATORY" ->{
-                        itemView.laboratory.visibility = visible
-                        itemView.laboratory.text = "Laboratory  	: " + it.score
+                        itemView.laboratory_assignment.visibility = visible
+                        itemView.laboratory_assignment.text = "Laboratory  	: " + it.score
+                    }
+                    "THEORY: Assignment" ->{
+                        itemView.assignment.visibility = visible
+                        itemView.assignment.text = "Assignment	: " +it.score
+                    }
+                    "THEORY: Mid Exam"   ->{
+                        itemView.mid.visibility = visible
+                        itemView.mid.text = "Mid Exam    	: " + it.score
+                    }
+                    "THEORY: Final Exam" ->{
+                        itemView.fin.visibility = visible
+                        itemView.fin.text = "Final Exam  	: " +it.score
+                    }
+                    "LAB: Quiz" ->{
+                        itemView.laboratory_quiz.visibility = visible
+                        itemView.laboratory_quiz.text = "Lab Quiz	: " + it.score
+                    }
+
+                    "LAB: Assignment" ->{
+                        itemView.laboratory_assignment.visibility = visible
+                        itemView.laboratory_assignment.text = "Lab assignment  	: " + it.score
+                    }
+
+                    "LAB: Project" ->{
+                        itemView.laboratory_project.visibility = visible
+                        itemView.laboratory_project.text = "Lab project 	: " + it.score
+                    }
+
+                    "LAB: Final Exam" ->{
+                        itemView.laboratory_fin.visibility = visible
+                        itemView.laboratory_fin.text = "Lab Final   	 : " + it.score
                     }
                 }
             }
