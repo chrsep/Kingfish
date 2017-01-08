@@ -36,15 +36,12 @@ object DataApi {
     var isActive = false
     private val baseUrl = "https://binusmaya.binus.ac.id/services/ci/index.php/"
     private val api = buildRetrofit()
+    private fun isStaff(ctx : Context) = ctx.readPref(R.string.isStaff, false) as Boolean
 
     fun initializeApp(ctx: Context): Single<Unit> {
         var cookie = ctx.readPref(R.string.cookie, "") as String
-        return signIn(ctx, cookie).flatMap {
-            val headerCookie = it.headers().get("Set-Cookie")
-            if (headerCookie != null) {
-                if (cookie == "") cookie = headerCookie
-                cookie.savePref(ctx, R.string.cookie)
-            }
+        return signIn(ctx, cookie, isStaff(ctx)).flatMap {
+            cookie = it
             api.getTerms(cookie).subscribeOn(Schedulers.io())
         }.flatMap {
             terms ->
@@ -79,16 +76,13 @@ object DataApi {
             }).zipWith(fetchRecent(ctx, cookie, terms[0].value.toString()), {
                 a, b ->
             }).map {
-                DateTime.now().toString().savePref(ctx, R.string.last_update)
+                ctx.savePref(DateTime.now().toString(), R.string.last_update)
             }
         }.doOnSubscribe {
-
             isActive = true
         }.doOnError {
-
             isActive = false
         }.doOnSuccess {
-
             isActive = false
         }
     }
@@ -96,25 +90,18 @@ object DataApi {
     fun fetchData(ctx: Context): Single<Unit> {
         var cookie = ctx.readPref(R.string.cookie, "") as String
         val realm = Realm.getDefaultInstance()
-        return signIn(ctx, cookie).flatMap {
+        return signIn(ctx, cookie, isStaff(ctx)).flatMap {
             val term = realm.where(TermModel::class.java).max("value")
-            val headerCookie = it.headers().get("Set-Cookie")
-            if (headerCookie != null) {
-                if (cookie == "") cookie = headerCookie
-                cookie.savePref(ctx, R.string.cookie)
-            }
+            cookie = it
             fetchRecent(ctx, cookie, term.toString())
         }.map { terms ->
             realm.close()
-            DateTime.now().toString().savePref(ctx, R.string.last_update)
+            ctx.savePref(DateTime.now().toString(), R.string.last_update)
         }.doOnSubscribe {
-
             isActive = true
         }.doOnError {
-
             isActive = false
         }.doOnSuccess {
-
             isActive = false
         }
     }
@@ -122,12 +109,8 @@ object DataApi {
     fun fetchResources(ctx: Context, data: RealmResults<CourseModel>): Single<Unit> {
         isActive = true
         var cookie = ctx.readPref(R.string.cookie, "") as String
-        return signIn(ctx, cookie).flatMap {
-            val headerCookie = it.headers().get("Set-Cookie")
-            if (headerCookie != null) {
-                cookie = headerCookie
-                cookie.savePref(ctx, R.string.cookie)
-            }
+        return signIn(ctx, cookie, isStaff(ctx)).flatMap {
+            cookie = it
             Single.zip(data.map {
                 val classNumber = it.classNumber
                 api.getResources(
@@ -169,7 +152,7 @@ object DataApi {
     fun fetchAssignment(ctx: Context, data: RealmResults<CourseModel>): Single<Unit> {
         isActive = true
         val cookie = ctx.readPref(R.string.cookie, "") as String
-        return signIn(ctx, cookie).flatMap {
+        return signIn(ctx, cookie, isStaff(ctx)).flatMap {
             Single.zip(data.map {
                 val classNumber = it.classNumber
                 api.getAssignment(
@@ -222,14 +205,18 @@ object DataApi {
         }
     }
 
-
-    private fun signIn(ctx: Context, cookie: String = "") = api.signIn(
-            ctx.readPref(R.string.username, "") as String,
-            ctx.readPref(R.string.password, "") as String,
-            "",
-            cookie)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+    private fun signIn(ctx: Context, cookie: String = "", isStaff: Boolean): Single<String> {
+        var newCookie: String = cookie
+        return api.signIn(
+                ctx.readPref(R.string.username, "") as String,
+                ctx.readPref(R.string.password, "") as String,
+                "", cookie).flatMap {
+            newCookie = it.headers().get("Set-Cookie") ?: newCookie
+            ctx.savePref(newCookie, R.string.cookie)
+            if (isStaff) api.switchRole(newCookie)
+            else Single.just(it)
+        }.flatMap { Single.just(newCookie) }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+    }
 
     private fun fetchGrades(terms: List<TermModel>, cookie: String): List<Single<GradeModel>> =
             terms.map {
@@ -317,11 +304,11 @@ object DataApi {
     private fun saveProfile(ctx: Context, response: ResponseBody) {
         try {
             val profile = JSONObject(response.string()).getJSONArray("Profile").getJSONObject(0)
-            profile.getString("ACAD_PROG_DESCR").savePref(ctx, R.string.major)
-            profile.getString("ACAD_CAREER_DESCR").savePref(ctx, R.string.degree)
-            profile.getString("BIRTHDATE").savePref(ctx, R.string.birthday)
-            profile.getString("NAMA").savePref(ctx, R.string.name)
-            profile.getString("NIM").savePref(ctx, R.string.nim)
+            ctx.savePref(profile.getString("ACAD_PROG_DESCR"), R.string.major)
+            ctx.savePref(profile.getString("ACAD_CAREER_DESCR"), R.string.degree)
+            ctx.savePref(profile.getString("BIRTHDATE"), R.string.birthday)
+            ctx.savePref(profile.getString("NAMA"), R.string.name)
+            ctx.savePref(profile.getString("NIM"), R.string.nim)
         } catch (e: JSONException) {
             Crashlytics.log(response.string())
             Crashlytics.logException(e)
@@ -334,8 +321,8 @@ object DataApi {
             val responseJson = JSONArray(response.string())
             if (responseJson.length() == 0) return
             val summary = responseJson.getJSONObject(0)
-            summary.getInt("charge").savePref(ctx, R.string.finance_charge)
-            summary.getInt("payment").savePref(ctx, R.string.finance_payment)
+            ctx.savePref(summary.getInt("charge"), R.string.finance_charge)
+            ctx.savePref(summary.getInt("payment"), R.string.finance_payment)
         } catch (e: JSONException) {
             Crashlytics.log(response.string())
             Crashlytics.logException(e)

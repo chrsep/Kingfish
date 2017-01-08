@@ -18,6 +18,10 @@ interface DataService {
                @Field("ctl00\$ContentPlaceHolder1\$SubmitButtonBM") button: String = "Login")
             : Single<Response<String>>
 
+    @Headers("Referer: https://binusmaya.binus.ac.id/newStaff/", "Origin: https://binusmaya.binus.ac.id")
+    @POST("https://binusmaya.binus.ac.id/services/ci/index.php/login/switchrole/2/104")
+    fun switchRole(@Header("Cookie") cookie: String): Single<Response<ResponseBody>>
+
     @Headers("Referer: https://binusmaya.binus.ac.id/newStudent/")
     @GET("student/profile/profileStudent")
     fun getProfile(@Header("Cookie") cookie: String): Single<ResponseBody>

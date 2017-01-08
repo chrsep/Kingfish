@@ -8,15 +8,15 @@ import android.view.KeyEvent
 import android.view.View
 import org.jetbrains.anko.onKey
 
-fun Any.savePref(ctx: Context, @StringRes id: Int) {
-    val key = ctx.getString(id)
-    val editor = ctx.getSharedPreferences("com.kingfish", Context.MODE_PRIVATE).edit()
-    when (this) {
-        is String -> editor.putString(key, this)
-        is Boolean -> editor.putBoolean(key, this)
-        is Float -> editor.putFloat(key, this)
-        is Int -> editor.putInt(key, this)
-        is Long -> editor.putLong(key, this)
+fun Context.savePref(data: Any, @StringRes id: Int) {
+    val key = getString(id)
+    val editor = getSharedPreferences("com.kingfish", Context.MODE_PRIVATE).edit()
+    when (data) {
+        is String -> editor.putString(key, data)
+        is Boolean -> editor.putBoolean(key, data)
+        is Float -> editor.putFloat(key, data)
+        is Int -> editor.putInt(key, data)
+        is Long -> editor.putLong(key, data)
         else -> return
     }
     editor.commit()

@@ -15,4 +15,5 @@
     <string name="finance_payment">payment</string>
     <string name="last_update">lastUpdate</string>
     <string name="campus_setting">campusDisabled</string>
+    <string name="isStaff">isStaff</string>
 </resources>

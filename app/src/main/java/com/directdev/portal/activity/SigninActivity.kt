@@ -14,6 +14,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_signin.*
 import org.jetbrains.anko.*
+import java.io.IOException
 import java.net.SocketTimeoutException
 import kotlin.properties.Delegates
 
@@ -23,6 +24,7 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val realm = Realm.getDefaultInstance()
+        savePref(false, R.string.isStaff)
         if (!realm.isEmpty)
             realm.executeTransaction {
                 it.deleteAll()
@@ -56,8 +58,8 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
     }
 
     private fun saveCredentials() {
-        formPass.text.toString().savePref(this, R.string.password)
-        formUsername.text.toString().savePref(this, R.string.username)
+        savePref(formPass.text.toString(), R.string.password)
+        savePref(formUsername.text.toString(), R.string.username)
     }
 
     private fun switchLoginTextView() {
@@ -75,7 +77,7 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
 
     private fun signInCallToServer() {
         DataApi.initializeApp(this).subscribe({
-            true.savePref(ctx, R.string.isLoggedIn)
+            savePref(true, R.string.isLoggedIn)
             setAnalyticsUserProperties()
             Answers.getInstance().logLogin(LoginEvent()
                     .putSuccess(true)
@@ -84,7 +86,8 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
                     .putCustomAttribute("Generation", (this.readPref(R.string.nim, "") as String).substring(0, 3)))
             startActivity<MainActivity>()
         }, {
-            false.savePref(ctx, R.string.isLoggedIn)
+            savePref(false, R.string.isLoggedIn)
+            savePref(false, R.string.isStaff)
             switchLoginTextView()
             Answers.getInstance().logLogin(LoginEvent()
                     .putSuccess(false)
@@ -93,9 +96,16 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
             val snackString = DataApi.decideFailedString(it)
             if (it is SocketTimeoutException) {
                 signinActivity?.snack(snackString, Snackbar.LENGTH_LONG) {
-                    action("retry", Color.YELLOW, { signInCallToServer() })
+                    action("retry", Color.YELLOW, { signIn() })
                 }
-            } else {
+            } else if(it is IOException) {
+                signinActivity?.snack(snackString, Snackbar.LENGTH_INDEFINITE) {
+                    action("retry as staff", Color.YELLOW, {
+                        savePref(true, R.string.isStaff)
+                        signIn()
+                    })
+                }
+            } else{
                 signinActivity?.snack(snackString, Snackbar.LENGTH_LONG)
             }
         })
@@ -104,12 +114,9 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
     private fun getNotif() {
         val notifyExtra = intent.getBundleExtra("Notify")
         if (notifyExtra != null && notifyExtra.getString("message") != null) {
-            info { notifyExtra }
-            info { notifyExtra.getString("message") }
             alert(notifyExtra.getString("message"), notifyExtra.getString("title")) {
                 negativeButton("Ok, Got it")
             }.show()
         }
     }
-
 }
