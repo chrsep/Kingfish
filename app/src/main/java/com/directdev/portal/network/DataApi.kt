@@ -36,10 +36,10 @@ object DataApi {
     var isActive = false
     private val baseUrl = "https://binusmaya.binus.ac.id/services/ci/index.php/"
     private val api = buildRetrofit()
-    private fun isStaff(ctx : Context) = ctx.readPref(R.string.isStaff, false) as Boolean
+    private fun isStaff(ctx: Context) = ctx.readPref(R.string.isStaff, false)
 
     fun initializeApp(ctx: Context): Single<Unit> {
-        var cookie = ctx.readPref(R.string.cookie, "") as String
+        var cookie = ctx.readPref(R.string.cookie, "")
         return signIn(ctx, cookie, isStaff(ctx)).flatMap {
             cookie = it
             api.getTerms(cookie).subscribeOn(Schedulers.io())
@@ -88,7 +88,7 @@ object DataApi {
     }
 
     fun fetchData(ctx: Context): Single<Unit> {
-        var cookie = ctx.readPref(R.string.cookie, "") as String
+        var cookie = ctx.readPref(R.string.cookie, "")
         val realm = Realm.getDefaultInstance()
         return signIn(ctx, cookie, isStaff(ctx)).flatMap {
             val term = realm.where(TermModel::class.java).max("value")
@@ -108,7 +108,7 @@ object DataApi {
 
     fun fetchResources(ctx: Context, data: RealmResults<CourseModel>): Single<Unit> {
         isActive = true
-        var cookie = ctx.readPref(R.string.cookie, "") as String
+        var cookie = ctx.readPref(R.string.cookie, "")
         return signIn(ctx, cookie, isStaff(ctx)).flatMap {
             cookie = it
             Single.zip(data.map {
@@ -149,67 +149,35 @@ object DataApi {
         }
     }
 
-    fun fetchAssignment(ctx: Context, data: RealmResults<CourseModel>): Single<Unit> {
-        isActive = true
-        val cookie = ctx.readPref(R.string.cookie, "") as String
-        return signIn(ctx, cookie, isStaff(ctx)).flatMap {
-            Single.zip(data.map {
-                val classNumber = it.classNumber
-                api.getAssignment(
-                        it.courseId,
-                        it.crseId,
-                        it.term.toString(),
-                        it.ssrComponent,
-                        it.classNumber.toString(),
-                        cookie
-                ).map { data ->
-                    data.forEach { it.classNumber = classNumber }
-                    data
-                }.subscribeOn(Schedulers.io())
-            }, {
-                assignment ->
-                val realm = Realm.getDefaultInstance()
-                realm.executeTransaction { realm ->
-                    val list = mutableListOf<AssignmentIndividualModel>()
-                    (assignment.filterIsInstance<List<AssignmentIndividualModel>>()).forEach {
-                        list.addAll(it)
-                    }
-                    realm.cleanInsert(list)
-                }
-            })
+    fun decideCauseOfFailure(it: Throwable) = when (it) {
+        is SocketTimeoutException -> "Request Timed Out"
+        is HttpException -> {
+            Crashlytics.log("HttpException")
+            Crashlytics.logException(it)
+            "Binusmaya's server seems to be offline, try again later"
+        }
+        is ConnectException -> "Failed to connect to Binusmaya"
+        is SSLException -> "Failed to connect to Binusmaya"
+        is UnknownHostException -> "Failed to connect to Binusmaya"
+        is IOException -> "Wrong email or password"
+        is IndexOutOfBoundsException -> {
+            Crashlytics.log("IndexOutOfBoundsException")
+            Crashlytics.logException(it)
+            "Binusmaya server is acting weird, try again later"
+        }
+        else -> {
+            Crashlytics.log("Unknown CrashOnSignIn")
+            Crashlytics.logException(it)
+            "We have no idea what went wrong, but we have received the error log, we'll look into this"
         }
     }
 
-    fun decideFailedString(it: Throwable): String {
-        return when (it) {
-            is SocketTimeoutException -> "Request Timed Out"
-            is HttpException -> {
-                Crashlytics.log("HttpException")
-                Crashlytics.logException(it)
-                "Binusmaya's server seems to be offline, try again later"
-            }
-            is ConnectException -> "Failed to connect to Binusmaya"
-            is SSLException -> "Failed to connect to Binusmaya"
-            is UnknownHostException -> "Failed to connect to Binusmaya"
-            is IOException -> "Wrong email or password"
-            is IndexOutOfBoundsException -> {
-                Crashlytics.log("IndexOutOfBoundsException")
-                Crashlytics.logException(it)
-                "Binusmaya server is acting weird, try again later"
-            }
-            else -> {
-                Crashlytics.log("Unknown CrashOnSignIn")
-                Crashlytics.logException(it)
-                "We have no idea what went wrong, but we have received the error log, we'll look into this"
-            }
-        }
-    }
 
     private fun signIn(ctx: Context, cookie: String = "", isStaff: Boolean): Single<String> {
         var newCookie: String = cookie
         return api.signIn(
-                ctx.readPref(R.string.username, "") as String,
-                ctx.readPref(R.string.password, "") as String,
+                ctx.readPref(R.string.username, ""),
+                ctx.readPref(R.string.password, ""),
                 "", cookie).flatMap {
             newCookie = it.headers().get("Set-Cookie") ?: newCookie
             ctx.savePref(newCookie, R.string.cookie)
@@ -255,7 +223,7 @@ object DataApi {
             api.getFinances(cookie).subscribeOn(Schedulers.io()),
             api.getSessions(cookie).subscribeOn(Schedulers.io()),
             api.getExams(ExamRequestBody(term), cookie).subscribeOn(Schedulers.io()),
-            api.getGrades(term.toString(), cookie).subscribeOn(Schedulers.io()),
+            api.getGrades(term, cookie).subscribeOn(Schedulers.io()),
             api.getFinanceSummary(cookie).subscribeOn(Schedulers.io()),
             api.getCourse(term, cookie).subscribeOn(Schedulers.io()),
             { finance, session, exam, grade, financeSummary, course ->
@@ -278,13 +246,11 @@ object DataApi {
 
 
     /**
-     * Helper Functions for saving data
+     * Helper Functions for saving data to realm
      * */
 
     private fun saveCourse(course: CourseWrapperModel, term: String, realm: Realm) {
-        course.courses.forEach {
-            it.term = term.toInt()
-        }
+        course.courses.forEach { it.term = term.toInt() }
         realm.insertOrUpdate(course.courses)
     }
 
@@ -337,16 +303,13 @@ object DataApi {
     }
 
     private fun Realm.cleanInsert(data: List<RealmObject>) {
-        if (data.size == 0) return
+        if (data.isEmpty()) return
         delete(data[0].javaClass)
         insert(data)
     }
 
     private fun buildRetrofit(): DataService {
-        val client: OkHttpClient
-        if (BuildConfig.DEBUG) client = buildDebugClient()
-        else client = buildClient()
-
+        val client = if (BuildConfig.DEBUG) buildDebugClient() else buildClient()
         return Retrofit.Builder()
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(NullConverterFactory())

@@ -48,7 +48,7 @@ class JournalFragment : Fragment() {
     }
 
     private fun checkLastUpdate() {
-        val savedData = ctx.readPref(R.string.last_update, "") as String
+        val savedData = ctx.readPref(R.string.last_update, "")
         var hours = "ages"
         var hoursInt = 0
         if (savedData != "") {
@@ -69,7 +69,7 @@ class JournalFragment : Fragment() {
         val journalToday = journalDates?.filter {
             it.date == today.toDate()
         } ?: return
-        if (journalToday.size > 0 && journalToday[0].session.size > 0) {
+        if (journalToday.isNotEmpty() && journalToday[0].session.size > 0) {
             journalToolbar.title = "Today - " + today.toString(DateTimeFormat.forPattern("dd MMMM"))
         } else journalToolbar.title = "Today - Holiday"
         if (!menuInflated) {
@@ -96,7 +96,7 @@ class JournalFragment : Fragment() {
         DataApi.fetchData(ctx).subscribe({
             view?.snack("Success")
         }, {
-            view?.snack(DataApi.decideFailedString(it))
+            view?.snack(DataApi.decideCauseOfFailure(it))
         })
         return true
     }

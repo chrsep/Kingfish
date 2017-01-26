@@ -33,7 +33,7 @@ class ResourcesRecyclerAdapter(val context: Context, val data: List<String>, val
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         fun bindData(ctx: Context, item: List<ResResourcesModel>, resources: ResModel) {
-            if (item.size == 0) return
+            if (item.isEmpty()) return
             itemView.resSession.text = "Meeting " + item[0].sessionIDNUM
             itemView.resTopic.text = item[0].courseOutlineTopic
             try {
@@ -45,7 +45,7 @@ class ResourcesRecyclerAdapter(val context: Context, val data: List<String>, val
                 val selectedDownload = resources.path.filter {
                     it.mediaTypeId == "01" && it.courseOutlineTopicID == item[0].courseOutlineTopicID
                 }
-                if (selectedDownload.size == 0) return@onClick
+                if (selectedDownload.isEmpty()) return@onClick
                 val path = (selectedDownload[0].path
                         + selectedDownload[0].location
                         + "/"

@@ -23,20 +23,14 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val realm = Realm.getDefaultInstance()
-        savePref(false, R.string.isStaff)
-        if (!realm.isEmpty)
-            realm.executeTransaction {
-                it.deleteAll()
-                clearPref()
-            }
-        realm.close()
         setContentView(R.layout.activity_signin)
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
-        setBannerFont()
+
         if (DataApi.isActive) switchLoginTextView()
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
+        mainBanner.typeface = Typeface.createFromAsset(assets, "fonts/SpaceMono-BoldItalic.ttf")
         formSignIn.onClick { signIn() }
         formPass.onEnter { signIn() }
+        clearData()
         getNotif()
     }
 
@@ -52,9 +46,68 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
         signInCallToServer()
     }
 
-    private fun setBannerFont() {
-        val font = Typeface.createFromAsset(assets, "fonts/SpaceMono-BoldItalic.ttf")
-        mainBanner.typeface = font
+    private fun signInCallToServer() {
+        DataApi.initializeApp(this).subscribe({
+            // On Success of Login
+            logAnalyticData()
+            savePref(true, R.string.isLoggedIn)
+            startActivity<MainActivity>()
+        }, {
+            // On Failure of login
+            switchLoginTextView()
+            Answers.getInstance().logLogin(failedLoginEvent(it))
+            savePref(false, R.string.isLoggedIn)
+            savePref(false, R.string.isStaff)
+            signinActivity.snack(DataApi.decideCauseOfFailure(it), Snackbar.LENGTH_INDEFINITE) {
+                when (it) {
+                    is SocketTimeoutException -> action("retry", Color.YELLOW, {
+                        signIn()
+                    })
+                    is IOException -> action("retry as staff", Color.YELLOW, {
+                        savePref(true, R.string.isStaff)
+                        signIn()
+                    })
+                }
+            }
+        })
+    }
+
+    private fun logAnalyticData() {
+        mFirebaseAnalytics.setUserProperty("degree", this.readPref(R.string.major, ""))
+        mFirebaseAnalytics.setUserProperty("major", this.readPref(R.string.degree, ""))
+        mFirebaseAnalytics.setUserProperty("generation", this.readPref(R.string.nim, "").substring(0, 3))
+        Answers.getInstance().logLogin(successLoginEvent())
+    }
+
+    private fun successLoginEvent() = LoginEvent()
+            .putSuccess(true)
+            .putCustomAttribute("Degree", this.readPref(R.string.major, ""))
+            .putCustomAttribute("Major", this.readPref(R.string.degree, ""))
+            .putCustomAttribute("Generation", this.readPref(R.string.nim, "").substring(0, 3))
+
+    private fun failedLoginEvent(it: Throwable) = LoginEvent()
+            .putSuccess(false)
+            .putCustomAttribute("Error Message", it.message)
+            .putCustomAttribute("Error Log", it.toString())
+
+    private fun getNotif() {
+        val notifyExtra = intent.getBundleExtra("Notify")
+        if (notifyExtra != null && notifyExtra.getString("message") != null) {
+            alert(notifyExtra.getString("message"), notifyExtra.getString("title")) {
+                negativeButton("Ok, Got it")
+            }.show()
+        }
+    }
+
+    private fun clearData() {
+        val realm = Realm.getDefaultInstance()
+        savePref(false, R.string.isStaff)
+        if (!realm.isEmpty)
+            realm.executeTransaction {
+                it.deleteAll()
+                clearPref()
+            }
+        realm.close()
     }
 
     private fun saveCredentials() {
@@ -66,57 +119,6 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
         runOnUiThread {
             textSwitch.showNext()
             iconSwitch.showNext()
-        }
-    }
-
-    private fun setAnalyticsUserProperties() {
-        mFirebaseAnalytics.setUserProperty("degree", this.readPref(R.string.major, "") as String)
-        mFirebaseAnalytics.setUserProperty("major", this.readPref(R.string.degree, "") as String)
-        mFirebaseAnalytics.setUserProperty("generation", (this.readPref(R.string.nim, "") as String).substring(0, 3))
-    }
-
-    private fun signInCallToServer() {
-        DataApi.initializeApp(this).subscribe({
-            savePref(true, R.string.isLoggedIn)
-            setAnalyticsUserProperties()
-            Answers.getInstance().logLogin(LoginEvent()
-                    .putSuccess(true)
-                    .putCustomAttribute("Degree", this.readPref(R.string.major, "") as String)
-                    .putCustomAttribute("Major", this.readPref(R.string.degree, "") as String)
-                    .putCustomAttribute("Generation", (this.readPref(R.string.nim, "") as String).substring(0, 3)))
-            startActivity<MainActivity>()
-        }, {
-            savePref(false, R.string.isLoggedIn)
-            savePref(false, R.string.isStaff)
-            switchLoginTextView()
-            Answers.getInstance().logLogin(LoginEvent()
-                    .putSuccess(false)
-                    .putCustomAttribute("Error Message", it.message)
-                    .putCustomAttribute("Error Log", it.toString()))
-            val snackString = DataApi.decideFailedString(it)
-            if (it is SocketTimeoutException) {
-                signinActivity?.snack(snackString, Snackbar.LENGTH_LONG) {
-                    action("retry", Color.YELLOW, { signIn() })
-                }
-            } else if(it is IOException) {
-                signinActivity?.snack(snackString, Snackbar.LENGTH_INDEFINITE) {
-                    action("retry as staff", Color.YELLOW, {
-                        savePref(true, R.string.isStaff)
-                        signIn()
-                    })
-                }
-            } else{
-                signinActivity?.snack(snackString, Snackbar.LENGTH_LONG)
-            }
-        })
-    }
-
-    private fun getNotif() {
-        val notifyExtra = intent.getBundleExtra("Notify")
-        if (notifyExtra != null && notifyExtra.getString("message") != null) {
-            alert(notifyExtra.getString("message"), notifyExtra.getString("title")) {
-                negativeButton("Ok, Got it")
-            }.show()
         }
     }
 }

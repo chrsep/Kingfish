@@ -14,9 +14,7 @@ class SettingsActivity : Activity() {
         fragmentManager.beginTransaction().replace(R.id.settingsContent, SettingFragment()).commit()
         settingToolbar.title = "Settings"
         settingToolbar.setNavigationIcon(R.drawable.ic_arrow_back)
-        settingToolbar.setNavigationOnClickListener {
-            finish()
-        }
+        settingToolbar.setNavigationOnClickListener { finish() }
     }
 
     class SettingFragment : PreferenceFragment() {

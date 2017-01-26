@@ -41,9 +41,8 @@ class GradesFragment : Fragment(), AnkoLogger, LineChartOnValueSelectListener {
                 .setCubic(true)
                 .setColor(ContextCompat.getColor(ctx, R.color.colorAccent))
         lines.add(line)
-        val axisX = Axis()
         val data = LineChartData(lines)
-        data.axisYLeft = axisX
+        data.axisYLeft = Axis()
         setupChart(data)
         setDataByTerm(pointValues.size)
     }
@@ -65,7 +64,11 @@ class GradesFragment : Fragment(), AnkoLogger, LineChartOnValueSelectListener {
         chart.onValueTouchListener = this
         chart.isZoomEnabled = false
         chart.isValueSelectionEnabled = true
-        val viewport = Viewport(chart.currentViewport.left, chart.currentViewport.top + 0.1f, chart.currentViewport.right, chart.currentViewport.bottom - 0.1f)
+        val viewport = Viewport(
+                chart.currentViewport.left,
+                chart.currentViewport.top + 0.1f,
+                chart.currentViewport.right,
+                chart.currentViewport.bottom - 0.1f)
         chart.maximumViewport = viewport
         chart.currentViewport = viewport
     }
@@ -93,18 +96,21 @@ class GradesFragment : Fragment(), AnkoLogger, LineChartOnValueSelectListener {
                 else -> "N/A"
             }
             gradesToolbar.title = "Semester " + term
-
             val course = realm.where(CourseModel::class.java).equalTo("term", chosenTermCode).findAll()
-            val courseIdSet = mutableSetOf<String>()
             val scoreResultList = mutableListOf<RealmResults<ScoreModel>>()
-            course.forEach { courseIdSet.add(it.courseId) }
-            courseIdSet.forEach {
-                val result = realm.where(ScoreModel::class.java).equalTo("courseId", it).findAll()
+            course.forEach {
+                val result = realm.where(ScoreModel::class.java).equalTo("courseId", it.courseId).findAll()
                 if (!result.isEmpty()) scoreResultList.add(result)
             }
 
-            if (scoreResultList.isEmpty()) empty_placeholder.visibility = View.VISIBLE
-            else empty_placeholder.visibility = View.GONE
+            if (scoreResultList.isEmpty()) {
+                empty_placeholder.visibility = View.VISIBLE
+                gradesRecycler.visibility = View.GONE
+                return
+            } else {
+                empty_placeholder.visibility = View.GONE
+                gradesRecycler.visibility = View.VISIBLE
+            }
 
             gradesRecycler.layoutManager = LinearLayoutManager(ctx)
             gradesRecycler.adapter = GradesRecyclerAdapter(realm, scoreResultList)

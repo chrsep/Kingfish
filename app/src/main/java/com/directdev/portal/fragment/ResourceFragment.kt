@@ -29,9 +29,6 @@ import org.jetbrains.anko.onClick
 import org.jetbrains.anko.runOnUiThread
 import kotlin.properties.Delegates
 
-/**
- * Created by chris on 9/14/2016.
- */
 class ResourceFragment : Fragment(), AnkoLogger {
     private var realm: Realm by Delegates.notNull()
 

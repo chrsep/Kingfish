@@ -10,13 +10,10 @@ class MyApplication : Application() {
     override fun onCreate() {
         JodaTimeAndroid.init(this)
         Realm.init(this)
-
-        if (BuildConfig.DEBUG)
-        Stetho.initialize(
-                Stetho.newInitializerBuilder(this)
-                        .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
-                        .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
-                        .build())
+        if (BuildConfig.DEBUG) Stetho.initialize(Stetho.newInitializerBuilder(this)
+                    .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+                    .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
+                    .build())
         super.onCreate()
     }
 }

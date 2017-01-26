@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.directdev.portal.R
 import com.directdev.portal.model.FinanceModel
-import com.directdev.portal.utils.readPref
+import com.directdev.portal.utils.formatToRupiah
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
@@ -16,8 +16,6 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeComparator
 import org.joda.time.Days
 import org.joda.time.format.DateTimeFormat
-import java.text.NumberFormat
-import java.util.*
 
 // This recyclerView is in reversed order, so we put the header (The one that shows unpaid bill) at
 // the end of the list to make it show on top
@@ -29,27 +27,25 @@ class FinancesRecyclerAdapter(
         RealmRecyclerViewAdapter<FinanceModel, FinancesRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
     private val HEADER = 1
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        if (viewType == HEADER)
-            return HeaderViewHolder(realm, context, inflater.inflate(R.layout.item_finances_header, parent, false))
-        else
-            return NormalViewHolder(inflater.inflate(R.layout.item_finances, parent, false))
-    }
+    override fun getItemCount() = super.getItemCount() + 1
+
+    override fun getItemViewType(position: Int) =
+            if (position == data?.size) HEADER
+            else super.getItemViewType(position)
+
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) =
+            if (viewType == HEADER)
+                HeaderViewHolder(realm, inflater.inflate(R.layout.item_finances_header, parent, false))
+            else
+                NormalViewHolder(inflater.inflate(R.layout.item_finances, parent, false))
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         // Normally for header, position==0 will be used, since this is reversed, we will want to
         // put the header on to bottom
-        if (position == data?.size) holder?.bindData(getItem(position - 1) as FinanceModel)
-        else holder?.bindData(getItem(position) as FinanceModel)
-    }
-
-    override fun getItemCount(): Int {
-        return super.getItemCount() + 1
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        if (position == data?.size) return HEADER
-        return super.getItemViewType(position)
+        if (position == data?.size)
+            holder?.bindData(getItem(position - 1) as FinanceModel)
+        else
+            holder?.bindData(getItem(position) as FinanceModel)
     }
 
     abstract class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -58,9 +54,13 @@ class FinancesRecyclerAdapter(
 
     private class NormalViewHolder(view: View) : FinancesRecyclerAdapter.ViewHolder(view) {
         override fun bindData(item: FinanceModel) {
+            val date = DateTime
+                    .parse(item.dueDate.substring(0, 10))
+                    .toString(DateTimeFormat.forPattern("dd MMM ''yy"))
+            val amount = item.chargeAmount.formatToRupiah()
             itemView.finance_description.text = item.description
-            itemView.finance_date.text = DateTime.parse(item.dueDate.substring(0, 10)).toString(DateTimeFormat.forPattern("dd MMM ''yy"))
-            itemView.finance_amount.text = "Rp. " + NumberFormat.getNumberInstance(Locale.US).format(item.chargeAmount.toFloat())
+            itemView.finance_date.text = date
+            itemView.finance_amount.text = amount
             if (DateTime.parse(item.dueDate.substring(0, 10)).isAfterNow) {
                 itemView.finance_passed.visibility = View.GONE
                 itemView.finance_upcoming.visibility = View.VISIBLE
@@ -71,25 +71,33 @@ class FinancesRecyclerAdapter(
         }
     }
 
-    private class HeaderViewHolder(val realm: Realm, val ctx: Context, view: View) : FinancesRecyclerAdapter.ViewHolder(view) {
+    private class HeaderViewHolder(val realm: Realm, view: View) : FinancesRecyclerAdapter.ViewHolder(view) {
         override fun bindData(item: FinanceModel) {
+            val totalBillText: String
+            val nextChargeText: String
             val data = realm.where(FinanceModel::class.java).findAll()
-            val closestDate = data.map {
-                DateTime.parse(it.dueDate.substring(0, 10))
-            }.filter {
-                it.isAfterNow
-            }.sortedWith(DateTimeComparator.getInstance())
-            itemView.total_amount.text = "Rp. " + NumberFormat.getNumberInstance(Locale.US).format(ctx.readPref(R.string.finance_charge, 0) as Int)
+            val closestDate = data
+                    .map { DateTime.parse(it.dueDate.substring(0, 10)) }
+                    .filter { it.isAfterNow }
+                    .sortedWith(DateTimeComparator.getInstance())
             if (closestDate.isNotEmpty()) {
-                val upcomingBill = data.filter { DateTime.parse(it.dueDate.substring(0, 10)).isAfterNow }
-                val totalBill = upcomingBill.sumBy { it.chargeAmount.toDouble().toInt() }
-                itemView.total_amount.text = "Rp. ${NumberFormat.getNumberInstance(Locale.US).format(totalBill)}"
-                val lengthFromToday = Days.daysBetween(closestDate[0], DateTime.now())
-                itemView.next_charge.text = DateTime(closestDate[0]).toString(DateTimeFormat.forPattern("dd MMMM"))+ """ (${lengthFromToday.days.toString().substring(1)} days)"""
-            }else{
-                itemView.total_amount.text = "Rp. 0,-"
-                itemView.next_charge.text = "-"
+                val nextChargeDate = closestDate[0].toString("dd MMMM")
+                val daysCount = Days
+                        .daysBetween(closestDate[0], DateTime.now())
+                        .days
+                        .toString()
+                        .substring(1)
+                val totalBill = data
+                        .filter { DateTime.parse(it.dueDate.substring(0, 10)).isAfterNow }
+                        .sumBy { it.chargeAmount.toDouble().toInt() }
+                totalBillText = """Rp. $totalBill"""
+                nextChargeText = """$nextChargeDate ($daysCount days)"""
+            } else {
+                totalBillText = "Rp. 0,-"
+                nextChargeText = "-"
             }
+            itemView.total_amount.text = totalBillText
+            itemView.next_charge.text = nextChargeText
         }
     }
 }

@@ -7,6 +7,10 @@ import android.support.design.widget.Snackbar
 import android.view.KeyEvent
 import android.view.View
 import org.jetbrains.anko.onKey
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+import java.text.NumberFormat
+import java.util.*
 
 fun Context.savePref(data: Any, @StringRes id: Int) {
     val key = getString(id)
@@ -22,17 +26,16 @@ fun Context.savePref(data: Any, @StringRes id: Int) {
     editor.commit()
 }
 
-fun Context.readPref(@StringRes id: Int, defaultValue: Any, preferenceId: String = "com.kingfish"): Any {
+fun Context.readPref(@StringRes id: Int, defaultValue: String, preferenceId: String = "com.kingfish"): String {
     val sp = this.getSharedPreferences(preferenceId, Context.MODE_PRIVATE)
     val key = this.getString(id)
-    return when (defaultValue) {
-        is String -> sp.getString(key, defaultValue)
-        is Boolean -> sp.getBoolean(key, defaultValue)
-        is Float -> sp.getFloat(key, defaultValue)
-        is Int -> sp.getInt(key, defaultValue)
-        is Long -> sp.getLong(key, defaultValue)
-        else -> 0
-    }
+    return sp.getString(key, defaultValue)
+}
+
+fun Context.readPref(@StringRes id: Int, defaultValue: Boolean, preferenceId: String = "com.kingfish"): Boolean {
+    val sp = this.getSharedPreferences(preferenceId, Context.MODE_PRIVATE)
+    val key = this.getString(id)
+    return sp.getBoolean(key, defaultValue)
 }
 
 fun Context.clearPref() {
@@ -49,8 +52,7 @@ fun View.snack(msg: Any, length: Int = Snackbar.LENGTH_SHORT, option: Snackbar.(
 
 fun View.onEnter(callback: () -> Unit) {
     onKey { view, i, keyEvent ->
-        if (keyEvent?.action == KeyEvent.ACTION_DOWN &&
-                keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER)
+        if (keyEvent?.action == KeyEvent.ACTION_DOWN && keyEvent.keyCode == KeyEvent.KEYCODE_ENTER)
             callback()
         false
     }
@@ -61,6 +63,11 @@ fun Snackbar.action(action: String, color: Int? = null, listener: (View) -> Unit
     color?.let { setActionTextColor(color) }
 }
 
-fun ConnectivityManager.isNetworkAvailable(): Boolean {
-    return activeNetworkInfo != null && activeNetworkInfo.isConnected
-}
+fun ConnectivityManager.isNetworkAvailable(): Boolean =
+        activeNetworkInfo != null && activeNetworkInfo.isConnected
+
+fun String.formatToRupiah() = "Rp. " + NumberFormat
+        .getNumberInstance(Locale.US)
+        .format(toFloat())
+
+fun DateTime.toString(pattern: String) = toString(DateTimeFormat.forPattern(pattern))

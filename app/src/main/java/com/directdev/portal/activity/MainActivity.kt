@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onResume() {
         super.onResume()
-        if (!(readPref(R.string.isLoggedIn, false) as Boolean)) finishAffinity()
+        if (!(readPref(R.string.isLoggedIn, false))) finishAffinity()
     }
 
     private fun getNotif() {

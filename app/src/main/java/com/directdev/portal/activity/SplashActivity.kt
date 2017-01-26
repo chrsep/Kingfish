@@ -17,10 +17,10 @@ class SplashActivity : AppCompatActivity(), AnkoLogger {
         Fabric.with(this, Answers(), Crashlytics())
         if (intent.extras != null) {
             val intentExtras = intent.extras
-            if (readPref(R.string.isLoggedIn, false) as Boolean) startActivity<MainActivity>("Notify" to intentExtras)
+            if (readPref(R.string.isLoggedIn, false)) startActivity<MainActivity>("Notify" to intentExtras)
             else startActivity<SigninActivity>("Notify" to intentExtras)
         } else {
-            if (readPref(R.string.isLoggedIn, false) as Boolean) startActivity<MainActivity>()
+            if (readPref(R.string.isLoggedIn, false)) startActivity<MainActivity>()
             else startActivity<SigninActivity>()
         }
     }
