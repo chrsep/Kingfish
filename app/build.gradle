@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.1-M04'
+    ext.kotlin_version = '1.1.0-beta-17'
     repositories {
         maven { url 'https://maven.fabric.io/public' }
 
@@ -87,8 +87,7 @@ dependencies {
     compile 'com.facebook.stetho:stetho-okhttp3:1.4.2'
     compile 'io.realm:android-adapters:1.4.0'
     compile 'com.github.rahatarmanahmed:circularprogressview:2.5.0'
-    compile 'com.roughike:bottom-bar:2.0.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta1'
+    compile 'com.roughike:bottom-bar:2.0.2'
     compile 'com.google.firebase:firebase-core:10.0.1'
     compile 'com.google.firebase:firebase-messaging:10.0.1'
     compile 'com.github.lecho:hellocharts-android:v1.5.8'
@@ -99,6 +98,7 @@ dependencies {
     androidTestCompile 'com.android.support.test:rules:0.6-alpha'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.3-alpha'
     androidTestCompile 'com.android.support:support-annotations:25.1.0'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
 }
 repositories {
     mavenCentral()

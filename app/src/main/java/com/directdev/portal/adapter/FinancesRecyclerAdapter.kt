@@ -19,7 +19,14 @@ import org.joda.time.format.DateTimeFormat
 import java.text.NumberFormat
 import java.util.*
 
-class FinancesRecyclerAdapter(val realm: Realm, context: Context, data: OrderedRealmCollection<FinanceModel>?, autoUpdate: Boolean) : RealmRecyclerViewAdapter<FinanceModel, FinancesRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
+// This recyclerView is in reversed order, so we put the header (The one that shows unpaid bill) at
+// the end of the list to make it show on top
+class FinancesRecyclerAdapter(
+        val realm: Realm,
+        context: Context,
+        data: OrderedRealmCollection<FinanceModel>?,
+        autoUpdate: Boolean) :
+        RealmRecyclerViewAdapter<FinanceModel, FinancesRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
     private val HEADER = 1
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
@@ -30,6 +37,8 @@ class FinancesRecyclerAdapter(val realm: Realm, context: Context, data: OrderedR
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+        // Normally for header, position==0 will be used, since this is reversed, we will want to
+        // put the header on to bottom
         if (position == data?.size) holder?.bindData(getItem(position - 1) as FinanceModel)
         else holder?.bindData(getItem(position) as FinanceModel)
     }
@@ -47,7 +56,7 @@ class FinancesRecyclerAdapter(val realm: Realm, context: Context, data: OrderedR
         abstract fun bindData(item: FinanceModel)
     }
 
-    class NormalViewHolder(view: View) : FinancesRecyclerAdapter.ViewHolder(view) {
+    private class NormalViewHolder(view: View) : FinancesRecyclerAdapter.ViewHolder(view) {
         override fun bindData(item: FinanceModel) {
             itemView.finance_description.text = item.description
             itemView.finance_date.text = DateTime.parse(item.dueDate.substring(0, 10)).toString(DateTimeFormat.forPattern("dd MMM ''yy"))
@@ -62,7 +71,7 @@ class FinancesRecyclerAdapter(val realm: Realm, context: Context, data: OrderedR
         }
     }
 
-    class HeaderViewHolder(val realm: Realm, val ctx: Context, view: View) : FinancesRecyclerAdapter.ViewHolder(view) {
+    private class HeaderViewHolder(val realm: Realm, val ctx: Context, view: View) : FinancesRecyclerAdapter.ViewHolder(view) {
         override fun bindData(item: FinanceModel) {
             val data = realm.where(FinanceModel::class.java).findAll()
             val closestDate = data.map {
@@ -76,7 +85,7 @@ class FinancesRecyclerAdapter(val realm: Realm, context: Context, data: OrderedR
                 val totalBill = upcomingBill.sumBy { it.chargeAmount.toDouble().toInt() }
                 itemView.total_amount.text = "Rp. ${NumberFormat.getNumberInstance(Locale.US).format(totalBill)}"
                 val lengthFromToday = Days.daysBetween(closestDate[0], DateTime.now())
-                itemView.next_charge.text = DateTime(closestDate[0]).toString(DateTimeFormat.forPattern("dd MMMM")) + """ (${lengthFromToday.days.toString().substring(1)} days)"""
+                itemView.next_charge.text = DateTime(closestDate[0]).toString(DateTimeFormat.forPattern("dd MMMM"))+ """ (${lengthFromToday.days.toString().substring(1)} days)"""
             }else{
                 itemView.total_amount.text = "Rp. 0,-"
                 itemView.next_charge.text = "-"
