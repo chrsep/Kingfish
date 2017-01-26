@@ -41,7 +41,7 @@ class FinancesRecyclerAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         // Normally for header, position==0 will be used, since this is reversed, we will want to
-        // put the header on to bottom
+        // put the header on the bottom
         if (position == data?.size)
             holder?.bindData(getItem(position - 1) as FinanceModel)
         else
@@ -90,8 +90,8 @@ class FinancesRecyclerAdapter(
                 val totalBill = data
                         .filter { DateTime.parse(it.dueDate.substring(0, 10)).isAfterNow }
                         .sumBy { it.chargeAmount.toDouble().toInt() }
-                totalBillText = """Rp. $totalBill"""
-                nextChargeText = """$nextChargeDate ($daysCount days)"""
+                totalBillText = "Rp. $totalBill"
+                nextChargeText = "$nextChargeDate ($daysCount days)"
             } else {
                 totalBillText = "Rp. 0,-"
                 nextChargeText = "-"

@@ -6,15 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.directdev.portal.R
+import com.directdev.portal.model.CreditModel
 import com.directdev.portal.model.ScoreModel
 import io.realm.Realm
 import io.realm.RealmResults
 import kotlinx.android.synthetic.main.item_grades.view.*
+import kotlinx.android.synthetic.main.item_grades_header.view.*
 
 
 class GradesRecyclerAdapter(
         val realm: Realm,
-        val data: List<RealmResults<ScoreModel>>) :
+        val data: List<RealmResults<ScoreModel>>,
+        val term: Int) :
         RecyclerView.Adapter<GradesRecyclerAdapter.ViewHolder>() {
 
     private val HEADER = 1
@@ -30,16 +33,15 @@ class GradesRecyclerAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent?.context)
-        if (viewType == HEADER)
-            return HeaderViewHolder(inflater.inflate(R.layout.item_grades_header, parent, false))
+        return if (viewType == HEADER)
+            HeaderViewHolder(inflater.inflate(R.layout.item_grades_header, parent, false), term, realm)
         else
-            return NormalViewHolder(inflater.inflate(R.layout.item_grades, parent, false))
+            NormalViewHolder(inflater.inflate(R.layout.item_grades, parent, false))
     }
 
-    override fun getItemViewType(position: Int): Int {
-        if (position == 0) return HEADER
-        return super.getItemViewType(position)
-    }
+    override fun getItemViewType(position: Int) =
+        if (position == 0) HEADER
+        else super.getItemViewType(position)
 
     abstract class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         abstract fun bindData(score: RealmResults<ScoreModel>)
@@ -126,9 +128,12 @@ class GradesRecyclerAdapter(
         }
     }
 
-    private class HeaderViewHolder(view: View) : ViewHolder(view) {
+    private class HeaderViewHolder(view: View, val term: Int, val realm: Realm) : ViewHolder(view) {
         override fun bindData(score: RealmResults<ScoreModel>) {
-
+            val data = realm.where(CreditModel::class.java).equalTo("term", term).findFirst()
+            itemView.totalCreditCount.text = "${data.scuFinished} SCU"
+            itemView.cumulativeGpaCount.text = data.gpaCummulative
+            itemView.semesterGpaCount.text = if(data.gpaCurrent.equals("0.00")) "N/A" else data.gpaCurrent
         }
     }
 }

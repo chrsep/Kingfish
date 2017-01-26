@@ -33,7 +33,7 @@ class SessionRecyclerAdapter(context: Context, data: OrderedRealmCollection<Sess
                 itemView.journalShift.visibility = View.GONE
                 color = "#f44336"
             } else {
-                if (!(ctx.readPref(R.string.campus_setting, false, "com.directdev.portal_preferences") as Boolean)) {
+                if (!(ctx.readPref(R.string.campus_setting, false, "com.directdev.portal_preferences"))) {
                     itemView.journalCampus.text = session.locationId
                 }
                 itemView.journalMode.text = session.typeId

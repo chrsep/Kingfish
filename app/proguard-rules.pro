@@ -60,3 +60,5 @@
 -keep class com.directdev.portal.model** { *; }
 
 -dontwarn okhttp3.*
+
+-dontwarn com.roughike.bottombar.**

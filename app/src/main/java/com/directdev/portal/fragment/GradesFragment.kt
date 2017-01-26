@@ -15,6 +15,7 @@ import com.directdev.portal.model.ScoreModel
 import io.realm.Realm
 import io.realm.RealmResults
 import kotlinx.android.synthetic.main.fragment_grades.*
+import lecho.lib.hellocharts.formatter.SimpleAxisValueFormatter
 import lecho.lib.hellocharts.listener.LineChartOnValueSelectListener
 import lecho.lib.hellocharts.model.*
 import org.jetbrains.anko.AnkoLogger
@@ -42,7 +43,10 @@ class GradesFragment : Fragment(), AnkoLogger, LineChartOnValueSelectListener {
                 .setColor(ContextCompat.getColor(ctx, R.color.colorAccent))
         lines.add(line)
         val data = LineChartData(lines)
-        data.axisYLeft = Axis()
+        val xAxis = Axis()
+        xAxis.formatter = SimpleAxisValueFormatter(1)
+        xAxis.setHasSeparationLine(false)
+        data.axisYLeft = xAxis
         setupChart(data)
         setDataByTerm(pointValues.size)
     }
@@ -96,10 +100,15 @@ class GradesFragment : Fragment(), AnkoLogger, LineChartOnValueSelectListener {
                 else -> "N/A"
             }
             gradesToolbar.title = "Semester " + term
-            val course = realm.where(CourseModel::class.java).equalTo("term", chosenTermCode).findAll()
+            val course = realm
+                    .where(CourseModel::class.java)
+                    .equalTo("term", chosenTermCode)
+                    .findAll()
+                    .map { it.courseId }
+                    .toSet()
             val scoreResultList = mutableListOf<RealmResults<ScoreModel>>()
             course.forEach {
-                val result = realm.where(ScoreModel::class.java).equalTo("courseId", it.courseId).findAll()
+                val result = realm.where(ScoreModel::class.java).equalTo("courseId", it).findAll()
                 if (!result.isEmpty()) scoreResultList.add(result)
             }
 
@@ -113,7 +122,7 @@ class GradesFragment : Fragment(), AnkoLogger, LineChartOnValueSelectListener {
             }
 
             gradesRecycler.layoutManager = LinearLayoutManager(ctx)
-            gradesRecycler.adapter = GradesRecyclerAdapter(realm, scoreResultList)
+            gradesRecycler.adapter = GradesRecyclerAdapter(realm, scoreResultList, chosenTermCode)
         }
     }
 }
