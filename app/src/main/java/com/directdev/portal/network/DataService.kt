@@ -6,6 +6,10 @@ import retrofit2.Response
 import retrofit2.http.*
 import rx.Single
 
+/**-------------------------------------------------------------------------------------------------
+ * Interface for building Retrofit service.
+ *------------------------------------------------------------------------------------------------*/
+
 interface DataService {
     
     @FormUrlEncoded

@@ -1,64 +1,66 @@
 package com.directdev.portal.activity
 
-import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.directdev.portal.R
 import com.directdev.portal.fragment.FinancesFragment
 import com.directdev.portal.fragment.GradesFragment
 import com.directdev.portal.fragment.JournalFragment
 import com.directdev.portal.fragment.ResourceFragment
-import com.directdev.portal.utils.readPref
 import com.google.firebase.analytics.FirebaseAnalytics
-import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.alert
 import kotlin.properties.Delegates
 
+/**-------------------------------------------------------------------------------------------------
+ *
+ * This is NOT the activity that is always loaded first when Portal starts (#SplashActivity is).
+ * This class acts as the container for the fragments. It's job is to show the Bottom bar and control
+ * which fragments is getting displayed at any time.
+ *
+ *------------------------------------------------------------------------------------------------*/
+
 class MainActivity : AppCompatActivity(), AnkoLogger {
-    private var mFirebaseAnalytics : FirebaseAnalytics by Delegates.notNull()
+    private var mFirebaseAnalytics: FirebaseAnalytics by Delegates.notNull()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         setContentView(R.layout.activity_main)
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         bottomBar.setOnTabSelectListener {
-            val transaction = fragmentManager.beginTransaction()
-            when (it) {
-                R.id.tab_journal -> {
-                    transaction.replace(R.id.fragmentContainer, JournalFragment()).commit()
-                }
-                R.id.tab_grades -> {
-                    transaction.replace(R.id.fragmentContainer, GradesFragment()).commit()
-                }
-                R.id.tab_finances -> {
-                    transaction.replace(R.id.fragmentContainer, FinancesFragment()).commit()
-                }
-//                R.id.tab_assignments -> {
-//                    transaction.replace(R.id.fragmentContainer, AssignmentFragment()).commit()
-//                }
-                R.id.tab_resources -> {
-                    transaction.replace(R.id.fragmentContainer, ResourceFragment()).commit()
-                }
+            val fragment = when (it) {
+                R.id.tab_journal -> JournalFragment()
+                R.id.tab_grades -> GradesFragment()
+                R.id.tab_finances -> FinancesFragment()
+                R.id.tab_resources -> ResourceFragment()
+                else -> JournalFragment()
             }
+            fragmentManager
+                    .beginTransaction()
+                    .replace(R.id.fragmentContainer, fragment)
+                    .commit()
         }
-        getNotif()
+        handleNotification()
     }
 
+    // TODO: REFACTOR | Not sure what this function is for, further investigation needed
     override fun onResume() {
         super.onResume()
-        if (!(readPref(R.string.isLoggedIn, false))) finishAffinity()
+        if (!readPref(R.string.isLoggedIn, false)) finishAffinity()
     }
 
-    private fun getNotif() {
-        val notifyExtra = intent.getBundleExtra("Notify")
-        if (notifyExtra != null && notifyExtra.getString("message") != null) {
-            alert(notifyExtra.getString("message"), notifyExtra.getString("title")) {
+    /**-------------------------------------------------------------------------------------------------
+     *
+     * Handles notification from Firebase Cloud Messaging. When a notification is clicked, it will start
+     * this activity with an 'extra'. So we check if the extra is empty or not, and choose whether to
+     * show the alert containing the message or not.
+     *
+     *------------------------------------------------------------------------------------------------*/
+
+    private fun handleNotification() {
+        val extra = intent.getBundleExtra("Notify")
+        if (extra != null && extra.getString("message") != null) {
+            alert(extra.getString("message"), extra.getString("title")) {
                 negativeButton("Ok, Got it")
             }.show()
         }
-    }
-
-    private fun showAddAssignment() {
-        bottomSheet.showWithSheetView(layoutInflater.inflate(R.layout.bottomsheet_assignment, bottomSheet, false))
     }
 }

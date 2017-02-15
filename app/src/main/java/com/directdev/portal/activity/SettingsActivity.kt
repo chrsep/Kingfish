@@ -1,10 +1,14 @@
 package com.directdev.portal.activity
 
-import android.app.Activity
-import android.os.Bundle
 import android.preference.PreferenceFragment
 import com.directdev.portal.R
-import kotlinx.android.synthetic.main.activity_settings.*
+
+/**-------------------------------------------------------------------------------------------------
+ *
+ * This activity handles the 'Setting page', it's just about setting up the toolbar and layout for
+ * the 'Setting page'.
+ *
+ *------------------------------------------------------------------------------------------------*/
 
 class SettingsActivity : Activity() {
 
@@ -22,9 +26,5 @@ class SettingsActivity : Activity() {
             super.onCreate(savedInstanceState)
             addPreferencesFromResource(R.xml.pref_data)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 }

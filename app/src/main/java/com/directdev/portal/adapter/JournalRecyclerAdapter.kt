@@ -10,15 +10,20 @@ import com.directdev.portal.model.JournalModel
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
-import kotlinx.android.synthetic.main.item_journal.view.*
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import java.util.*
 
-class JournalRecyclerAdapter(val realm: Realm, context: Context, data: OrderedRealmCollection<JournalModel>?, autoUpdate: Boolean) : RealmRecyclerViewAdapter<JournalModel, JournalRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        return ViewHolder(inflater.inflate(R.layout.item_journal, parent, false))
-    }
+class JournalRecyclerAdapter(
+        val realm: Realm,
+        context: Context,
+        data: OrderedRealmCollection<JournalModel>?,
+        autoUpdate: Boolean) :
+        RealmRecyclerViewAdapter<JournalModel, JournalRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
+
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) =
+        ViewHolder(inflater.inflate(R.layout.item_journal, parent, false))
+
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         holder?.bindData(context, getItem(position) as JournalModel)

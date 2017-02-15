@@ -8,16 +8,19 @@ import com.directdev.portal.R
 import com.directdev.portal.model.ExamModel
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter
-import kotlinx.android.synthetic.main.item_jexams.view.*
 
-class JExamsRecyclerAdapter(context: Context, data: OrderedRealmCollection<ExamModel>?, autoUpdate: Boolean) : RealmRecyclerViewAdapter<ExamModel, JExamsRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
+class JExamsRecyclerAdapter(
+        context: Context,
+        data: OrderedRealmCollection<ExamModel>?,
+        autoUpdate: Boolean) :
+        RealmRecyclerViewAdapter<ExamModel, JExamsRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
+
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         holder?.bindData(data?.get(position) as ExamModel)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        return ViewHolder(inflater.inflate(R.layout.item_jexams, parent, false))
-    }
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder =
+         ViewHolder(inflater.inflate(R.layout.item_jexams, parent, false))
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 

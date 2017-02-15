@@ -32,6 +32,20 @@ import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLException
 
+/**-------------------------------------------------------------------------------------------------
+ * A singleton that handles all of Portal API calls, Using ReactiveX and Retrofit.
+ *------------------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------------------------------
+ *
+ * This is by far the most nightmarish part of this codebase. Due to the complex sequence of calls
+ * and the concurrency involved, we are heavily reliant on ReactiveX, and since this is the first
+ * time we use ReactiveX, this code has become quite a mess (at least that's how we feel). Further
+ * refinement of this object will be required, any help will be appreciated :)
+ *
+ * TODO: REFACTOR | Reorganizes DataApi to create more readable code
+ *
+ *------------------------------------------------------------------------------------------------*/
+
 object DataApi {
     var isActive = false
     private val baseUrl = "https://binusmaya.binus.ac.id/services/ci/index.php/"
@@ -149,29 +163,6 @@ object DataApi {
         }
     }
 
-    fun decideCauseOfFailure(it: Throwable) = when (it) {
-        is SocketTimeoutException -> "Request Timed Out"
-        is HttpException -> {
-            Crashlytics.log("HttpException")
-            Crashlytics.logException(it)
-            "Binusmaya's server seems to be offline, try again later"
-        }
-        is ConnectException -> "Failed to connect to Binusmaya"
-        is SSLException -> "Failed to connect to Binusmaya"
-        is UnknownHostException -> "Failed to connect to Binusmaya"
-        is IOException -> "Wrong email or password"
-        is IndexOutOfBoundsException -> {
-            Crashlytics.log("IndexOutOfBoundsException")
-            Crashlytics.logException(it)
-            "Binusmaya server is acting weird, try again later"
-        }
-        else -> {
-            Crashlytics.log("Unknown CrashOnSignIn")
-            Crashlytics.logException(it)
-            "We have no idea what went wrong, but we have received the error log, we'll look into this"
-        }
-    }
-
 
     private fun signIn(ctx: Context, cookie: String = "", isStaff: Boolean): Single<String> {
         var newCookie: String = cookie
@@ -244,10 +235,9 @@ object DataApi {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 
-
-    /**
-     * Helper Functions for saving data to realm
-     * */
+    /*----------------------------------------------------------------------------------------------
+     * Helper function for saving data to Realm
+     *--------------------------------------------------------------------------------------------*/
 
     private fun saveCourse(course: CourseWrapperModel, term: String, realm: Realm) {
         course.courses.forEach { it.term = term.toInt() }
@@ -308,6 +298,10 @@ object DataApi {
         insert(data)
     }
 
+    /**---------------------------------------------------------------------------------------------
+     * Build retrofit service for making API Calls
+     *--------------------------------------------------------------------------------------------*/
+
     private fun buildRetrofit(): DataService {
         val client = if (BuildConfig.DEBUG) buildDebugClient() else buildClient()
         return Retrofit.Builder()
@@ -319,6 +313,10 @@ object DataApi {
                 .build().create(DataService::class.java)
     }
 
+    /**---------------------------------------------------------------------------------------------
+     * Build OkHttpClient WITH Stheto for DEBUG
+     *--------------------------------------------------------------------------------------------*/
+
     private fun buildDebugClient() = OkHttpClient().newBuilder()
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
@@ -327,10 +325,38 @@ object DataApi {
             .followRedirects(false)
             .build()
 
+    /**---------------------------------------------------------------------------------------------
+     * Build OkHttpClient WITHOUT Stheto for PRODUCTION
+     *--------------------------------------------------------------------------------------------*/
+
     private fun buildClient() = OkHttpClient().newBuilder()
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .followRedirects(false)
             .build()
+
+
+    fun decideCauseOfFailure(it: Throwable) = when (it) {
+        is SocketTimeoutException -> "Request Timed Out"
+        is HttpException -> {
+            Crashlytics.log("HttpException")
+            Crashlytics.logException(it)
+            "Binusmaya's server seems to be offline, try again later"
+        }
+        is ConnectException -> "Failed to connect to Binusmaya"
+        is SSLException -> "Failed to connect to Binusmaya"
+        is UnknownHostException -> "Failed to connect to Binusmaya"
+        is IOException -> "Wrong email or password"
+        is IndexOutOfBoundsException -> {
+            Crashlytics.log("IndexOutOfBoundsException")
+            Crashlytics.logException(it)
+            "Binusmaya server is acting weird, try again later"
+        }
+        else -> {
+            Crashlytics.log("Unknown CrashOnSignIn")
+            Crashlytics.logException(it)
+            "We have no idea what went wrong, but we have received the error log, we'll look into this"
+        }
+    }
 }

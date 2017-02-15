@@ -10,8 +10,6 @@ import com.directdev.portal.utils.formatToRupiah
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
-import kotlinx.android.synthetic.main.item_finances.view.*
-import kotlinx.android.synthetic.main.item_finances_header.view.*
 import org.joda.time.DateTime
 import org.joda.time.DateTimeComparator
 import org.joda.time.Days
@@ -29,6 +27,8 @@ class FinancesRecyclerAdapter(
 
     override fun getItemCount() = super.getItemCount() + 1
 
+    // Normally for header, position==0 will be used, since this is reversed, we will want to
+    // put the header on the bottom
     override fun getItemViewType(position: Int) =
             if (position == data?.size) HEADER
             else super.getItemViewType(position)
@@ -40,8 +40,6 @@ class FinancesRecyclerAdapter(
                 NormalViewHolder(inflater.inflate(R.layout.item_finances, parent, false))
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        // Normally for header, position==0 will be used, since this is reversed, we will want to
-        // put the header on the bottom
         if (position == data?.size)
             holder?.bindData(getItem(position - 1) as FinanceModel)
         else

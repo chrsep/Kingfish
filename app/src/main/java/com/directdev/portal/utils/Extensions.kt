@@ -1,5 +1,6 @@
 package com.directdev.portal.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.support.annotation.StringRes
@@ -12,6 +13,20 @@ import org.joda.time.format.DateTimeFormat
 import java.text.NumberFormat
 import java.util.*
 
+/*--------------------------------------------------------------------------------------------------
+ *
+ * These are extension functions for common repetitive things (Ex. Saving preferences, Showing
+ * SnackBars, etc...), created as an effort to make the code more readable and concise
+ *
+ *------------------------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------------------------------
+ * Interacting with Shared Preferences
+ *------------------------------------------------------------------------------------------------*/
+/**-------------------------------------------------------------------------------------------------
+ * Extension Function for saving shared preference
+ *------------------------------------------------------------------------------------------------*/
+
+@SuppressLint("CommitPrefEdits")
 fun Context.savePref(data: Any, @StringRes id: Int) {
     val key = getString(id)
     val editor = getSharedPreferences("com.kingfish", Context.MODE_PRIVATE).edit()
@@ -26,29 +41,65 @@ fun Context.savePref(data: Any, @StringRes id: Int) {
     editor.commit()
 }
 
+/**-------------------------------------------------------------------------------------------------
+ * Extension Function for reading shared preference
+ *------------------------------------------------------------------------------------------------*/
+
 fun Context.readPref(@StringRes id: Int, defaultValue: String, preferenceId: String = "com.kingfish"): String {
-    val sp = this.getSharedPreferences(preferenceId, Context.MODE_PRIVATE)
-    val key = this.getString(id)
+    val sp = getSharedPreferences(preferenceId, Context.MODE_PRIVATE)
+    val key = getString(id)
     return sp.getString(key, defaultValue)
 }
 
+/**-------------------------------------------------------------------------------------------------
+ * Extension Function for reading shared preference
+ *------------------------------------------------------------------------------------------------*/
+
 fun Context.readPref(@StringRes id: Int, defaultValue: Boolean, preferenceId: String = "com.kingfish"): Boolean {
-    val sp = this.getSharedPreferences(preferenceId, Context.MODE_PRIVATE)
-    val key = this.getString(id)
+    val sp = getSharedPreferences(preferenceId, Context.MODE_PRIVATE)
+    val key = getString(id)
     return sp.getBoolean(key, defaultValue)
 }
 
+/**-------------------------------------------------------------------------------------------------
+ * Extension function for clearing shared preference
+ *------------------------------------------------------------------------------------------------*/
+
+@SuppressLint("CommitPrefEdits")
 fun Context.clearPref() {
     val editor = getSharedPreferences("com.kingfish", Context.MODE_PRIVATE).edit()
     editor.clear()
     editor.commit()
 }
 
+/*--------------------------------------------------------------------------------------------------
+ * Interacting with SnackBars
+ *------------------------------------------------------------------------------------------------*/
+/**-------------------------------------------------------------------------------------------------
+ * Extension function for creating and show snack bar
+ *------------------------------------------------------------------------------------------------*/
+
 fun View.snack(msg: Any, length: Int = Snackbar.LENGTH_SHORT, option: Snackbar.() -> Unit = {}) {
     val snack = Snackbar.make(this, msg.toString(), length)
     snack.option()
     snack.show()
 }
+
+/**-------------------------------------------------------------------------------------------------
+ * Extension Function for adding an action to a SnackBar (the button on a SnackBar)
+ *------------------------------------------------------------------------------------------------*/
+
+fun Snackbar.action(action: String, color: Int? = null, listener: (View) -> Unit) {
+    setAction(action, listener)
+    color?.let { setActionTextColor(color) }
+}
+
+/*--------------------------------------------------------------------------------------------------
+ * Interacting with Views
+ *------------------------------------------------------------------------------------------------*/
+/**-------------------------------------------------------------------------------------------------
+ * Extension Function for adding a callback that response to a 'enter key' press on a view
+ *------------------------------------------------------------------------------------------------*/
 
 fun View.onEnter(callback: () -> Unit) {
     onKey { view, i, keyEvent ->
@@ -58,16 +109,24 @@ fun View.onEnter(callback: () -> Unit) {
     }
 }
 
-fun Snackbar.action(action: String, color: Int? = null, listener: (View) -> Unit) {
-    setAction(action, listener)
-    color?.let { setActionTextColor(color) }
-}
+/*--------------------------------------------------------------------------------------------------
+ * Other helper function
+ *------------------------------------------------------------------------------------------------*/
+/**-------------------------------------------------------------------------------------------------
+ * Turn a string of number into rupiah currency Eg. 12345 -> Rp. 123.45
+ *------------------------------------------------------------------------------------------------*/
+
+fun String.formatToRupiah() = "Rp. ${NumberFormat.getNumberInstance(Locale.US).format(toFloat())}"
+
+/**-------------------------------------------------------------------------------------------------
+ * Format a date into string with a given pattern
+ *------------------------------------------------------------------------------------------------*/
+
+fun DateTime.toString(pattern: String): String = toString(DateTimeFormat.forPattern(pattern))
+
+/**-------------------------------------------------------------------------------------------------
+ * Check if network is available
+ *------------------------------------------------------------------------------------------------*/
 
 fun ConnectivityManager.isNetworkAvailable(): Boolean =
         activeNetworkInfo != null && activeNetworkInfo.isConnected
-
-fun String.formatToRupiah() = "Rp. " + NumberFormat
-        .getNumberInstance(Locale.US)
-        .format(toFloat())
-
-fun DateTime.toString(pattern: String) = toString(DateTimeFormat.forPattern(pattern))

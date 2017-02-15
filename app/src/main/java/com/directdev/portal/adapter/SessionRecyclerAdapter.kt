@@ -10,16 +10,19 @@ import com.directdev.portal.model.SessionModel
 import com.directdev.portal.utils.readPref
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter
-import kotlinx.android.synthetic.main.item_sessions.view.*
 
-class SessionRecyclerAdapter(context: Context, data: OrderedRealmCollection<SessionModel>?, autoUpdate: Boolean) : RealmRecyclerViewAdapter<SessionModel, SessionRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
+class SessionRecyclerAdapter(
+        context: Context,
+        data: OrderedRealmCollection<SessionModel>?,
+        autoUpdate: Boolean) :
+        RealmRecyclerViewAdapter<SessionModel, SessionRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
+
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         holder?.bindData(data?.get(position) as SessionModel, context)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        return ViewHolder(inflater.inflate(R.layout.item_sessions, parent, false))
-    }
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) =
+            ViewHolder(inflater.inflate(R.layout.item_sessions, parent, false))
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
@@ -33,7 +36,7 @@ class SessionRecyclerAdapter(context: Context, data: OrderedRealmCollection<Sess
                 itemView.journalShift.visibility = View.GONE
                 color = "#f44336"
             } else {
-                if (!(ctx.readPref(R.string.campus_setting, false, "com.directdev.portal_preferences"))) {
+                if (!ctx.readPref(R.string.campus_setting, false, "com.directdev.portal_preferences")) {
                     itemView.journalCampus.text = session.locationId
                 }
                 itemView.journalMode.text = session.typeId

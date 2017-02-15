@@ -8,18 +8,21 @@ import com.directdev.portal.R
 import com.directdev.portal.model.FinanceModel
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter
-import kotlinx.android.synthetic.main.item_jfinances.view.*
 import java.text.NumberFormat
 import java.util.*
 
-class JFinanceRecyclerAdapter(context: Context, data: OrderedRealmCollection<FinanceModel>?, autoUpdate: Boolean) : RealmRecyclerViewAdapter<FinanceModel, JFinanceRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
+class JFinanceRecyclerAdapter(
+        context: Context,
+        data: OrderedRealmCollection<FinanceModel>?,
+        autoUpdate: Boolean) :
+        RealmRecyclerViewAdapter<FinanceModel, JFinanceRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
+
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         holder?.bindData(data?.get(position) as FinanceModel)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        return ViewHolder(inflater.inflate(R.layout.item_jfinances, parent, false))
-    }
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) =
+        ViewHolder(inflater.inflate(R.layout.item_jfinances, parent, false))
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
