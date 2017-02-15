@@ -10,6 +10,8 @@ import com.directdev.portal.utils.formatToRupiah
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
+import kotlinx.android.synthetic.main.item_finances.view.*
+import kotlinx.android.synthetic.main.item_finances_header.view.*
 import org.joda.time.DateTime
 import org.joda.time.DateTimeComparator
 import org.joda.time.Days

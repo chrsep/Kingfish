@@ -8,6 +8,7 @@ import com.directdev.portal.R
 import com.directdev.portal.model.FinanceModel
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter
+import kotlinx.android.synthetic.main.item_jfinances.view.*
 import java.text.NumberFormat
 import java.util.*
 

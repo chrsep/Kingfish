@@ -10,6 +10,7 @@ import com.directdev.portal.model.SessionModel
 import com.directdev.portal.utils.readPref
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter
+import kotlinx.android.synthetic.main.item_sessions.view.*
 
 class SessionRecyclerAdapter(
         context: Context,

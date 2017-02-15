@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.1.0-beta-17'
+    ext.kotlin_version = '1.1.0-beta-38'
     repositories {
         maven { url 'https://maven.fabric.io/public' }
 
@@ -65,11 +65,11 @@ dependencies {
     compile('com.crashlytics.sdk.android:answers:1.3.9@aar') {
         transitive = true;
     }
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'com.android.support:cardview-v7:25.1.0'
-    compile 'com.android.support:recyclerview-v7:25.1.0'
-    compile 'com.android.support:design:25.1.0'
-    compile 'com.android.support:percent:25.1.0'
+    compile 'com.android.support:appcompat-v7:25.1.1'
+    compile 'com.android.support:cardview-v7:25.1.1'
+    compile 'com.android.support:recyclerview-v7:25.1.1'
+    compile 'com.android.support:design:25.1.1'
+    compile 'com.android.support:percent:25.1.1'
     compile 'net.danlew:android.joda:2.9.5'
     compile 'io.reactivex:rxjava:1.2.5'
     compile 'io.reactivex:rxandroid:1.2.1'
@@ -97,7 +97,7 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.6-alpha'
     androidTestCompile 'com.android.support.test:rules:0.6-alpha'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.3-alpha'
-    androidTestCompile 'com.android.support:support-annotations:25.1.0'
+    androidTestCompile 'com.android.support:support-annotations:25.1.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
 }
 repositories {

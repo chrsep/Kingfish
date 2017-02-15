@@ -1,5 +1,6 @@
 package com.directdev.portal.adapter
 
+import android.app.DownloadManager
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -11,8 +12,10 @@ import android.view.ViewGroup
 import com.directdev.portal.R
 import com.directdev.portal.model.ResModel
 import com.directdev.portal.model.ResResourcesModel
+import kotlinx.android.synthetic.main.item_resources.view.*
 import org.jetbrains.anko.downloadManager
 import org.jetbrains.anko.layoutInflater
+import org.jetbrains.anko.onClick
 
 class ResourcesRecyclerAdapter(
         val context: Context,

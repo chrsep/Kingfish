@@ -1,7 +1,10 @@
 package com.directdev.portal.activity
 
+import android.app.Activity
+import android.os.Bundle
 import android.preference.PreferenceFragment
 import com.directdev.portal.R
+import kotlinx.android.synthetic.main.activity_settings.*
 
 /**-------------------------------------------------------------------------------------------------
  *

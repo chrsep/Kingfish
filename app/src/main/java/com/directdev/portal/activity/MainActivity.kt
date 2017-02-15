@@ -1,13 +1,17 @@
 package com.directdev.portal.activity
 
+import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.directdev.portal.R
 import com.directdev.portal.fragment.FinancesFragment
 import com.directdev.portal.fragment.GradesFragment
 import com.directdev.portal.fragment.JournalFragment
 import com.directdev.portal.fragment.ResourceFragment
+import com.directdev.portal.utils.readPref
 import com.google.firebase.analytics.FirebaseAnalytics
+import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.alert
 import kotlin.properties.Delegates
 
 /**-------------------------------------------------------------------------------------------------

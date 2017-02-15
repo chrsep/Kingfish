@@ -2,15 +2,18 @@ package com.directdev.portal.activity
 
 import android.graphics.Color
 import android.graphics.Typeface
+import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.LoginEvent
 import com.directdev.portal.R
 import com.directdev.portal.network.DataApi
+import com.directdev.portal.utils.*
 import com.google.firebase.analytics.FirebaseAnalytics
 import io.realm.Realm
-import org.jetbrains.anko.AnkoLogger
+import kotlinx.android.synthetic.main.activity_signin.*
+import org.jetbrains.anko.*
 import java.io.IOException
 import java.net.SocketTimeoutException
 import kotlin.properties.Delegates

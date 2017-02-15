@@ -10,6 +10,7 @@ import com.directdev.portal.model.JournalModel
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
+import kotlinx.android.synthetic.main.item_journal.view.*
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import java.util.*

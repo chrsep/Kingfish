@@ -8,6 +8,7 @@ import com.directdev.portal.R
 import com.directdev.portal.model.ExamModel
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter
+import kotlinx.android.synthetic.main.item_jexams.view.*
 
 class JExamsRecyclerAdapter(
         context: Context,
