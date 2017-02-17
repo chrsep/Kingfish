@@ -135,7 +135,7 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
 
     /**---------------------------------------------------------------------------------------------
      *
-     * You notice the little animation on the login button when clicked or when loading finished?
+     * Do you notice the little animation on the login button when clicked or when loading finished?
      * This function initiate that animation (the text and icon switching animation on signin button
      * to be exact).
      *

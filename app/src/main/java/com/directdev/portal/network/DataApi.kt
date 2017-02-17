@@ -32,9 +32,6 @@ import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLException
 
-/**-------------------------------------------------------------------------------------------------
- * A singleton that handles all of Portal API calls, Using ReactiveX and Retrofit.
- *------------------------------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------------------------------
  *
  * This is by far the most nightmarish part of this codebase. Due to the complex sequence of calls
@@ -44,6 +41,9 @@ import javax.net.ssl.SSLException
  *
  * TODO: REFACTOR | Reorganizes DataApi to create more readable code
  *
+ *------------------------------------------------------------------------------------------------*/
+/**-------------------------------------------------------------------------------------------------
+ * A singleton that handles all of Portal API calls, Using ReactiveX and Retrofit.
  *------------------------------------------------------------------------------------------------*/
 
 object DataApi {
@@ -244,6 +244,10 @@ object DataApi {
         realm.insertOrUpdate(course.courses)
     }
 
+    /**---------------------------------------------------------------------------------------------
+     * Combine exam, finance, and session object into one journal object for saving to realm
+     *--------------------------------------------------------------------------------------------*/
+
     private fun mapToJournal(exam: List<ExamModel>, finance: List<FinanceModel>, session: List<SessionModel>): MutableList<JournalModel> {
         val items = mutableListOf<JournalModel>()
         finance.forEach { items.add(JournalModel(it.dueDate).setDate()) }
@@ -256,6 +260,10 @@ object DataApi {
         }
         return items
     }
+
+    /**---------------------------------------------------------------------------------------------
+     * Save user personal data to preferences
+     *--------------------------------------------------------------------------------------------*/
 
     private fun saveProfile(ctx: Context, response: ResponseBody) {
         try {
@@ -272,6 +280,10 @@ object DataApi {
         }
     }
 
+    /**---------------------------------------------------------------------------------------------
+     * Save and extract total charge and total payment to preference from server response
+     *--------------------------------------------------------------------------------------------*/
+
     private fun saveFinanceSummary(ctx: Context, response: ResponseBody) {
         try {
             val responseJson = JSONArray(response.string())
@@ -285,12 +297,21 @@ object DataApi {
         }
     }
 
-    private fun Realm.insertGrade(data: GradeModel) {
-        data.credit.term = data.term.toInt()
-        cleanInsert(data.gradings)
-        insert(data.scores)
-        insertOrUpdate(data.credit)
+    /**---------------------------------------------------------------------------------------------
+     * Delete all grades from realm and insert new ones to realm
+     *--------------------------------------------------------------------------------------------*/
+
+    private fun Realm.insertGrade(grade: GradeModel) {
+        // encode the term into the grade data
+        grade.credit.term = grade.term.toInt()
+        cleanInsert(grade.gradings)
+        insert(grade.scores)
+        insertOrUpdate(grade.credit)
     }
+
+    /**---------------------------------------------------------------------------------------------
+     * Delete all data before inserting new data
+     *--------------------------------------------------------------------------------------------*/
 
     private fun Realm.cleanInsert(data: List<RealmObject>) {
         if (data.isEmpty()) return
