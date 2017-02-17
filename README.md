@@ -1,9 +1,12 @@
 # Kingfish
-[![Build Status](https://travis-ci.org/chrisep8/Kingfish.svg?branch=0.3-dev)](https://travis-ci.org/chrisep8/Kingfish)
 
 *We will (at least we expect to) be graduating on 2018.
 From then on we won't be maintaining Portal anymore since we will no longer be studying on Binus.
 Let us know If you're interested in keeping Portal alive, well after 2018.*
+
+---
+
+[![Build Status](https://travis-ci.org/chrisep8/Kingfish.svg?branch=0.3-dev)](https://travis-ci.org/chrisep8/Kingfish)
 
 Portal gives you instant and easy access to your schedules and other
 university-related data that are available on Binusmaya, online or offline.
