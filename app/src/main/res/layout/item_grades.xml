@@ -92,6 +92,20 @@
                 android:textColor="@color/white"
                 android:visibility="gone" />
 
+            <TextView
+                android:id="@+id/final_multipaper_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/final_multipaper_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:visibility="gone" />
+
 
         </LinearLayout>
 

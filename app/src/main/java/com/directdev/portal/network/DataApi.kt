@@ -315,7 +315,7 @@ object DataApi {
 
     private fun Realm.cleanInsert(data: List<RealmObject>) {
         if (data.isEmpty()) return
-        delete(data[0].javaClass)
+        delete(data[0]::class.java)
         insert(data)
     }
 
@@ -323,16 +323,13 @@ object DataApi {
      * Build retrofit service for making API Calls
      *--------------------------------------------------------------------------------------------*/
 
-    private fun buildRetrofit(): DataService {
-        val client = if (BuildConfig.DEBUG) buildDebugClient() else buildClient()
-        return Retrofit.Builder()
+    private fun buildRetrofit() = Retrofit.Builder()
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(NullConverterFactory())
                 .addConverterFactory(MoshiConverterFactory.create())
-                .client(client)
+                .client(if (BuildConfig.DEBUG) buildDebugClient() else buildClient())
                 .baseUrl(baseUrl)
                 .build().create(DataService::class.java)
-    }
 
     /**---------------------------------------------------------------------------------------------
      * Build OkHttpClient WITH Stheto for DEBUG

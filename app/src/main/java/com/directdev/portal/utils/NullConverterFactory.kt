@@ -7,9 +7,10 @@ import java.lang.reflect.Type
 
 /**-------------------------------------------------------------------------------------------------
  *
- * Retrofit can crash the application when it receives a response that contains no value.
+ * Retrofit can crash the application when it receives a response that contains no data other than the
+ * one placed on the header.
  *
- * But sometimes we do need to call a Binusmaya API that returns no value and get some data
+ * But sometimes we do need to call an API (such as for signing in) that returns no value and get some data
  * (Such as cookies) from its response header. This nullConverter will prevent retrofit from crashing
  * when we make such call.
  *

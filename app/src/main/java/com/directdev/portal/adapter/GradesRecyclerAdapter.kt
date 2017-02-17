@@ -114,6 +114,14 @@ class GradesRecyclerAdapter(
                         itemView.laboratory_fin.visibility = visible
                         itemView.laboratory_fin.text = "Lab Final   	 : " + it.score
                     }
+                    "THEORY: Final - Multipaper 1" -> {
+                        itemView.final_multipaper_1.visibility = visible
+                        itemView.final_multipaper_1.text = "Final Multipaper I   	 : " + it.score
+                    }
+                    "THEORY: Final - Multipaper 2" -> {
+                        itemView.final_multipaper_2.visibility = visible
+                        itemView.final_multipaper_2.text = "Final Multipaper II   	 : " + it.score
+                    }
                 }
             }
             val bgColor = when (score[0].courseGradeTotal[0]) {
