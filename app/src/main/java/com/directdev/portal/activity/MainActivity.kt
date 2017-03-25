@@ -16,9 +16,9 @@ import kotlin.properties.Delegates
 
 /**-------------------------------------------------------------------------------------------------
  *
- * This is NOT the activity that is always loaded first when Portal starts (#SplashActivity is).
- * This class acts as the container for the fragments. It's job is to show the Bottom bar and control
- * which fragments is getting displayed at any time.
+ * This is NOT the activity that always gets loaded first when Portal starts (#SplashActivity is).
+ * MainActivity acts as the container for the fragments. It's shows the Bottom bar and control
+ * which fragments to be displayed.
  *
  *------------------------------------------------------------------------------------------------*/
 
@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
     /**-------------------------------------------------------------------------------------------------
      *
      * Handles notification from Firebase Cloud Messaging. When a notification is clicked, it will start
-     * this activity with an 'extra'. So we check if the extra is empty or not, and choose whether to
+     * MainActivity with an 'extra'. So we check if the extra is empty or not, and choose whether to
      * show the alert containing the message or not.
      *
      *------------------------------------------------------------------------------------------------*/

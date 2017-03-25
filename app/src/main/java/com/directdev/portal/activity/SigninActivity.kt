@@ -57,7 +57,7 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
             // An anonymous function, called On login success
             //
             // Analytic data to tell us where our app is popular, Ex. of data sent
-            // { undergraduate,Computer Science,18 }
+            // { undergraduate,Computer Science,18(generation) }
             //
 
             mFirebaseAnalytics.setUserProperty("degree", this.readPref(R.string.major, ""))
