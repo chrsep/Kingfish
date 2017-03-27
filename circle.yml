@@ -2,13 +2,9 @@ dependencies:
   pre:
     - chmod +x gradlew
     - echo y | android update sdk --no-ui --all --filter build-tools-25.0.2
-    - echo y | android update sdk --no-ui --all --filter extra-android-support
-    - echo y | android update sdk --no-ui --all --filter extra-android-m2repository
-    - echo y | android update sdk --no-ui --all --filter android-25
-    - echo y | android update sdk --no-ui --all --filter platform-tools
-    - echo y | android update sdk --no-ui --all --filter tools
-    - echo y | sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2"
-    - echo y | sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
+    - mkdir "$ANDROID_HOME/licenses" || true
+    - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
+    - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
 
 test:
   override:
