@@ -5,7 +5,8 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter extra-android-support
     - echo y | android update sdk --no-ui --all --filter extra-android-m2repository
     - echo y | android update sdk --no-ui --all --filter android-25
-    - echo y | android update sdk --no-ui --all --filter extras-m2repository
+    - echo y | android update sdk --no-ui --all --filter platform-tools
+    - echo y | android update sdk --no-ui --all --filter tools
 
 test:
   override:
