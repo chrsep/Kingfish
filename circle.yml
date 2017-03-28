@@ -1,3 +1,6 @@
+machine:
+  environment:
+    _JAVA_OPTIONS: "Xms256m -Xmx1280m -XX:MaxPermSize=350m"
 dependencies:
   pre:
     - chmod +x gradlew
