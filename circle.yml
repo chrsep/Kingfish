@@ -1,3 +1,6 @@
+machine:
+  environment:
+    _JAVA_OPTIONS: "-Xms256m -Xmx1280m -XX:MaxPermSize=350m"
 dependencies:
   pre:
     - chmod +x gradlew
@@ -17,6 +20,6 @@ test:
     # run tests  against the emulator.
     - ./gradlew connectedAndroidTest
     # copy the build outputs to artifacts
-    - cp -r my-project/build/outputs $CIRCLE_ARTIFACTS
+    - cp -r ~/Kingfish/app/build/outputs $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.
-    - cp -r my-project/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
+    - cp -r ~/Kingfish/app/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS

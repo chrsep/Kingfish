@@ -6,7 +6,7 @@ Let us know If you're interested in keeping Portal alive, well after 2018.*
 
 ---
 
-[![Build Status](https://travis-ci.org/chrisep8/Kingfish.svg?branch=0.3-dev)](https://travis-ci.org/chrisep8/Kingfish)
+[![CircleCI](https://circleci.com/gh/chrsep/Kingfish.svg?style=svg)](https://circleci.com/gh/chrsep/Kingfish)
 
 Portal gives you instant and easy access to your schedules and other
 university-related data that are available on Binusmaya, online or offline.
