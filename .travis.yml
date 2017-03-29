@@ -9,7 +9,8 @@ android:
         - android-24
         - sys-img-armeabi-v7a-android-24
         - extra-android-support
-        - extra-android-m2repository 
+        - extra-android-m2repository     
+        - extra-google-m2repository
         - extra-google-google_play_services
         
 before_install:
