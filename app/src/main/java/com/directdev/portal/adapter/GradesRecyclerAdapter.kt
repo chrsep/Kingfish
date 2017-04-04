@@ -13,6 +13,12 @@ import io.realm.RealmResults
 import kotlinx.android.synthetic.main.item_grades.view.*
 import kotlinx.android.synthetic.main.item_grades_header.view.*
 
+/**-------------------------------------------------------------------------------------------------
+ *
+ * Adapter for grades, this generates the list of card showing the grades of every semester on
+ * the grades fragment. Includes a header for showing GPA.
+ *
+ *------------------------------------------------------------------------------------------------*/
 
 class GradesRecyclerAdapter(
         val realm: Realm,
@@ -22,15 +28,25 @@ class GradesRecyclerAdapter(
 
     private val HEADER = 1
 
+    // +1 because of the added header
     override fun getItemCount(): Int {
         return data.size + 1
     }
 
+    // returns view type of header when position is 0
+    override fun getItemViewType(position: Int) =
+            if (position == 0) HEADER
+            else super.getItemViewType(position)
+
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        // on position 0, bind the first data into the viewholder
+        // on the next position, bind the data normally, starting from data 0
         if (position == 0) holder.bindData(data[position])
         else holder.bindData(data[position - 1])
     }
 
+    // Return the correct viewHolder based on the viewtype return by getItemViewType
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent?.context)
         return if (viewType == HEADER)
@@ -39,14 +55,11 @@ class GradesRecyclerAdapter(
             NormalViewHolder(inflater.inflate(R.layout.item_grades, parent, false))
     }
 
-    override fun getItemViewType(position: Int) =
-        if (position == 0) HEADER
-        else super.getItemViewType(position)
-
     abstract class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         abstract fun bindData(score: RealmResults<ScoreModel>)
     }
 
+    // TODO: REFACTOR | Recent binusmaya changes blows up the when statement, better alternative needed
     private class NormalViewHolder(view: View) : ViewHolder(view) {
         val gone = View.GONE
         val visible = View.VISIBLE

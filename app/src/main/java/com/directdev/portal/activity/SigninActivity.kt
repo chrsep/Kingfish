@@ -20,8 +20,7 @@ import kotlin.properties.Delegates
 
 /**-------------------------------------------------------------------------------------------------
  *
- * Handles the user Signin. This class is mostly about handling login calls and gathering anonymous
- * analytics.
+ * Handles the user Signin. This class is mostly about login calls and anonymous analytics.
  *
  *------------------------------------------------------------------------------------------------*/
 
@@ -53,42 +52,45 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
     }
 
     private fun signInCallToServer() {
-        DataApi.initializeApp(this).subscribe({
-            // An anonymous function, called On login success
-            //
-            // Analytic data to tell us where our app is popular, Ex. of data sent
-            // { undergraduate,Computer Science,18(generation) }
-            //
+        DataApi.initializeApp(this).subscribe(
+                // An anonymous function, called On login success
+                {
 
-            mFirebaseAnalytics.setUserProperty("degree", this.readPref(R.string.major, ""))
-            mFirebaseAnalytics.setUserProperty("major", this.readPref(R.string.degree, ""))
-            mFirebaseAnalytics.setUserProperty("generation", this.readPref(R.string.nim, "").substring(0, 3))
-            Answers.getInstance().logLogin(successLoginEvent())
+                    //
+                    // Analytic data to tell us where our app is popular, Ex. of data sent
+                    // { undergraduate,Computer Science,18(generation) }
+                    //
 
-            savePref(true, R.string.isLoggedIn)
-            startActivity<MainActivity>()
-        }, {
-            // Another anonymous function, called On login failure
-            Answers.getInstance().logLogin(failedLoginEvent(it))
+                    mFirebaseAnalytics.setUserProperty("degree", this.readPref(R.string.major, ""))
+                    mFirebaseAnalytics.setUserProperty("major", this.readPref(R.string.degree, ""))
+                    mFirebaseAnalytics.setUserProperty("generation", this.readPref(R.string.nim, "").substring(0, 3))
+                    Answers.getInstance().logLogin(successLoginEvent())
 
-            animateSigninButton()
-            savePref(false, R.string.isLoggedIn)
-            savePref(false, R.string.isStaff)
+                    savePref(true, R.string.isLoggedIn)
+                    startActivity<MainActivity>()
+                },
+                // Another anonymous function, called On login failure
+                {
+                    Answers.getInstance().logLogin(failedLoginEvent(it))
 
-            //
-            // Shows a SnackBar telling user what went wrong with their login attempt
-            //
+                    animateSigninButton()
+                    savePref(false, R.string.isLoggedIn)
+                    savePref(false, R.string.isStaff)
 
-            signinActivity.snack(DataApi.decideCauseOfFailure(it), Snackbar.LENGTH_INDEFINITE) {
-                when (it) {
-                    is SocketTimeoutException -> action("retry", Color.YELLOW, { signIn() })
-                    is IOException -> action("retry as staff", Color.YELLOW, {
-                        savePref(true, R.string.isStaff)
-                        signIn()
-                    })
-                }
-            }
-        })
+                    //
+                    // Shows a SnackBar telling user what went wrong with their login attempt
+                    //
+
+                    signinActivity.snack(DataApi.decideCauseOfFailure(it), Snackbar.LENGTH_INDEFINITE) {
+                        when (it) {
+                            is SocketTimeoutException -> action("retry", Color.YELLOW, { signIn() })
+                            is IOException -> action("retry as staff", Color.YELLOW, {
+                                savePref(true, R.string.isStaff)
+                                signIn()
+                            })
+                        }
+                    }
+                })
     }
 
     private fun successLoginEvent() = LoginEvent()

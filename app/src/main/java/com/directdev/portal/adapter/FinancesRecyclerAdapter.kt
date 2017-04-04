@@ -17,6 +17,13 @@ import org.joda.time.DateTimeComparator
 import org.joda.time.Days
 import org.joda.time.format.DateTimeFormat
 
+/**-------------------------------------------------------------------------------------------------
+ *
+ * Adapter for list of bills in finance fragment. It includes a header that shows the total number
+ * of incoming bills.
+ *
+ *------------------------------------------------------------------------------------------------*/
+// TODO: REFACTOR | This list is reversed, and i forgot why, further investigation needed
 // This recyclerView is in reversed order, so we put the header (The one that shows unpaid bill) at
 // the end of the list to make it show on top
 class FinancesRecyclerAdapter(
@@ -29,8 +36,8 @@ class FinancesRecyclerAdapter(
 
     override fun getItemCount() = super.getItemCount() + 1
 
-    // Normally for header, position==0 will be used, since this is reversed, we will want to
-    // put the header on the bottom
+    // Normally for header, position==0 will be used (So that it shows on top), since this is
+    // reversed, we will want to put the header on the bottom.
     override fun getItemViewType(position: Int) =
             if (position == data?.size) HEADER
             else super.getItemViewType(position)
