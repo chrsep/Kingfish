@@ -6,15 +6,23 @@ android:
         - tools
         - build-tools-25.0.2
         - android-25
-        - sys-img-armeabi-v7a-addon-google_apis-google-25
+        - android-24
+        - sys-img-armeabi-v7a-android-24
         - extra-android-support
-        - extra-android-m2repository
+        - extra-android-m2repository     
+        - extra-google-m2repository
+        - extra-google-google_play_services
+        
 before_install:
-    - chmod +x gradlew
-    - echo no | android create avd --force -n test -t android-25 --abi google_apis/x86_64
+    - chmod +x gradlew   
+    - mkdir "$ANDROID_HOME/licenses" || true
+    - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
+    - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
+    - echo no | android create avd --force -n test -t android-24 --abi armeabi-v7a
     - emulator -avd test -no-skin -no-audio -no-window &
     - android-wait-for-emulator
     - adb shell input keyevent 82 &
+    
 env:
     - GRADLE_OPTS="-Xmx1034M -XX:MaxPermSize=512m"
 
@@ -26,4 +34,4 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-script: travis_wait 60 ./gradlew build connectedCheck
+script: ./gradlew build connectedCheck
