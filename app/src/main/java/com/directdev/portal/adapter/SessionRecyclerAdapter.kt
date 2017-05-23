@@ -3,6 +3,7 @@ package com.directdev.portal.adapter
 import android.content.Context
 import android.graphics.Color
 import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.directdev.portal.R
@@ -13,17 +14,17 @@ import io.realm.RealmRecyclerViewAdapter
 import kotlinx.android.synthetic.main.item_sessions.view.*
 
 class SessionRecyclerAdapter(
-        context: Context,
+        val context: Context,
         data: OrderedRealmCollection<SessionModel>?,
         autoUpdate: Boolean) :
-        RealmRecyclerViewAdapter<SessionModel, SessionRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
+        RealmRecyclerViewAdapter<SessionModel, SessionRecyclerAdapter.ViewHolder>(data, autoUpdate) {
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         holder?.bindData(data?.get(position) as SessionModel, context)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) =
-            ViewHolder(inflater.inflate(R.layout.item_sessions, parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+            ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_sessions, parent, false))
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 

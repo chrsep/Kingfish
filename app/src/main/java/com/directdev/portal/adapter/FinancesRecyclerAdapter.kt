@@ -2,6 +2,7 @@ package com.directdev.portal.adapter
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.directdev.portal.R
@@ -31,7 +32,7 @@ class FinancesRecyclerAdapter(
         context: Context,
         data: OrderedRealmCollection<FinanceModel>?,
         autoUpdate: Boolean) :
-        RealmRecyclerViewAdapter<FinanceModel, FinancesRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
+        RealmRecyclerViewAdapter<FinanceModel, FinancesRecyclerAdapter.ViewHolder>(data, autoUpdate) {
     private val HEADER = 1
 
     override fun getItemCount() = super.getItemCount() + 1
@@ -42,11 +43,11 @@ class FinancesRecyclerAdapter(
             if (position == data?.size) HEADER
             else super.getItemViewType(position)
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) =
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             if (viewType == HEADER)
-                HeaderViewHolder(realm, inflater.inflate(R.layout.item_finances_header, parent, false))
+                HeaderViewHolder(realm, LayoutInflater.from(parent.context).inflate(R.layout.item_finances_header, parent, false))
             else
-                NormalViewHolder(inflater.inflate(R.layout.item_finances, parent, false))
+                NormalViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_finances, parent, false))
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         if (position == data?.size)

@@ -11,7 +11,10 @@ import rx.Single
  *------------------------------------------------------------------------------------------------*/
 
 interface DataService {
-    
+
+    @GET("https://binusmaya.binus.ac.id/login/index.php")
+    fun getToken(): Single<ResponseBody>
+
     @FormUrlEncoded
     @Headers("Referer: https://binusmaya.binus.ac.id/login/", "Origin: https://binusmaya.binus.ac.id")
     @POST("https://binusmaya.binus.ac.id/login/sys_login.php")
@@ -19,6 +22,7 @@ interface DataService {
                @Field("pass") pass: String,
                @Field("defaultLoginReal") defaultLoginReal: String,
                @Header("Cookie") cookie: String,
+               @Field("token") token: String? = "",
                @Field("ctl00\$ContentPlaceHolder1\$SubmitButtonBM") button: String = "Login")
             : Single<Response<String>>
 

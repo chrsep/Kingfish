@@ -51,8 +51,8 @@ wanted to contribute to this project :).
 This is our first time dealing with open source contribution, but here are our suggestion on how to start contributing:
 
 1. Create a new issue, telling us your suggestion or what you wanted to do so that we can have a discussion.
-2. Fork the repository and create a new branch and push your changes into that branch
-3. Create a pull request
+2. Fork the repository and push your changes into that repository
+3. Create a pull request to the develop branch
 4. We'll review the code changes and discuss any possible improvement together
 5. When the code is ready we'll merge it.
 

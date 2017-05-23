@@ -166,15 +166,21 @@ object DataApi {
 
     private fun signIn(ctx: Context, cookie: String = "", isStaff: Boolean): Single<String> {
         var newCookie: String = cookie
-        return api.signIn(
+        return api.getToken().flatMap {
+            val regex = Regex("<input type=\"hidden\" name=\"token\" value=\".*\"")
+            val input = regex.find(it.string())
+            api.signIn(
                 ctx.readPref(R.string.username, ""),
                 ctx.readPref(R.string.password, ""),
-                "", cookie).flatMap {
+                "", cookie, input?.value?.substring(41) )
+        }.flatMap {
             newCookie = it.headers().get("Set-Cookie") ?: newCookie
             ctx.savePref(newCookie, R.string.cookie)
             if (isStaff) api.switchRole(newCookie)
             else Single.just(it)
-        }.flatMap { Single.just(newCookie) }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+        }.flatMap {
+            Single.just(newCookie)
+        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
     }
 
     private fun fetchGrades(terms: List<TermModel>, cookie: String): List<Single<GradeModel>> =

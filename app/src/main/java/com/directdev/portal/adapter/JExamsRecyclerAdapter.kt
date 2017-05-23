@@ -2,6 +2,7 @@ package com.directdev.portal.adapter
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.directdev.portal.R
@@ -14,14 +15,14 @@ class JExamsRecyclerAdapter(
         context: Context,
         data: OrderedRealmCollection<ExamModel>?,
         autoUpdate: Boolean) :
-        RealmRecyclerViewAdapter<ExamModel, JExamsRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
+        RealmRecyclerViewAdapter<ExamModel, JExamsRecyclerAdapter.ViewHolder>(data, autoUpdate) {
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         holder?.bindData(data?.get(position) as ExamModel)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder =
-         ViewHolder(inflater.inflate(R.layout.item_jexams, parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+         ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_jexams, parent, false))
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 

@@ -3,6 +3,7 @@ package com.directdev.portal.adapter
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.directdev.portal.R
@@ -17,13 +18,13 @@ import java.util.*
 
 class JournalRecyclerAdapter(
         val realm: Realm,
-        context: Context,
+        val context: Context,
         data: OrderedRealmCollection<JournalModel>?,
         autoUpdate: Boolean) :
-        RealmRecyclerViewAdapter<JournalModel, JournalRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
+        RealmRecyclerViewAdapter<JournalModel, JournalRecyclerAdapter.ViewHolder>(data, autoUpdate) {
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) =
-        ViewHolder(inflater.inflate(R.layout.item_journal, parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+        ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_journal, parent, false))
 
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {

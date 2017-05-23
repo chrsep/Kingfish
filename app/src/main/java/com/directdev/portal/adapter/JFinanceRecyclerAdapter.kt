@@ -2,6 +2,7 @@ package com.directdev.portal.adapter
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.directdev.portal.R
@@ -16,14 +17,14 @@ class JFinanceRecyclerAdapter(
         context: Context,
         data: OrderedRealmCollection<FinanceModel>?,
         autoUpdate: Boolean) :
-        RealmRecyclerViewAdapter<FinanceModel, JFinanceRecyclerAdapter.ViewHolder>(context, data, autoUpdate) {
+        RealmRecyclerViewAdapter<FinanceModel, JFinanceRecyclerAdapter.ViewHolder>(data, autoUpdate) {
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         holder?.bindData(data?.get(position) as FinanceModel)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) =
-        ViewHolder(inflater.inflate(R.layout.item_jfinances, parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+        ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_jfinances, parent, false))
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
