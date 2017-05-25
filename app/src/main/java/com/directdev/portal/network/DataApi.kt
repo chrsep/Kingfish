@@ -172,7 +172,7 @@ object DataApi {
             api.signIn(
                 ctx.readPref(R.string.username, ""),
                 ctx.readPref(R.string.password, ""),
-                "", cookie, input?.value?.substring(41, input.value.length) )
+                "", cookie, input?.value?.substring(41, input.value.length - 1) )
         }.flatMap {
             newCookie = it.headers().get("Set-Cookie") ?: newCookie
             ctx.savePref(newCookie, R.string.cookie)
