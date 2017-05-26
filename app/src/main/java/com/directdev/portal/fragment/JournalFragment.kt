@@ -12,6 +12,7 @@ import com.directdev.portal.activity.SettingsActivity
 import com.directdev.portal.adapter.JournalRecyclerAdapter
 import com.directdev.portal.model.JournalModel
 import com.directdev.portal.network.DataApi
+import com.directdev.portal.network.SyncManager
 import com.directdev.portal.utils.action
 import com.directdev.portal.utils.readPref
 import com.directdev.portal.utils.snack
@@ -24,6 +25,7 @@ import org.jetbrains.anko.startActivity
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.format.DateTimeFormat
+import rx.functions.Action1
 import kotlin.properties.Delegates
 
 class JournalFragment : Fragment() {
@@ -93,9 +95,9 @@ class JournalFragment : Fragment() {
     private fun update(): Boolean {
         view?.snack("Updating", Snackbar.LENGTH_INDEFINITE)
         if (DataApi.isActive) return true
-        DataApi.fetchData(ctx).subscribe({
+        SyncManager.sync(ctx, SyncManager.COMMON, Action1 {
             view?.snack("Success")
-        }, {
+        }, Action1 {
             view?.snack(DataApi.decideCauseOfFailure(it))
         })
         return true

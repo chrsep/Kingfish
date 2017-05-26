@@ -79,4 +79,8 @@ interface DataService {
                       @Path("ssrComponent") ssrComponent: String,
                       @Path("classNumber") classNumber: String,
                       @Header("Cookie") cookie: String): Single<List<AssignmentIndividualModel>>
+
+    @Headers("Referer: https://binusmaya.binus.ac.id/login/")
+    @GET("https://binusmaya.binus.ac.id/login/captcha.php")
+    fun getCaptchaImage(@Header("Cookie") cookie: String): Single<Response<ResponseBody>>
 }

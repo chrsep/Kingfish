@@ -3,6 +3,7 @@ package com.directdev.portal.fragment
 import android.app.Fragment
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
@@ -19,6 +20,7 @@ import com.directdev.portal.model.CourseModel
 import com.directdev.portal.model.ResModel
 import com.directdev.portal.model.TermModel
 import com.directdev.portal.network.DataApi
+import com.directdev.portal.network.SyncManager
 import com.directdev.portal.utils.snack
 import io.realm.Realm
 import io.realm.RealmResults
@@ -27,6 +29,7 @@ import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.ctx
 import org.jetbrains.anko.onClick
 import org.jetbrains.anko.runOnUiThread
+import rx.functions.Action1
 import kotlin.properties.Delegates
 
 class ResourceFragment : Fragment(), AnkoLogger {
@@ -45,20 +48,19 @@ class ResourceFragment : Fragment(), AnkoLogger {
                 .equalTo("term", term as Long)
                 .equalTo("ssrComponent", "LEC")
                 .findAll()
-        try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             refreshresourceButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(ctx.getString(R.color.colorAccent)))
-        } catch (e: NoSuchMethodError) {
         }
         refreshresourceButton.onClick {
             view.snack("Refreshing data, please wait...", Snackbar.LENGTH_INDEFINITE)
-            DataApi.fetchResources(ctx, courses).subscribe({
+            SyncManager.sync(ctx, SyncManager.RESOURCES, Action1 {
                 view?.snack("Success")
                 runOnUiThread {
                     setRecycler(courseResourceSpinner.selectedView as TextView, courses)
                 }
-            }, {
+            }, Action1 {
                 view?.snack("Failed")
-            })
+            }, courses)
         }
         val courseName = courses.map { it.courseName }.toSet()
         val spinnerAdapter = ArrayAdapter(ctx, android.R.layout.simple_spinner_dropdown_item, courseName.toList())

@@ -1,6 +1,8 @@
 package com.directdev.portal.network
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import com.crashlytics.android.Crashlytics
 import com.directdev.portal.BuildConfig
 import com.directdev.portal.R
@@ -14,6 +16,8 @@ import io.realm.RealmObject
 import io.realm.RealmResults
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.runOnUiThread
 import org.joda.time.DateTime
 import org.json.JSONArray
 import org.json.JSONException
@@ -26,6 +30,7 @@ import rx.Single
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.io.IOException
+import java.io.InputStream
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -52,9 +57,9 @@ object DataApi {
     private val api = buildRetrofit()
     private fun isStaff(ctx: Context) = ctx.readPref(R.string.isStaff, false)
 
-    fun initializeApp(ctx: Context): Single<Unit> {
+    fun initializeApp(ctx: Context, captcha: String): Single<Unit> {
         var cookie = ctx.readPref(R.string.cookie, "")
-        return signIn(ctx, cookie, isStaff(ctx)).flatMap {
+        return signIn(ctx, cookie, isStaff(ctx), captcha).flatMap {
             cookie = it
             api.getTerms(cookie).subscribeOn(Schedulers.io())
         }.flatMap {
@@ -101,10 +106,10 @@ object DataApi {
         }
     }
 
-    fun fetchData(ctx: Context): Single<Unit> {
+    fun fetchData(ctx: Context, captcha: String): Single<Unit> {
         var cookie = ctx.readPref(R.string.cookie, "")
         val realm = Realm.getDefaultInstance()
-        return signIn(ctx, cookie, isStaff(ctx)).flatMap {
+        return signIn(ctx, cookie, isStaff(ctx), captcha).flatMap {
             val term = realm.where(TermModel::class.java).max("value")
             cookie = it
             fetchRecent(ctx, cookie, term.toString())
@@ -120,10 +125,10 @@ object DataApi {
         }
     }
 
-    fun fetchResources(ctx: Context, data: RealmResults<CourseModel>): Single<Unit> {
+    fun fetchResources(ctx: Context, data: RealmResults<CourseModel>, captcha: String): Single<Unit> {
         isActive = true
         var cookie = ctx.readPref(R.string.cookie, "")
-        return signIn(ctx, cookie, isStaff(ctx)).flatMap {
+        return signIn(ctx, cookie, isStaff(ctx), captcha).flatMap {
             cookie = it
             Single.zip(data.map {
                 val classNumber = it.classNumber
@@ -164,15 +169,15 @@ object DataApi {
     }
 
 
-    private fun signIn(ctx: Context, cookie: String = "", isStaff: Boolean): Single<String> {
+    private fun signIn(ctx: Context, cookie: String = "", isStaff: Boolean, captcha: String): Single<String> {
         var newCookie: String = cookie
         return api.getToken().flatMap {
             val regex = Regex("<input type=\"hidden\" name=\"token\" value=\".*\"")
             val input = regex.find(it.string())
             api.signIn(
-                ctx.readPref(R.string.username, ""),
-                ctx.readPref(R.string.password, ""),
-                "", cookie, input?.value?.substring(41, input.value.length - 1) )
+                    ctx.readPref(R.string.username, ""),
+                    ctx.readPref(R.string.password, ""),
+                    captcha, cookie, input?.value?.substring(41, input.value.length - 1))
         }.flatMap {
             newCookie = it.headers().get("Set-Cookie") ?: newCookie
             ctx.savePref(newCookie, R.string.cookie)
@@ -182,6 +187,15 @@ object DataApi {
             Single.just(newCookie)
         }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
     }
+
+    fun fetchCaptcha(ctx: Context, cookie: String) : Single<Bitmap> {
+        return api.getCaptchaImage(cookie).map {
+            val inputStream = it.body().byteStream()
+            ctx.savePref(it.headers().get("Set-Cookie") ?: cookie, R.string.cookie)
+            BitmapFactory.decodeStream(inputStream)
+        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+    }
+
 
     private fun fetchGrades(terms: List<TermModel>, cookie: String): List<Single<GradeModel>> =
             terms.map {
@@ -330,12 +344,12 @@ object DataApi {
      *--------------------------------------------------------------------------------------------*/
 
     private fun buildRetrofit() = Retrofit.Builder()
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .addConverterFactory(NullConverterFactory())
-                .addConverterFactory(MoshiConverterFactory.create())
-                .client(if (BuildConfig.DEBUG) buildDebugClient() else buildClient())
-                .baseUrl(baseUrl)
-                .build().create(DataService::class.java)
+            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+            .addConverterFactory(NullConverterFactory())
+            .addConverterFactory(MoshiConverterFactory.create())
+            .client(if (BuildConfig.DEBUG) buildDebugClient() else buildClient())
+            .baseUrl(baseUrl)
+            .build().create(DataService::class.java)
 
     /**---------------------------------------------------------------------------------------------
      * Build OkHttpClient WITH Stheto for DEBUG
@@ -371,7 +385,8 @@ object DataApi {
         is ConnectException -> "Failed to connect to Binusmaya"
         is SSLException -> "Failed to connect to Binusmaya"
         is UnknownHostException -> "Failed to connect to Binusmaya"
-        is IOException -> "Wrong email or password"
+        is IOException -> "Auth fails, maybe wrong pass, username, or captcha?"
+        is NoSuchMethodException -> "Captcha cancelled"
         is IndexOutOfBoundsException -> {
             Crashlytics.log("IndexOutOfBoundsException")
             Crashlytics.logException(it)
