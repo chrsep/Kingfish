@@ -2,6 +2,7 @@ buildscript {
     ext.kotlin_version = '1.1.2-4'
     repositories {
         maven { url 'https://maven.fabric.io/public' }
+        maven { url 'https://maven.google.com' }
         jcenter()
         mavenCentral()
     }
@@ -25,8 +26,8 @@ android {
         applicationId "com.directdev.portal"
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 51
-        versionName "0.3.4c"
+        versionCode 52
+        versionName "0.3.4d"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
