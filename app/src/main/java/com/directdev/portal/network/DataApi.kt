@@ -179,6 +179,7 @@ object DataApi {
                     ctx.readPref(R.string.password, ""),
                     captcha, cookie, input?.value?.substring(41, input.value.length - 1))
         }.flatMap {
+            Crashlytics.log(it.headers().get("Location"))
             newCookie = it.headers().get("Set-Cookie") ?: newCookie
             ctx.savePref(newCookie, R.string.cookie)
             if (isStaff) api.switchRole(newCookie)
@@ -375,27 +376,30 @@ object DataApi {
             .build()
 
 
-    fun decideCauseOfFailure(it: Throwable) = when (it) {
-        is SocketTimeoutException -> "Request Timed Out"
-        is HttpException -> {
-            Crashlytics.log("HttpException")
-            Crashlytics.logException(it)
-            "Binusmaya's server seems to be offline, try again later"
-        }
-        is ConnectException -> "Failed to connect to Binusmaya"
-        is SSLException -> "Failed to connect to Binusmaya"
-        is UnknownHostException -> "Failed to connect to Binusmaya"
-        is IOException -> "Auth fails, maybe wrong pass, username, or captcha?"
-        is NoSuchMethodException -> "Captcha cancelled"
-        is IndexOutOfBoundsException -> {
-            Crashlytics.log("IndexOutOfBoundsException")
-            Crashlytics.logException(it)
-            "Binusmaya server is acting weird, try again later"
-        }
-        else -> {
-            Crashlytics.log("Unknown CrashOnSignIn")
-            Crashlytics.logException(it)
-            "We have no idea what went wrong, but we have received the error log, we'll look into this"
+    fun decideCauseOfFailure(it: Throwable): String {
+        Crashlytics.logException(it)
+        return when (it) {
+            is SocketTimeoutException -> "Request Timed Out"
+            is HttpException -> {
+                Crashlytics.log("HttpException")
+                Crashlytics.logException(it)
+                "Binusmaya's server seems to be offline, try again later"
+            }
+            is ConnectException -> "Failed to connect to Binusmaya"
+            is SSLException -> "Failed to connect to Binusmaya"
+            is UnknownHostException -> "Failed to connect to Binusmaya"
+            is IOException -> "Auth fails, maybe wrong pass, username, or captcha?"
+            is NoSuchMethodException -> "Captcha cancelled"
+            is IndexOutOfBoundsException -> {
+                Crashlytics.log("IndexOutOfBoundsException")
+                Crashlytics.logException(it)
+                "Binusmaya server is acting weird, try again later"
+            }
+            else -> {
+                Crashlytics.log("Unknown CrashOnSignIn")
+                Crashlytics.logException(it)
+                "We have no idea what went wrong, but we have received the error log, we'll look into this"
+            }
         }
     }
 }

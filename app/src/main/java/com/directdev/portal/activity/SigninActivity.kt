@@ -2,9 +2,13 @@ package com.directdev.portal.activity
 
 import android.graphics.Color
 import android.graphics.Typeface
+import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
+import android.text.Html
+import android.text.method.LinkMovementMethod
+import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.LoginEvent
 import com.directdev.portal.R
@@ -36,6 +40,16 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
         mainBanner.typeface = Typeface.createFromAsset(assets, "fonts/SpaceMono-BoldItalic.ttf")
         formSignIn.onClick { signIn() }
         formPass.onEnter { signIn() }
+        troubleTextView.movementMethod = LinkMovementMethod.getInstance()
+        troubleTextView.isClickable = true
+
+        val text = if (Build.VERSION.SDK_INT >= 24) {
+            Html.fromHtml("Having trouble? Visit <a href='https://goo.gl/93vrOc'> Github Issue </a>", Html.FROM_HTML_MODE_LEGACY) // for 24 api and more
+        } else {
+            Html.fromHtml("Having trouble? Visit <a href='https://goo.gl/93vrOc'> Github Issue </a>") // or for older api
+        }
+
+        troubleTextView.text = text
         if (DataApi.isActive) animateSigninButton()
         else deleteDbData()
         getNotif()
