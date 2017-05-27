@@ -9,11 +9,13 @@ import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.LoginEvent
 import com.directdev.portal.R
 import com.directdev.portal.network.DataApi
+import com.directdev.portal.network.SyncManager
 import com.directdev.portal.utils.*
 import com.google.firebase.analytics.FirebaseAnalytics
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_signin.*
 import org.jetbrains.anko.*
+import rx.functions.Action1
 import java.io.IOException
 import java.net.SocketTimeoutException
 import kotlin.properties.Delegates
@@ -52,45 +54,42 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
     }
 
     private fun signInCallToServer() {
-        DataApi.initializeApp(this).subscribe(
-                // An anonymous function, called On login success
-                {
+        SyncManager.sync(ctx, SyncManager.INIT, Action1 {
+            // An anonymous function, called On login success
+            //
+            // Analytic data to tell us where our app is popular, Ex. of data sent
+            // { undergraduate,Computer Science,18(generation) }
+            //
 
-                    //
-                    // Analytic data to tell us where our app is popular, Ex. of data sent
-                    // { undergraduate,Computer Science,18(generation) }
-                    //
+            mFirebaseAnalytics.setUserProperty("degree", this.readPref(R.string.major, ""))
+            mFirebaseAnalytics.setUserProperty("major", this.readPref(R.string.degree, ""))
+            mFirebaseAnalytics.setUserProperty("generation", this.readPref(R.string.nim, "").substring(0, 3))
+            Answers.getInstance().logLogin(successLoginEvent())
 
-                    mFirebaseAnalytics.setUserProperty("degree", this.readPref(R.string.major, ""))
-                    mFirebaseAnalytics.setUserProperty("major", this.readPref(R.string.degree, ""))
-                    mFirebaseAnalytics.setUserProperty("generation", this.readPref(R.string.nim, "").substring(0, 3))
-                    Answers.getInstance().logLogin(successLoginEvent())
+            savePref(true, R.string.isLoggedIn)
+            startActivity<MainActivity>()
+        }, Action1 {
+            // Another anonymous function, called On login failure
+            Answers.getInstance().logLogin(failedLoginEvent(it))
 
-                    savePref(true, R.string.isLoggedIn)
-                    startActivity<MainActivity>()
-                },
-                // Another anonymous function, called On login failure
-                {
-                    Answers.getInstance().logLogin(failedLoginEvent(it))
+            animateSigninButton()
+            savePref(false, R.string.isLoggedIn)
+            savePref(false, R.string.isStaff)
 
-                    animateSigninButton()
-                    savePref(false, R.string.isLoggedIn)
-                    savePref(false, R.string.isStaff)
+            //
+            // Shows a SnackBar telling user what went wrong with their login attempt
+            //
 
-                    //
-                    // Shows a SnackBar telling user what went wrong with their login attempt
-                    //
-
-                    signinActivity.snack(DataApi.decideCauseOfFailure(it), Snackbar.LENGTH_INDEFINITE) {
-                        when (it) {
-                            is SocketTimeoutException -> action("retry", Color.YELLOW, { signIn() })
-                            is IOException -> action("retry as staff", Color.YELLOW, {
-                                savePref(true, R.string.isStaff)
-                                signIn()
-                            })
-                        }
-                    }
-                })
+            signinActivity.snack(DataApi.decideCauseOfFailure(it), Snackbar.LENGTH_INDEFINITE) {
+                when (it) {
+                    is SocketTimeoutException -> action("retry", Color.YELLOW, { signIn() })
+                    is IOException -> action("retry as staff", Color.YELLOW, {
+                        savePref(true, R.string.isStaff)
+                        signIn()
+                    })
+                }
+            }
+        })
     }
 
     private fun successLoginEvent() = LoginEvent()

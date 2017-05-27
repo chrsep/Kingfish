@@ -15,22 +15,14 @@
                 android:targetClass="com.directdev.portal.activity.SigninActivity" />
         </Preference>
     </PreferenceCategory>
-    <PreferenceCategory android:title="About">
+    <PreferenceCategory android:title="Support and Community">
         <Preference
-            android:summary="Portal Github repository"
-            android:title="Github"
+            android:summary="Bugs, problems and feature request discussions"
+            android:title="Issue Tracker"
             android:icon="@drawable/ic_github_icon">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="https://goo.gl/a4zWqu" />
-        </Preference>
-        <Preference
-            android:summary="Updates on Portal bugs and development"
-            android:title="Info Board"
-            android:icon="@drawable/ic_trello">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="https://goo.gl/njyqjb" />
+                android:data="https://goo.gl/93vrOc" />
         </Preference>
     </PreferenceCategory>
 </PreferenceScreen>
