@@ -29,6 +29,7 @@ android {
         versionCode 52
         versionName "0.3.4d"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -94,6 +95,7 @@ dependencies {
     compile 'com.flipboard:bottomsheet-core:1.5.2'
     compile 'com.google.firebase:firebase-crash:10.2.6'
     compile 'com.google.firebase:firebase-perf:10.2.6'
+    compile 'com.android.support:multidex:1.0.1'
     testCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support.test:runner:0.6-alpha'
     androidTestCompile 'com.android.support.test:rules:0.6-alpha'
