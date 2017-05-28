@@ -3,6 +3,7 @@ package com.directdev.portal.network
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import com.crashlytics.android.Crashlytics
 import com.directdev.portal.BuildConfig
 import com.directdev.portal.R
