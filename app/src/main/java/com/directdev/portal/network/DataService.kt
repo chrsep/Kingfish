@@ -13,15 +13,15 @@ import rx.Single
 interface DataService {
 
     @GET("https://binusmaya.binus.ac.id/login/index.php")
-    fun getToken(): Single<ResponseBody>
+    fun getToken(@Header("Cookie") cookie: String): Single<Response<ResponseBody>>
 
     @FormUrlEncoded
     @Headers("Referer: https://binusmaya.binus.ac.id/login/", "Origin: https://binusmaya.binus.ac.id")
     @POST("https://binusmaya.binus.ac.id/login/sys_login.php")
     fun signIn(@Field("uid") uid: String,
                @Field("pass") pass: String,
-               @Field("defaultLoginReal") defaultLoginReal: String,
                @Header("Cookie") cookie: String,
+               @Field("defaultLoginReal") defaultLoginReal: String,
                @Field("token") token: String? = "",
                @Field("ctl00\$ContentPlaceHolder1\$SubmitButtonBM") button: String = "Login")
             : Single<Response<String>>

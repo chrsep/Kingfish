@@ -7,9 +7,17 @@ import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
 import android.view.KeyEvent
 import android.view.View
+import android.view.ViewManager
+import io.realm.Realm
+import org.jetbrains.anko.AlertDialogBuilder
+import org.jetbrains.anko.alert
 import org.jetbrains.anko.onKey
+import org.jetbrains.anko.runOnUiThread
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
+import rx.Single
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 import java.text.NumberFormat
 import java.util.*
 
@@ -45,7 +53,7 @@ fun Context.savePref(data: Any, @StringRes id: Int) {
  * Extension Function for reading shared preference
  *------------------------------------------------------------------------------------------------*/
 
-fun Context.readPref(@StringRes id: Int, defaultValue: String, preferenceId: String = "com.kingfish"): String {
+fun Context.readPref(@StringRes id: Int, defaultValue: String = "", preferenceId: String = "com.kingfish"): String {
     val sp = getSharedPreferences(preferenceId, Context.MODE_PRIVATE)
     val key = getString(id)
     return sp.getString(key, defaultValue)
@@ -130,3 +138,23 @@ fun DateTime.toString(pattern: String): String = toString(DateTimeFormat.forPatt
 
 fun ConnectivityManager.isNetworkAvailable(): Boolean =
         activeNetworkInfo != null && activeNetworkInfo.isConnected
+
+fun Context.showDialog(name: String, view: AlertDialogBuilder.() -> Unit) {
+    runOnUiThread {
+        alert(name, "", view).show()
+    }
+}
+
+fun <T> Single<T>.observeOnMainThread(): Single<T> = observeOn(AndroidSchedulers.mainThread())
+
+
+fun <T> Single<T>.subscribeOnIo(): Single<T> = subscribeOn(Schedulers.io())
+
+
+fun <T> Single<T>.defaultThreads(): Single<T> = subscribeOnIo().observeOnMainThread()
+
+fun <T> List<List<T>>.flatten(): MutableList<T> {
+    val newList = mutableListOf<T>()
+    forEach { newList.addAll(it) }
+    return newList
+}

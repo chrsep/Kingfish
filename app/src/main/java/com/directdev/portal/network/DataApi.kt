@@ -3,26 +3,22 @@ package com.directdev.portal.network
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import com.crashlytics.android.Crashlytics
 import com.directdev.portal.BuildConfig
 import com.directdev.portal.R
 import com.directdev.portal.model.*
-import com.directdev.portal.utils.NullConverterFactory
-import com.directdev.portal.utils.readPref
-import com.directdev.portal.utils.savePref
+import com.directdev.portal.utils.*
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import io.realm.Realm
 import io.realm.RealmObject
 import io.realm.RealmResults
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
-import org.jetbrains.anko.alert
-import org.jetbrains.anko.runOnUiThread
 import org.joda.time.DateTime
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.HttpException
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
@@ -31,7 +27,6 @@ import rx.Single
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.io.IOException
-import java.io.InputStream
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -58,187 +53,148 @@ object DataApi {
     private val api = buildRetrofit()
     private fun isStaff(ctx: Context) = ctx.readPref(R.string.isStaff, false)
 
-    fun initializeApp(ctx: Context, captcha: String): Single<Unit> {
-        var cookie = ctx.readPref(R.string.cookie, "")
-        return signIn(ctx, cookie, isStaff(ctx), captcha).flatMap {
-            cookie = it
-            api.getTerms(cookie).subscribeOn(Schedulers.io())
-        }.flatMap {
-            terms ->
+    fun initializeApp(ctx: Context): Single<Unit> {
+        val cookie = ctx.readPref(R.string.cookie, "")
+        return api.getTerms(cookie).subscribeOnIo().flatMap { terms ->
             Crashlytics.log("initializeApp Term Data " + terms.toString())
-            val single: Single<Array<Any>>
-            if (terms.size == 1) {
-                single = fetchGrades(terms, cookie)[0].map {
-                    arrayOf<Any>(it)
-                }
-            } else {
-                single = Single.zip(fetchGrades(terms, cookie), {
-                    grades ->
-                    grades
-                })
+            val gradeObservable = when (terms.size) {
+                1 -> fetchGrades(terms, cookie)[0].map { arrayOf<Any>(it) }
+                else -> Single.zip(fetchGrades(terms, cookie)) { grades -> grades }
             }
-            single.zipWith(api.getProfile(cookie).subscribeOn(Schedulers.io()), {
-                grades, profile ->
+            Single.zip(gradeObservable,
+                    api.getProfile(cookie).subscribeOnIo(),
+                    fetchCourses(terms, cookie),
+                    fetchRecent(ctx, cookie, terms[0].value.toString())) {
+                grades, profile, courses, _ ->
                 saveProfile(ctx, profile)
                 profile.close()
-                grades
-            }).zipWith(fetchCourses(terms, cookie), {
-                grades, courses ->
                 val realm = Realm.getDefaultInstance()
                 realm.executeTransaction {
-                    realm ->
-                    realm.insertOrUpdate(terms)
-                    realm.insertOrUpdate(courses)
-                    realm.delete(ScoreModel::class.java)
-                    grades.forEach { realm.insertGrade(it as GradeModel) }
+                    it.insertOrUpdate(terms)
+                    it.insertOrUpdate(courses)
+                    it.delete(ScoreModel::class.java)
+                    grades.forEach { grade -> it.insertGrade(grade as GradeModel) }
                 }
                 realm.close()
-            }).zipWith(fetchRecent(ctx, cookie, terms[0].value.toString()), {
-                a, b ->
-            }).map {
-                ctx.savePref(DateTime.now().toString(), R.string.last_update)
+
             }
         }.doOnSubscribe {
             isActive = true
-        }.doOnError {
+        }.doAfterTerminate {
             isActive = false
         }.doOnSuccess {
-            isActive = false
+            setLastUpdate(ctx)
         }
     }
 
-    fun fetchData(ctx: Context, captcha: String): Single<Unit> {
-        var cookie = ctx.readPref(R.string.cookie, "")
+
+    fun fetchData(ctx: Context): Single<Unit> {
+        val cookie = ctx.readPref(R.string.cookie, "")
         val realm = Realm.getDefaultInstance()
-        return signIn(ctx, cookie, isStaff(ctx), captcha).flatMap {
-            val term = realm.where(TermModel::class.java).max("value")
-            cookie = it
-            fetchRecent(ctx, cookie, term.toString())
-        }.map { terms ->
-            realm.close()
-            ctx.savePref(DateTime.now().toString(), R.string.last_update)
+        val term = realm.where(TermModel::class.java).max("value")
+        return fetchRecent(ctx, cookie, term.toString()).doOnSuccess { _ ->
+            setLastUpdate(ctx)
         }.doOnSubscribe {
             isActive = true
-        }.doOnError {
-            isActive = false
-        }.doOnSuccess {
+        }.doAfterTerminate {
+            realm.close()
             isActive = false
         }
     }
 
-    fun fetchResources(ctx: Context, data: RealmResults<CourseModel>, captcha: String): Single<Unit> {
+    fun fetchResources(ctx: Context, data: RealmResults<CourseModel>): Single<Unit> {
         isActive = true
-        var cookie = ctx.readPref(R.string.cookie, "")
-        return signIn(ctx, cookie, isStaff(ctx), captcha).flatMap {
-            cookie = it
-            Single.zip(data.map {
-                val classNumber = it.classNumber
-                api.getResources(
-                        it.courseId,
-                        it.crseId,
-                        it.term.toString(),
-                        it.ssrComponent,
-                        it.classNumber.toString(),
-                        cookie
-                ).map { data ->
-                    data.classNumber = classNumber
-                    data
-                }.subscribeOn(Schedulers.io())
-            }, {
-                resources ->
-                val realm = Realm.getDefaultInstance()
-                realm.executeTransaction { realm ->
-                    resources.forEach {
-                        val resModel = ResModel()
-                        resModel.book.addAll((it as ResModelIntermidiary).book)
-                        resModel.path.addAll(it.path)
-                        resModel.resources.addAll(it.resources)
-                        resModel.url.addAll(it.url)
-                        resModel.webContent = it.webContent
-                        resModel.classNumber = it.classNumber
-                        realm.insertOrUpdate(resModel)
-                    }
+        val cookie = ctx.readPref(R.string.cookie, "")
+        return Single.zip(data.map {
+            val classNumber = it.classNumber
+            api.getResources(
+                    it.courseId,
+                    it.crseId,
+                    it.term.toString(),
+                    it.ssrComponent,
+                    it.classNumber.toString(),
+                    cookie
+            ).map { data ->
+                data.classNumber = classNumber
+                data
+            }.subscribeOnIo()
+        }) { resources ->
+            val realm = Realm.getDefaultInstance()
+            realm.executeTransaction { realm ->
+                resources.forEach {
+                    val resModel = ResModel()
+                    resModel.book.addAll((it as ResModelIntermidiary).book)
+                    resModel.path.addAll(it.path)
+                    resModel.resources.addAll(it.resources)
+                    resModel.url.addAll(it.url)
+                    resModel.webContent = it.webContent
+                    resModel.classNumber = it.classNumber
+                    realm.insertOrUpdate(resModel)
                 }
-            })
-        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).doOnSubscribe {
+            }
+            realm.close()
+        }.defaultThreads().doOnSubscribe {
             isActive = true
-        }.doOnError {
-            isActive = false
-        }.doOnSuccess {
+        }.doAfterTerminate {
             isActive = false
         }
     }
 
-
-    private fun signIn(ctx: Context, cookie: String = "", isStaff: Boolean, captcha: String): Single<String> {
-        var newCookie: String = cookie
-        return api.getToken().flatMap {
-            val regex = Regex("<input type=\"hidden\" name=\"token\" value=\".*\"")
-            val input = regex.find(it.string())
-            api.signIn(
-                    ctx.readPref(R.string.username, ""),
-                    ctx.readPref(R.string.password, ""),
-                    captcha, cookie, input?.value?.substring(41, input.value.length - 1))
-        }.flatMap {
-            Crashlytics.log(it.headers().get("Location"))
-            newCookie = it.headers().get("Set-Cookie") ?: newCookie
-            ctx.savePref(newCookie, R.string.cookie)
-            if (isStaff) api.switchRole(newCookie)
-            else Single.just(it)
-        }.flatMap {
-            Single.just(newCookie)
-        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-    }
-
-    fun fetchCaptcha(ctx: Context, cookie: String) : Single<Bitmap> {
-        return api.getCaptchaImage(cookie).map {
-            val inputStream = it.body().byteStream()
+    fun getToken(ctx: Context): Single<String> {
+        val cookie = ctx.readPref(R.string.cookie, "")
+        val pattern = "<input type=\"hidden\" name=\"token\" value=\".*\""
+        return api.getToken(cookie).map {
+            val input = Regex(pattern).find(it.body().string())
             ctx.savePref(it.headers().get("Set-Cookie") ?: cookie, R.string.cookie)
-            BitmapFactory.decodeStream(inputStream)
-        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            input?.value?.substring(41, input.value.length - 1) ?: ""
+        }.defaultThreads()
     }
 
+    fun signIn(ctx: Context, token: String, captcha: String): Single<Response<out Any>> = api.signIn(
+            ctx.readPref(R.string.username, ""),
+            ctx.readPref(R.string.password, ""),
+            ctx.readPref(R.string.cookie),
+            captcha, token).flatMap {
+        if (isStaff(ctx))
+            api.switchRole(ctx.readPref(R.string.cookie))
+        else
+            Single.just(it)
+    }.defaultThreads()
 
-    private fun fetchGrades(terms: List<TermModel>, cookie: String): List<Single<GradeModel>> =
-            terms.map {
-                api.getGrades(it.value.toString(), cookie).subscribeOn(Schedulers.io())
-            }
+    fun fetchCaptcha(cookie: String): Single<Bitmap> = api.getCaptchaImage(cookie).map {
+        val inputStream = it.body().byteStream()
+        BitmapFactory.decodeStream(inputStream)
+    }.defaultThreads()
 
-    private fun fetchCourses(terms: List<TermModel>, cookie: String): Single<List<CourseModel>> {
-        val single: Single<List<CourseModel>>
-        Crashlytics.log("fetchCourses Term Data " + terms.toString())
-        if (terms.size == 1) {
-            single = api.getCourse(terms[0].value.toString(), cookie)
-                    .subscribeOn(Schedulers.io())
+
+    private fun fetchGrades(terms: List<TermModel>, cookie: String) = terms.map {
+        api.getGrades(it.value.toString(), cookie).subscribeOn(Schedulers.io())
+    }
+
+    private fun fetchCourses(terms: List<TermModel>, cookie: String) = when (terms.size) {
+        1 -> api.getCourse(terms[0].value.toString(), cookie).subscribeOnIo()
+                .map {
+                    it.courses.forEach { it.term = terms[0].value }
+                    it.courses
+                }
+
+        else -> Single.zip(terms.drop(1).map { term ->
+            api.getCourse(term.value.toString(), cookie).subscribeOnIo()
                     .map {
-                        it.courses.forEach { it.term = terms[0].value }
+                        it.courses.forEach { it.term = term.value }
                         it.courses
                     }
-        } else {
-            single = Single.zip(terms.drop(1).map({ term ->
-                api.getCourse(term.value.toString(), cookie)
-                        .subscribeOn(Schedulers.io())
-                        .map {
-                            it.courses.forEach { it.term = term.value }
-                            it.courses
-                        }
-            }), {
-                val listOfCourses = mutableListOf<CourseModel>()
-                val itList = it.filterIsInstance<List<CourseModel>>()
-                itList.forEach { listOfCourses.addAll(it) }
-                listOfCourses
-            })
-        }
-        return single
+        }) { it.filterIsInstance<List<CourseModel>>().flatten() }
     }
 
+
     private fun fetchRecent(ctx: Context, cookie: String, term: String) = Single.zip(
-            api.getFinances(cookie).subscribeOn(Schedulers.io()),
-            api.getSessions(cookie).subscribeOn(Schedulers.io()),
-            api.getExams(ExamRequestBody(term), cookie).subscribeOn(Schedulers.io()),
-            api.getGrades(term, cookie).subscribeOn(Schedulers.io()),
-            api.getFinanceSummary(cookie).subscribeOn(Schedulers.io()),
-            api.getCourse(term, cookie).subscribeOn(Schedulers.io()),
+            api.getFinances(cookie).subscribeOnIo(),
+            api.getSessions(cookie).subscribeOnIo(),
+            api.getExams(ExamRequestBody(term), cookie).subscribeOnIo(),
+            api.getGrades(term, cookie).subscribeOnIo(),
+            api.getFinanceSummary(cookie).subscribeOnIo(),
+            api.getCourse(term, cookie).subscribeOnIo(),
             { finance, session, exam, grade, financeSummary, course ->
                 val realm = Realm.getDefaultInstance()
                 realm.executeTransaction {
@@ -253,9 +209,7 @@ object DataApi {
                 }
                 realm.close()
                 isActive = false
-            })
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+            }).defaultThreads()
 
     /*----------------------------------------------------------------------------------------------
      * Helper function for saving data to Realm
@@ -376,6 +330,8 @@ object DataApi {
             .followRedirects(false)
             .build()
 
+    private fun setLastUpdate(ctx: Context) =
+            ctx.savePref(DateTime.now().toString(), R.string.last_update)
 
     fun decideCauseOfFailure(it: Throwable): String {
         Crashlytics.logException(it)
