@@ -56,5 +56,6 @@ This is our first time dealing with open source contribution, but here are our s
 4. We'll review the code changes and discuss any possible improvement together
 5. When the code is ready we'll merge it.
 
+We are also trying to follow [GitFlow's](https://datasift.github.io/gitflow/IntroducingGitFlow.html) branching model.
 We are still figuring out how to do this so this is just a suggestion from us.
 

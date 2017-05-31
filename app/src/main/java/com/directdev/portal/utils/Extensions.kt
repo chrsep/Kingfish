@@ -110,7 +110,7 @@ fun Snackbar.action(action: String, color: Int? = null, listener: (View) -> Unit
  *------------------------------------------------------------------------------------------------*/
 
 fun View.onEnter(callback: () -> Unit) {
-    onKey { view, i, keyEvent ->
+    onKey { _, _, keyEvent ->
         if (keyEvent?.action == KeyEvent.ACTION_DOWN && keyEvent.keyCode == KeyEvent.KEYCODE_ENTER)
             callback()
         false
