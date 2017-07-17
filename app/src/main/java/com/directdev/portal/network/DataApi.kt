@@ -1,8 +1,6 @@
 package com.directdev.portal.network
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import com.crashlytics.android.Crashlytics
 import com.directdev.portal.BuildConfig
 import com.directdev.portal.R
@@ -24,7 +22,6 @@ import retrofit2.adapter.rxjava.HttpException
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import rx.Single
-import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.io.IOException
 import java.net.ConnectException
@@ -76,13 +73,8 @@ object DataApi {
                     grades.forEach { grade -> it.insertGrade(grade as GradeModel) }
                 }
                 realm.close()
-
             }
-        }.doOnSubscribe {
-            isActive = true
-        }.doAfterTerminate {
-            isActive = false
-        }.doOnSuccess {
+        }.bindToIsActive().doOnSuccess {
             setLastUpdate(ctx)
         }
     }
@@ -101,6 +93,29 @@ object DataApi {
             isActive = false
         }
     }
+
+    private fun fetchRecent(ctx: Context, cookie: String, term: String) = Single.zip(
+            api.getFinances(cookie).subscribeOnIo(),
+            api.getSessions(cookie).subscribeOnIo(),
+            api.getExams(ExamRequestBody(term), cookie).subscribeOnIo(),
+            api.getGrades(term, cookie).subscribeOnIo(),
+            api.getFinanceSummary(cookie).subscribeOnIo(),
+            api.getCourse(term, cookie).subscribeOnIo(),
+            { finance, session, exam, grade, financeSummary, course ->
+                val realm = Realm.getDefaultInstance()
+                realm.executeTransaction {
+                    it.delete(JournalModel::class.java)
+                    it.delete(ExamModel::class.java)
+                    it.delete(FinanceModel::class.java)
+                    it.delete(SessionModel::class.java)
+                    it.insertOrUpdate(mapToJournal(exam, finance, session))
+                    it.insertGrade(grade)
+                    saveFinanceSummary(ctx, financeSummary)
+                    saveCourse(course, term, it)
+                }
+                realm.close()
+                isActive = false
+            }).defaultThreads()
 
     fun fetchResources(ctx: Context, data: RealmResults<CourseModel>): Single<Unit> {
         isActive = true
@@ -140,80 +155,87 @@ object DataApi {
         }
     }
 
-    fun getToken(ctx: Context): Single<String> {
-        val cookie = ctx.readPref(R.string.cookie, "")
-        val pattern = "<input type=\"hidden\" name=\"token\" value=\".*\""
-        return api.getToken(cookie).map {
-            val input = Regex(pattern).find(it.body().string())
-            ctx.savePref(it.headers().get("Set-Cookie") ?: cookie, R.string.cookie)
-            input?.value?.substring(41, input.value.length - 1) ?: ""
-        }.defaultThreads()
-    }
-
-    fun signIn(ctx: Context, token: String, captcha: String): Single<Response<out Any>> = api.signIn(
-            ctx.readPref(R.string.username, ""),
-            ctx.readPref(R.string.password, ""),
-            ctx.readPref(R.string.cookie),
-            captcha, token).flatMap {
-        if (isStaff(ctx))
-            api.switchRole(ctx.readPref(R.string.cookie))
-        else
-            Single.just(it)
-    }.defaultThreads()
-
-    fun fetchCaptcha(cookie: String): Single<Bitmap> = api.getCaptchaImage(cookie).map {
-        val inputStream = it.body().byteStream()
-        BitmapFactory.decodeStream(inputStream)
-    }.defaultThreads()
-
-
     private fun fetchGrades(terms: List<TermModel>, cookie: String) = terms.map {
         api.getGrades(it.value.toString(), cookie).subscribeOn(Schedulers.io())
     }
 
     private fun fetchCourses(terms: List<TermModel>, cookie: String) = when (terms.size) {
-        1 -> api.getCourse(terms[0].value.toString(), cookie).subscribeOnIo()
+        1 -> api.getCourse(terms[0].value.toString(), cookie)
+                .subscribeOnIo()
                 .map {
                     it.courses.forEach { it.term = terms[0].value }
                     it.courses
                 }
 
         else -> Single.zip(terms.drop(1).map { term ->
-            api.getCourse(term.value.toString(), cookie).subscribeOnIo()
+            api.getCourse(term.value.toString(), cookie)
+                    .subscribeOnIo()
                     .map {
                         it.courses.forEach { it.term = term.value }
                         it.courses
                     }
-        }) { it.filterIsInstance<List<CourseModel>>().flatten() }
+        }) {
+            it.filterIsInstance<List<CourseModel>>().flatten()
+        }
+    }
+
+    fun signIn(ctx: Context, ids: RandomIds): Single<Response<out Any>> {
+        val usernamePair = HashMap<String, String>()
+        val passPair = HashMap<String, String>()
+        usernamePair.put(ids.user, ctx.readPref(R.string.username, ""))
+        passPair.put(ids.pass, ctx.readPref(R.string.password, ""))
+
+        return api.signIn(ctx.readPref(R.string.cookie), usernamePair, passPair, ids.pair1, ids.pair2).flatMap {
+            if (isStaff(ctx)) api.switchRole(ctx.readPref(R.string.cookie))
+            else Single.just(it)
+        }.defaultThreads()
     }
 
 
-    private fun fetchRecent(ctx: Context, cookie: String, term: String) = Single.zip(
-            api.getFinances(cookie).subscribeOnIo(),
-            api.getSessions(cookie).subscribeOnIo(),
-            api.getExams(ExamRequestBody(term), cookie).subscribeOnIo(),
-            api.getGrades(term, cookie).subscribeOnIo(),
-            api.getFinanceSummary(cookie).subscribeOnIo(),
-            api.getCourse(term, cookie).subscribeOnIo(),
-            { finance, session, exam, grade, financeSummary, course ->
-                val realm = Realm.getDefaultInstance()
-                realm.executeTransaction {
-                    it.delete(JournalModel::class.java)
-                    it.delete(ExamModel::class.java)
-                    it.delete(FinanceModel::class.java)
-                    it.delete(SessionModel::class.java)
-                    it.insertOrUpdate(mapToJournal(exam, finance, session))
-                    it.insertGrade(grade)
-                    saveFinanceSummary(ctx, financeSummary)
-                    saveCourse(course, term, it)
-                }
-                realm.close()
-                isActive = false
-            }).defaultThreads()
+    data class RandomIds(val user: String,
+                         val pass: String,
+                         val pair1: Map<String, String>,
+                         val pair2: Map<String, String>)
 
-    /*----------------------------------------------------------------------------------------------
-     * Helper function for saving data to Realm
-     *--------------------------------------------------------------------------------------------*/
+    fun getToken(ctx: Context): Single<RandomIds> {
+        val cookie = ctx.readPref(R.string.cookie, "")
+        val loaderPattern = "<script src=\".*login/loader.*\""
+        val usernamePattern = "<input type=\"text\" name=\".*placeholder=\"Username\""
+        val passPattern = "<input type=\"password\" name=\".*placeholder=\"Password\""
+        var loaderStr: String = ""
+        var userStr: String = ""
+        var passStr: String = ""
+        return api.getToken(cookie).flatMap {
+            ctx.savePref(it.headers().get("Set-Cookie") ?: cookie, R.string.cookie)
+            val body = it.body().string()
+            val loader = Regex(loaderPattern).find(body)?.value ?: ""
+            val user = Regex(usernamePattern).find(body)?.value ?: ""
+            val pass = Regex(passPattern).find(body)?.value ?: ""
+            loaderStr = loader.substring(40, loader.length - 1).removeHtmlEncoding()
+            userStr = user.substring(25, user.length - 45).removeHtmlEncoding()
+            passStr = pass.substring(29, pass.length - 24).removeHtmlEncoding()
+            api.getSerial(cookie, loaderStr)
+        }.map {
+            val pattern = "<input type=\"hidden\" name=\".*\" value=\".*\" />"
+            val body = it.body().string()
+            val extraInputs = Regex(pattern).findAll(body).toList()
+            val fields = extraInputs[0].value.split(" ")
+            val pair1 = HashMap<String, String>()
+            val pair2 = HashMap<String, String>()
+
+            pair1.put(fields[2].substring(6, fields[2].length - 1).removeHtmlEncoding(),
+                    fields[3].substring(6, fields[3].length - 1).removeHtmlEncoding())
+
+            pair2.put(fields[6].substring(6, fields[6].length - 1).removeHtmlEncoding(),
+                    fields[7].substring(6, fields[7].length - 1).removeHtmlEncoding())
+            RandomIds(userStr, passStr, pair1, pair2)
+        }.defaultThreads()
+    }
+
+
+/*----------------------------------------------------------------------------------------------
+ * Helper function for saving data to Realm
+ *--------------------------------------------------------------------------------------------*/
 
     private fun saveCourse(course: CourseWrapperModel, term: String, realm: Realm) {
         course.courses.forEach { it.term = term.toInt() }
@@ -294,6 +316,15 @@ object DataApi {
         delete(data[0]::class.java)
         insert(data)
     }
+
+    /**---------------------------------------------------------------------------------------------
+     * Replace html encoding in randomized data to normal string
+     *--------------------------------------------------------------------------------------------*/
+
+    private fun String.removeHtmlEncoding() = replace("%2F", "/").replace("%3D", "=")
+
+
+    private fun <T> Single<T>.bindToIsActive() = doOnSubscribe { isActive = true }.doAfterTerminate { isActive = false }
 
     /**---------------------------------------------------------------------------------------------
      * Build retrofit service for making API Calls

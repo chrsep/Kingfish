@@ -28,44 +28,14 @@ object SyncManager {
              onFailure: Action1<Throwable>,
              courses: RealmResults<CourseModel>? = null) {
         val data = SyncData(ctx, onSuccess, onFailure, courses)
-        var answer: TextView? = null
-        var token: String? = null
-        DataApi.getToken(ctx).flatMap {
-            token = it
-            DataApi.fetchCaptcha(ctx.readPref(R.string.cookie))
-        }.subscribe({
-            ctx.showDialog("Captcha") {
-                customView {
-                    linearLayout {
-                        imageView {
-                            setImageBitmap(it)
-                            lparams(width = dip(90), height = dip(32)) {
-                                horizontalMargin = dip(5)
-                                topMargin = dip(8)
-                                leftMargin = dip(16)
-                            }
-                        }
-                        answer = editText {
-                            lparams(width = matchParent) { rightMargin = dip(16) }
-                            hint = "Answer"
-                        }
-                    }
-                    yesButton { request(data, answer?.text.toString(), token, type) }
-                    noButton { request(data, answer?.text.toString(), token) }
-                    onCancel {  request(data, answer?.text.toString(), token)}
-                }
-            }
-        }, {
-            Crashlytics.log("sync function fails: $type")
-            Crashlytics.logException(it)
-        })
+        DataApi.getToken(ctx).map {
+            request(data,it, type)
+        }.subscribe()
     }
 
-    private fun request(data: SyncData, captcha: String = "", token: String?, type :String = "") {
-        Crashlytics.setString("captcha", captcha)
-        Crashlytics.setString("token", token)
+    private fun request(data: SyncData, ids: DataApi.RandomIds, type :String = "") {
         val (ctx, onSuccess, onFailure, courses) = data
-        DataApi.signIn(ctx, token ?: "", captcha).flatMap {
+        DataApi.signIn(ctx, ids).flatMap {
             when (type) {
                 INIT -> DataApi.initializeApp(ctx)
                 COMMON -> DataApi.fetchData(ctx)

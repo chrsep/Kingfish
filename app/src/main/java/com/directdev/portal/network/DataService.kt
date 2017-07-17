@@ -18,11 +18,11 @@ interface DataService {
     @FormUrlEncoded
     @Headers("Referer: https://binusmaya.binus.ac.id/login/", "Origin: https://binusmaya.binus.ac.id")
     @POST("https://binusmaya.binus.ac.id/login/sys_login.php")
-    fun signIn(@Field("uid") uid: String,
-               @Field("pass") pass: String,
-               @Header("Cookie") cookie: String,
-               @Field("defaultLoginReal") defaultLoginReal: String,
-               @Field("token") token: String? = "",
+    fun signIn(@Header("Cookie") cookie: String,
+               @FieldMap uid: Map<String, String>,
+               @FieldMap pass: Map<String, String>,
+               @FieldMap extraPair1: Map<String, String>,
+               @FieldMap extraPair2: Map<String, String>,
                @Field("ctl00\$ContentPlaceHolder1\$SubmitButtonBM") button: String = "Login")
             : Single<Response<String>>
 
@@ -81,6 +81,7 @@ interface DataService {
                       @Header("Cookie") cookie: String): Single<List<AssignmentIndividualModel>>
 
     @Headers("Referer: https://binusmaya.binus.ac.id/login/")
-    @GET("https://binusmaya.binus.ac.id/login/captcha.php")
-    fun getCaptchaImage(@Header("Cookie") cookie: String): Single<Response<ResponseBody>>
+    @GET("https://binusmaya.binus.ac.id/login/loader.php")
+    fun getSerial(@Header("Cookie") cookie: String,
+                  @Query("serial") serial: String): Single<Response<ResponseBody>>
 }
