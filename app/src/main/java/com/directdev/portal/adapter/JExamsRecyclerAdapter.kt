@@ -1,6 +1,5 @@
 package com.directdev.portal.adapter
 
-import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +11,6 @@ import io.realm.RealmRecyclerViewAdapter
 import kotlinx.android.synthetic.main.item_jexams.view.*
 
 class JExamsRecyclerAdapter(
-        context: Context,
         data: OrderedRealmCollection<ExamModel>?,
         autoUpdate: Boolean) :
         RealmRecyclerViewAdapter<ExamModel, JExamsRecyclerAdapter.ViewHolder>(data, autoUpdate) {

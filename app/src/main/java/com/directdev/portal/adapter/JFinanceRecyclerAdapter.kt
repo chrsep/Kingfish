@@ -1,6 +1,5 @@
 package com.directdev.portal.adapter
 
-import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +13,6 @@ import java.text.NumberFormat
 import java.util.*
 
 class JFinanceRecyclerAdapter(
-        context: Context,
         data: OrderedRealmCollection<FinanceModel>?,
         autoUpdate: Boolean) :
         RealmRecyclerViewAdapter<FinanceModel, JFinanceRecyclerAdapter.ViewHolder>(data, autoUpdate) {

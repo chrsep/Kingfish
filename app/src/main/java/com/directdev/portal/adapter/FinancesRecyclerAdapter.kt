@@ -1,6 +1,5 @@
 package com.directdev.portal.adapter
 
-import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -29,7 +28,6 @@ import org.joda.time.format.DateTimeFormat
 // the end of the list to make it show on top
 class FinancesRecyclerAdapter(
         val realm: Realm,
-        context: Context,
         data: OrderedRealmCollection<FinanceModel>?,
         autoUpdate: Boolean) :
         RealmRecyclerViewAdapter<FinanceModel, FinancesRecyclerAdapter.ViewHolder>(data, autoUpdate) {

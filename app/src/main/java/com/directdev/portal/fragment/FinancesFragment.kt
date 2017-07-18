@@ -32,7 +32,7 @@ class FinancesFragment : Fragment() , AnkoLogger {
             layout.stackFromEnd = true
             layout.reverseLayout = true
             financesRecycler.layoutManager = layout
-            financesRecycler.adapter = FinancesRecyclerAdapter(realm, ctx, data, true)
+            financesRecycler.adapter = FinancesRecyclerAdapter(realm, data, true)
         }
     }
 
