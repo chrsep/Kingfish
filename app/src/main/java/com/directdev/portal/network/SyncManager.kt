@@ -1,13 +1,9 @@
 package com.directdev.portal.network
 
 import android.content.Context
-import android.util.Log
 import com.crashlytics.android.Crashlytics
-import com.directdev.portal.R
 import com.directdev.portal.model.CourseModel
-import com.directdev.portal.utils.savePref
 import io.realm.RealmResults
-import org.joda.time.DateTime
 import rx.Single
 import rx.functions.Action1
 
@@ -28,10 +24,9 @@ object SyncManager {
              courses: RealmResults<CourseModel>? = null) {
         val data = SyncData(ctx, onSuccess, onFailure, courses)
         DataApi.getTokens(ctx).subscribe({
-            Log.d("Token", it.toString())
             request(data, it, type)
         }, {
-            Crashlytics.log("Get tokens failed: $data")
+            Crashlytics.log("Get tokens failed")
             Crashlytics.logException(it)
             onFailure.call(it)
         })

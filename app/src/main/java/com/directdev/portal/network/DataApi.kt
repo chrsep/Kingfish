@@ -16,13 +16,11 @@ import org.joda.time.DateTime
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.HttpException
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import rx.Single
-import rx.lang.kotlin.single
 import rx.schedulers.Schedulers
 import java.io.IOException
 import java.net.ConnectException
@@ -62,7 +60,7 @@ object DataApi {
             Single.zip(gradeObservable,
                     api.getProfile(cookie).subscribeOnIo(),
                     fetchCourses(terms, cookie),
-                    fetchRecent(ctx, cookie, terms[0].value.toString())) {
+                    fetchRecent(ctx, cookie, terms.subList(0,1), terms.last().value.toString())) {
                 grades, profile, courses, _ ->
                 saveProfile(ctx, profile)
                 profile.close()
@@ -84,8 +82,8 @@ object DataApi {
     fun fetchData(ctx: Context): Single<Unit> {
         val cookie = ctx.readPref(R.string.cookie, "")
         val realm = Realm.getDefaultInstance()
-        val term = realm.where(TermModel::class.java).max("value")
-        return fetchRecent(ctx, cookie, term.toString()).doOnSuccess { _ ->
+        val terms = realm.where(TermModel::class.java).findAllSorted("value").takeLast(3)
+        return fetchRecent(ctx, cookie, terms, terms.last().value.toString()).doOnSuccess { _ ->
             setLastUpdate(ctx)
         }.doOnSubscribe {
             isActive = true
@@ -95,24 +93,29 @@ object DataApi {
         }
     }
 
-    private fun fetchRecent(ctx: Context, cookie: String, term: String) = Single.zip(
+    private fun fetchRecent(ctx: Context, cookie: String, terms: List<TermModel>, lastTerm: String) = Single.zip(
             api.getFinances(cookie).subscribeOnIo(),
             api.getSessions(cookie).subscribeOnIo(),
-            api.getExams(ExamRequestBody(term), cookie).subscribeOnIo(),
-            api.getGrades(term, cookie).subscribeOnIo(),
+            api.getExams(ExamRequestBody(terms.takeLast(2).first().value.toString()), cookie).subscribeOnIo(),
+            api.getExams(ExamRequestBody(lastTerm), cookie).subscribeOnIo(),
+            api.getGrades(terms.first().value.toString(), cookie).subscribeOnIo(),
+            api.getGrades(terms.takeLast(2).first().value.toString(), cookie).subscribeOnIo(),
+            api.getGrades(lastTerm, cookie).subscribeOnIo(),
             api.getFinanceSummary(cookie).subscribeOnIo(),
-            api.getCourse(term, cookie).subscribeOnIo(),
-            { finance, session, exam, grade, financeSummary, course ->
+            api.getCourse(lastTerm, cookie).subscribeOnIo(),
+            { finance, session, exam1, exam2, grade1, grade2, grade3, financeSummary, course ->
                 val realm = Realm.getDefaultInstance()
                 realm.executeTransaction {
                     it.delete(JournalModel::class.java)
                     it.delete(ExamModel::class.java)
                     it.delete(FinanceModel::class.java)
                     it.delete(SessionModel::class.java)
-                    it.insertOrUpdate(mapToJournal(exam, finance, session))
-                    it.insertGrade(grade)
+                    it.insertOrUpdate(mapToJournal(exam1 + exam2, finance, session))
+                    it.insertGrade(grade1)
+                    it.insertGrade(grade2)
+                    it.insertGrade(grade3)
                     saveFinanceSummary(ctx, financeSummary)
-                    saveCourse(course, term, it)
+                    saveCourse(course, lastTerm, it)
                 }
                 realm.close()
                 isActive = false
