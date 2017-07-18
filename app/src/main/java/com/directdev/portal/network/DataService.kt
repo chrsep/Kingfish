@@ -13,7 +13,7 @@ import rx.Single
 interface DataService {
 
     @GET("https://binusmaya.binus.ac.id/login/index.php")
-    fun getToken(@Header("Cookie") cookie: String): Single<Response<ResponseBody>>
+    fun getIndexHtml(@Header("Cookie") cookie: String = ""): Single<Response<ResponseBody>>
 
     @FormUrlEncoded
     @Headers("Referer: https://binusmaya.binus.ac.id/login/", "Origin: https://binusmaya.binus.ac.id")

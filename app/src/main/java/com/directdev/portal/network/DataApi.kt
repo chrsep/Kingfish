@@ -22,6 +22,7 @@ import retrofit2.adapter.rxjava.HttpException
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import rx.Single
+import rx.lang.kotlin.single
 import rx.schedulers.Schedulers
 import java.io.IOException
 import java.net.ConnectException
@@ -179,34 +180,42 @@ object DataApi {
         }
     }
 
-    fun signIn(ctx: Context, ids: RandomIds): Single<Response<out Any>> {
+    fun signIn(ctx: Context, tokens: RandomTokens): Single<out Any> {
         val usernamePair = HashMap<String, String>()
         val passPair = HashMap<String, String>()
-        usernamePair.put(ids.user, ctx.readPref(R.string.username, ""))
-        passPair.put(ids.pass, ctx.readPref(R.string.password, ""))
+        usernamePair.put(tokens.user, ctx.readPref(R.string.username, ""))
+        passPair.put(tokens.pass, ctx.readPref(R.string.password, ""))
 
-        return api.signIn(ctx.readPref(R.string.cookie), usernamePair, passPair, ids.pair1, ids.pair2).flatMap {
-            if (isStaff(ctx)) api.switchRole(ctx.readPref(R.string.cookie))
-            else Single.just(it)
-        }.defaultThreads()
+        val single = if (!DateTime.now().closeToLastUpdate(ctx))
+            api.signIn(ctx.readPref(R.string.cookie), usernamePair, passPair, tokens.pair1, tokens.pair2).flatMap {
+                if (isStaff(ctx)) api.switchRole(ctx.readPref(R.string.cookie))
+                else Single.just(it)
+            } else Single.just("")
+        return single.defaultThreads()
+    }
+
+    private fun DateTime.closeToLastUpdate(ctx: Context): Boolean {
+        val lastUpdate = DateTime.parse(ctx.readPref(R.string.last_update, "2007-07-18T20:25:58.941+07:00"))
+        val bool = minusMinutes(10).isBefore(lastUpdate)
+        return bool
     }
 
 
-    data class RandomIds(val user: String,
-                         val pass: String,
-                         val pair1: Map<String, String>,
-                         val pair2: Map<String, String>)
+    data class RandomTokens(val user: String = "",
+                            val pass: String = "",
+                            val pair1: Map<String, String> = HashMap<String, String>(),
+                            val pair2: Map<String, String> = HashMap<String, String>())
 
-    fun getToken(ctx: Context): Single<RandomIds> {
-        val cookie = ctx.readPref(R.string.cookie, "")
+    fun getTokens(ctx: Context): Single<RandomTokens> {
         val loaderPattern = "<script src=\".*login/loader.*\""
         val usernamePattern = "<input type=\"text\" name=\".*placeholder=\"Username\""
         val passPattern = "<input type=\"password\" name=\".*placeholder=\"Password\""
-        var loaderStr: String = ""
+        var loaderStr: String
         var userStr: String = ""
         var passStr: String = ""
-        return api.getToken(cookie).flatMap {
-            ctx.savePref(it.headers().get("Set-Cookie") ?: cookie, R.string.cookie)
+        var cookie: String = ""
+        if (DateTime.now().closeToLastUpdate(ctx)) return Single.just(RandomTokens())
+        return api.getIndexHtml().flatMap {
             val body = it.body().string()
             val loader = Regex(loaderPattern).find(body)?.value ?: ""
             val user = Regex(usernamePattern).find(body)?.value ?: ""
@@ -214,6 +223,7 @@ object DataApi {
             loaderStr = loader.substring(40, loader.length - 1).removeHtmlEncoding()
             userStr = user.substring(25, user.length - 45).removeHtmlEncoding()
             passStr = pass.substring(29, pass.length - 24).removeHtmlEncoding()
+            cookie = it.headers().get("Set-Cookie") ?: ""
             api.getSerial(cookie, loaderStr)
         }.map {
             val pattern = "<input type=\"hidden\" name=\".*\" value=\".*\" />"
@@ -222,13 +232,12 @@ object DataApi {
             val fields = extraInputs[0].value.split(" ")
             val pair1 = HashMap<String, String>()
             val pair2 = HashMap<String, String>()
-
             pair1.put(fields[2].substring(6, fields[2].length - 1).removeHtmlEncoding(),
                     fields[3].substring(6, fields[3].length - 1).removeHtmlEncoding())
-
             pair2.put(fields[6].substring(6, fields[6].length - 1).removeHtmlEncoding(),
                     fields[7].substring(6, fields[7].length - 1).removeHtmlEncoding())
-            RandomIds(userStr, passStr, pair1, pair2)
+            ctx.savePref(cookie, R.string.cookie)
+            RandomTokens(userStr, passStr, pair1, pair2)
         }.defaultThreads()
     }
 
@@ -324,7 +333,11 @@ object DataApi {
     private fun String.removeHtmlEncoding() = replace("%2F", "/").replace("%3D", "=")
 
 
-    private fun <T> Single<T>.bindToIsActive() = doOnSubscribe { isActive = true }.doAfterTerminate { isActive = false }
+    private fun <T> Single<T>.bindToIsActive() = doOnSubscribe {
+        isActive = true
+    }.doAfterTerminate {
+        isActive = false
+    }
 
     /**---------------------------------------------------------------------------------------------
      * Build retrofit service for making API Calls
@@ -376,7 +389,7 @@ object DataApi {
             is ConnectException -> "Failed to connect to Binusmaya"
             is SSLException -> "Failed to connect to Binusmaya"
             is UnknownHostException -> "Failed to connect to Binusmaya"
-            is IOException -> "Auth fails, maybe wrong pass, username, or captcha?"
+            is IOException -> "Failed to authenticate with Bimay, wrong pass/username?"
             is NoSuchMethodException -> "Captcha cancelled"
             is IndexOutOfBoundsException -> {
                 Crashlytics.log("IndexOutOfBoundsException")
