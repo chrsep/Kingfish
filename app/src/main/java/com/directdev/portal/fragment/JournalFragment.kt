@@ -71,7 +71,7 @@ class JournalFragment : Fragment() {
         val journalToday = journalDates?.filter {
             it.date == today.toDate()
         } ?: return
-        if (journalToday.isNotEmpty() && journalToday[0].session.size > 0) {
+        if (journalToday.isNotEmpty() && (journalToday[0].session.size > 0 || journalToday[0].exam.size > 0) ) {
             journalToolbar.title = "Today - " + today.toString(DateTimeFormat.forPattern("dd MMMM"))
         } else journalToolbar.title = "Today - Holiday"
         if (!menuInflated) {
