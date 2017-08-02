@@ -8,13 +8,14 @@ import com.directdev.portal.R
 import com.directdev.portal.activity.MainActivity
 import com.directdev.portal.adapter.FinancesRecyclerAdapter
 import com.directdev.portal.model.FinanceModel
+import com.google.firebase.analytics.FirebaseAnalytics
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_finances.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.ctx
 import kotlin.properties.Delegates
 
-class FinancesFragment : Fragment() , AnkoLogger {
+class FinancesFragment : Fragment(), AnkoLogger {
     private var realm: Realm by Delegates.notNull()
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -24,6 +25,11 @@ class FinancesFragment : Fragment() , AnkoLogger {
 
     override fun onStart() {
         super.onStart()
+        val mFirebaseAnalytics = FirebaseAnalytics.getInstance(ctx)
+        val bundle = Bundle()
+        bundle.putString("content", "finances")
+        mFirebaseAnalytics.logEvent("content_opened", bundle)
+
         realm = Realm.getDefaultInstance()
         val data = realm.where(FinanceModel::class.java).findAll()
         val layout = LinearLayoutManager(ctx)

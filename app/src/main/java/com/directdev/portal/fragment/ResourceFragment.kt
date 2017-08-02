@@ -19,9 +19,9 @@ import com.directdev.portal.adapter.ResourcesRecyclerAdapter
 import com.directdev.portal.model.CourseModel
 import com.directdev.portal.model.ResModel
 import com.directdev.portal.model.TermModel
-import com.directdev.portal.network.DataApi
 import com.directdev.portal.network.SyncManager
 import com.directdev.portal.utils.snack
+import com.google.firebase.analytics.FirebaseAnalytics
 import io.realm.Realm
 import io.realm.RealmResults
 import kotlinx.android.synthetic.main.fragment_resources.*
@@ -42,6 +42,12 @@ class ResourceFragment : Fragment(), AnkoLogger {
 
     override fun onStart() {
         super.onStart()
+        //Analytics
+        val mFirebaseAnalytics = FirebaseAnalytics.getInstance(ctx)
+        val bundle = Bundle()
+        bundle.putString("content", "resources")
+        mFirebaseAnalytics.logEvent("content_opened", bundle)
+
         realm = Realm.getDefaultInstance()
         val term = realm.where(TermModel::class.java).max("value")
         val courses = realm.where(CourseModel::class.java)

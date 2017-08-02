@@ -1,8 +1,10 @@
 package com.directdev.portal.network
 
 import android.content.Context
+import android.os.Bundle
 import com.crashlytics.android.Crashlytics
 import com.directdev.portal.model.CourseModel
+import com.google.firebase.analytics.FirebaseAnalytics
 import io.realm.RealmResults
 import rx.Single
 import rx.functions.Action1
@@ -34,6 +36,12 @@ object SyncManager {
 
     private fun request(data: SyncData, tokens: DataApi.RandomTokens, type: String = "") {
         val (ctx, onSuccess, onFailure, courses) = data
+        // Analytics
+        val mFirebaseAnalytics = FirebaseAnalytics.getInstance(ctx)
+        val params = Bundle()
+        params.putString("type", type)
+        mFirebaseAnalytics.logEvent("data_update", params)
+
         DataApi.signIn(ctx, tokens).flatMap {
             when (type) {
                 INIT -> DataApi.initializeApp(ctx)

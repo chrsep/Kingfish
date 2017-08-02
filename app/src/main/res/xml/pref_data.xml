@@ -12,7 +12,11 @@
             android:summary="Sign Out from Portal">
             <intent
                 android:targetPackage="com.directdev.portal"
-                android:targetClass="com.directdev.portal.activity.SigninActivity" />
+                android:targetClass="com.directdev.portal.activity.SigninActivity" >
+                <extra
+                    android:name="signout"
+                    android:value="signout" />
+            </intent>
         </Preference>
     </PreferenceCategory>
     <PreferenceCategory android:title="Support and Community">

@@ -8,9 +8,9 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.text.Html
 import android.text.method.LinkMovementMethod
-import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.LoginEvent
+import com.directdev.portal.BuildConfig
 import com.directdev.portal.R
 import com.directdev.portal.network.DataApi
 import com.directdev.portal.network.SyncManager
@@ -52,6 +52,10 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
         troubleTextView.text = text
         if (DataApi.isActive) animateSigninButton()
         else deleteDbData()
+        if (intent.getStringExtra("signout") != null){
+            val bundle = Bundle()
+            mFirebaseAnalytics.logEvent("logout", bundle)
+        }
         getNotif()
     }
 
@@ -68,6 +72,7 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
     }
 
     private fun signInCallToServer() {
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, Bundle())
         SyncManager.sync(ctx, SyncManager.INIT, Action1 {
             // An anonymous function, called On login success
             //
@@ -116,6 +121,7 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
             .putSuccess(false)
             .putCustomAttribute("Error Message", it.message)
             .putCustomAttribute("Error Log", it.toString())
+            .putCustomAttribute("Build Number", BuildConfig.VERSION_CODE)
 
     private fun getNotif() {
         val notifyExtra = intent.getBundleExtra("Notify")

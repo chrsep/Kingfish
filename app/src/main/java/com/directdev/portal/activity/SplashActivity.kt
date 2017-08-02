@@ -22,7 +22,6 @@ import org.jetbrains.anko.startActivity
 class SplashActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         Fabric.with(this, Answers(), Crashlytics())
         if (intent.extras != null) {
             val extras = intent.extras
@@ -32,5 +31,6 @@ class SplashActivity : AppCompatActivity(), AnkoLogger {
             if (readPref(R.string.isLoggedIn, false)) startActivity<MainActivity>()
             else startActivity<SigninActivity>()
         }
+        super.onCreate(savedInstanceState)
     }
 }

@@ -16,6 +16,7 @@ import com.directdev.portal.network.SyncManager
 import com.directdev.portal.utils.action
 import com.directdev.portal.utils.readPref
 import com.directdev.portal.utils.snack
+import com.google.firebase.analytics.FirebaseAnalytics
 import io.realm.Realm
 import io.realm.RealmResults
 import kotlinx.android.synthetic.main.fragment_journal.*
@@ -42,6 +43,12 @@ class JournalFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        // Analytics
+        val mFirebaseAnalytics = FirebaseAnalytics.getInstance(ctx)
+        val bundle = Bundle()
+        bundle.putString("content", "journal")
+        mFirebaseAnalytics.logEvent("content_opened", bundle)
+
         realm = Realm.getDefaultInstance()
         if (DataApi.isActive) view?.snack("Updating", Snackbar.LENGTH_INDEFINITE)
         val journalDates = setupRecycler()

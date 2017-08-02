@@ -12,6 +12,7 @@ import com.directdev.portal.adapter.GradesRecyclerAdapter
 import com.directdev.portal.model.CourseModel
 import com.directdev.portal.model.CreditModel
 import com.directdev.portal.model.ScoreModel
+import com.google.firebase.analytics.FirebaseAnalytics
 import io.realm.Realm
 import io.realm.RealmResults
 import kotlinx.android.synthetic.main.fragment_grades.*
@@ -34,6 +35,12 @@ class GradesFragment : Fragment(), AnkoLogger, LineChartOnValueSelectListener {
 
     override fun onStart() {
         super.onStart()
+        // Analytics
+        val mFirebaseAnalytics = FirebaseAnalytics.getInstance(ctx)
+        val bundle = Bundle()
+        bundle.putString("content", "grades")
+        mFirebaseAnalytics.logEvent("content_opened", bundle)
+
         realm = Realm.getDefaultInstance()
         val lines = mutableListOf<Line>()
         val credit = realm.where(CreditModel::class.java).findAll().sort("term")

@@ -49,22 +49,31 @@ object DataApi {
     private val api = buildRetrofit()
     private fun isStaff(ctx: Context) = ctx.readPref(R.string.isStaff, false)
 
+    data class RandomTokens(val user: String = "",
+                            val pass: String = "",
+                            val pair1: Map<String, String> = HashMap<String, String>(),
+                            val pair2: Map<String, String> = HashMap<String, String>())
+
     fun initializeApp(ctx: Context): Single<Unit> {
         val cookie = ctx.readPref(R.string.cookie, "")
         return api.getTerms(cookie).subscribeOnIo().flatMap { terms ->
-            Crashlytics.log("initializeApp Term Data " + terms.toString())
+            Crashlytics.log("initializeApp Term Data " + terms.map { it.value }.toString())
+            Crashlytics.setInt("login_level", 1)
             val gradeObservable = when (terms.size) {
                 1 -> fetchGrades(terms, cookie)[0].map { arrayOf<Any>(it) }
                 else -> Single.zip(fetchGrades(terms, cookie)) { grades -> grades }
             }
+            Crashlytics.setInt("login_level", 2)
             Single.zip(gradeObservable,
                     api.getProfile(cookie).subscribeOnIo(),
                     fetchCourses(terms, cookie),
-                    fetchRecent(ctx, cookie, terms.subList(0,1), terms.last().value.toString())) {
+                    fetchRecent(ctx, cookie, terms.subList(0, 1), terms.last().value.toString())) {
                 grades, profile, courses, _ ->
+                Crashlytics.setInt("login_level", 3)
                 saveProfile(ctx, profile)
                 profile.close()
                 val realm = Realm.getDefaultInstance()
+                Crashlytics.setInt("login_level", 4)
                 realm.executeTransaction {
                     it.insertOrUpdate(terms)
                     it.insertOrUpdate(courses)
@@ -191,23 +200,17 @@ object DataApi {
 
         val single = if (!DateTime.now().closeToLastUpdate(ctx))
             api.signIn(ctx.readPref(R.string.cookie), usernamePair, passPair, tokens.pair1, tokens.pair2).flatMap {
+                Crashlytics.setString("returned_header", it.headers().get("Location") ?: "none")
+                Crashlytics.setString("user_field", tokens.user)
+                Crashlytics.setString("pass_field", tokens.pass)
+                Crashlytics.setString("pair1", tokens.pair1.toString())
+                Crashlytics.setString("pair2", tokens.pair2.toString())
                 if (isStaff(ctx)) api.switchRole(ctx.readPref(R.string.cookie))
                 else Single.just(it)
             } else Single.just("")
         return single.defaultThreads()
     }
 
-    private fun DateTime.closeToLastUpdate(ctx: Context): Boolean {
-        val lastUpdate = DateTime.parse(ctx.readPref(R.string.last_update, "2007-07-18T20:25:58.941+07:00"))
-        val bool = minusMinutes(10).isBefore(lastUpdate)
-        return bool
-    }
-
-
-    data class RandomTokens(val user: String = "",
-                            val pass: String = "",
-                            val pair1: Map<String, String> = HashMap<String, String>(),
-                            val pair2: Map<String, String> = HashMap<String, String>())
 
     fun getTokens(ctx: Context): Single<RandomTokens> {
         val loaderPattern = "<script src=\".*login/loader.*\""
@@ -379,6 +382,12 @@ object DataApi {
 
     private fun setLastUpdate(ctx: Context) =
             ctx.savePref(DateTime.now().toString(), R.string.last_update)
+
+    private fun DateTime.closeToLastUpdate(ctx: Context): Boolean {
+        val lastUpdate = DateTime.parse(ctx.readPref(R.string.last_update, "2007-07-18T20:25:58.941+07:00"))
+        val bool = minusMinutes(10).isBefore(lastUpdate)
+        return bool
+    }
 
     fun decideCauseOfFailure(it: Throwable): String {
         Crashlytics.logException(it)
