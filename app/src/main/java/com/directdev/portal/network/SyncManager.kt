@@ -8,6 +8,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import io.realm.RealmResults
 import rx.Single
 import rx.functions.Action1
+import java.util.*
 
 object SyncManager {
     val INIT = "INIT"
@@ -28,7 +29,15 @@ object SyncManager {
         DataApi.getTokens(ctx).subscribe({
             request(data, it, type)
         }, {
-            Crashlytics.log("Get tokens failed")
+            val random_num = Random().nextInt(1000000000)
+            val mFirebaseAnalytics = FirebaseAnalytics.getInstance(ctx)
+            val params = Bundle()
+            params.putInt("id", random_num)
+            params.putString("error", it.toString())
+            params.putString("message", it.message)
+            mFirebaseAnalytics.logEvent("failed_login", params)
+
+            Crashlytics.log("Get tokens failed: " + random_num)
             Crashlytics.logException(it)
             onFailure.call(it)
         })

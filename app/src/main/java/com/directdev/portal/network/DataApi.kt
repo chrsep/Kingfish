@@ -57,10 +57,15 @@ object DataApi {
     fun initializeApp(ctx: Context): Single<Unit> {
         val cookie = ctx.readPref(R.string.cookie, "")
         return api.getTerms(cookie).subscribeOnIo().flatMap { terms ->
-            Crashlytics.log("initializeApp Term Data " + terms.map { it.value }.toString())
+            Crashlytics.log("initializeApp Term Data: " + terms.map { it.value }.toString())
             Crashlytics.setInt("login_level", 1)
+            Crashlytics.setInt("term_size", terms.size)
             val gradeObservable = when (terms.size) {
-                1 -> fetchGrades(terms, cookie)[0].map { arrayOf<Any>(it) }
+                1 -> {
+                    val grades = fetchGrades(terms, cookie)
+                    Crashlytics.setInt("grade_size", grades.size)
+                    grades[0].map { arrayOf<Any>(it) }
+                }
                 else -> Single.zip(fetchGrades(terms, cookie)) { grades -> grades }
             }
             Crashlytics.setInt("login_level", 2)
