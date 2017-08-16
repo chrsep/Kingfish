@@ -48,8 +48,13 @@ class JournalFragment : Fragment() {
         val bundle = Bundle()
         bundle.putString("content", "journal")
         mFirebaseAnalytics.logEvent("content_opened", bundle)
+        try {
+            realm = Realm.getDefaultInstance()
+        } catch (err: IllegalStateException){
+            Realm.init(ctx.applicationContext)
+            realm = Realm.getDefaultInstance()
+        }
 
-        realm = Realm.getDefaultInstance()
         if (DataApi.isActive) view?.snack("Updating", Snackbar.LENGTH_INDEFINITE)
         val journalDates = setupRecycler()
         setupToolbar(journalDates)

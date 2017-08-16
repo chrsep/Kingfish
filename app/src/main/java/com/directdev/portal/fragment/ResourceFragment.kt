@@ -93,6 +93,9 @@ class ResourceFragment : Fragment(), AnkoLogger {
             Crashlytics.setInt("course size", courses.size)
             Crashlytics.log("setRecycler")
             Crashlytics.log((p1 as TextView).text.toString())
+
+            resourceEmptyPlaceholder.visibility = View.VISIBLE
+            return
         }
         val resources = realm.where(ResModel::class.java)
                 .equalTo("classNumber", selected[0].classNumber)
