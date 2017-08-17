@@ -12,16 +12,19 @@ import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.LoginEvent
 import com.directdev.portal.BuildConfig
 import com.directdev.portal.R
+import com.directdev.portal.contract.SigninContract
 import com.directdev.portal.network.DataApi
 import com.directdev.portal.network.SyncManager
 import com.directdev.portal.utils.*
 import com.google.firebase.analytics.FirebaseAnalytics
+import dagger.android.AndroidInjection
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_signin.*
 import org.jetbrains.anko.*
 import rx.functions.Action1
 import java.io.IOException
 import java.net.SocketTimeoutException
+import javax.inject.Inject
 import kotlin.properties.Delegates
 
 /**-------------------------------------------------------------------------------------------------
@@ -30,10 +33,13 @@ import kotlin.properties.Delegates
  *
  *------------------------------------------------------------------------------------------------*/
 
-class SigninActivity : AppCompatActivity(), AnkoLogger {
+class SigninActivity : AppCompatActivity(), SigninContract.View, AnkoLogger {
+
     private var mFirebaseAnalytics: FirebaseAnalytics by Delegates.notNull()
+    @Inject override lateinit var presenter: SigninContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signin)
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
@@ -43,13 +49,12 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
         troubleTextView.movementMethod = LinkMovementMethod.getInstance()
         troubleTextView.isClickable = true
 
-        val text = if (Build.VERSION.SDK_INT >= 24) {
+        troubleTextView.text = if (Build.VERSION.SDK_INT >= 24) {
             Html.fromHtml("Having trouble? Visit <a href='https://goo.gl/93vrOc'> Github Issue </a>", Html.FROM_HTML_MODE_LEGACY) // for 24 api and more
         } else {
             Html.fromHtml("Having trouble? Visit <a href='https://goo.gl/93vrOc'> Github Issue </a>") // or for older api
         }
 
-        troubleTextView.text = text
         if (DataApi.isActive) animateSigninButton()
         else deleteDbData()
         if (intent.getStringExtra("signout") != null){
@@ -162,7 +167,7 @@ class SigninActivity : AppCompatActivity(), AnkoLogger {
      *
      *--------------------------------------------------------------------------------------------*/
 
-    private fun animateSigninButton() {
+    override fun animateSigninButton() {
         runOnUiThread {
             textSwitch.showNext()
             iconSwitch.showNext()

@@ -1,10 +1,15 @@
 package com.directdev.portal
 
+import android.app.Activity
 import android.app.Application
+import com.directdev.portal.component.DaggerApplicationComponent
 import com.facebook.stetho.Stetho
 import com.uphyca.stetho_realm.RealmInspectorModulesProvider
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.HasActivityInjector
 import io.realm.Realm
 import net.danlew.android.joda.JodaTimeAndroid
+import javax.inject.Inject
 
 /**-------------------------------------------------------------------------------------------------
  *
@@ -13,14 +18,25 @@ import net.danlew.android.joda.JodaTimeAndroid
  *
  *------------------------------------------------------------------------------------------------*/
 
-class MyApplication : Application() {
+class Portal : Application() , HasActivityInjector{
+    @Inject lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Activity>
+
+    override fun activityInjector() = dispatchingAndroidInjector
+
     override fun onCreate() {
+        DaggerApplicationComponent
+                .builder()
+                .application(this)
+                .build()
+                .inject(this)
+
         JodaTimeAndroid.init(this)
         Realm.init(this)
         if (BuildConfig.DEBUG) Stetho.initialize(Stetho.newInitializerBuilder(this)
                     .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
                     .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
                     .build())
+
         super.onCreate()
     }
 }
