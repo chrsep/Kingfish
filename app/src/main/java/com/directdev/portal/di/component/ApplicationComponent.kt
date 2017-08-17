@@ -1,8 +1,8 @@
-package com.directdev.portal.component
+package com.directdev.portal.di.component
 
 import android.app.Application
 import com.directdev.portal.Portal
-import com.directdev.portal.module.ActivityModule
+import com.directdev.portal.di.module.ActivityModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjectionModule

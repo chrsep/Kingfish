@@ -1,4 +1,4 @@
-package com.directdev.portal.module
+package com.directdev.portal.di.module
 
 import com.directdev.portal.activity.SigninActivity
 import dagger.Module

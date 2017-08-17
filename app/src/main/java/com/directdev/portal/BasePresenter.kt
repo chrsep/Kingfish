@@ -1,4 +1,4 @@
-package com.directdev.portal.presenter
+package com.directdev.portal
 
 /**
  * Created by chris on 8/16/17.
