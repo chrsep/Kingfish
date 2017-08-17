@@ -2,7 +2,7 @@ package com.directdev.portal
 
 import android.app.Activity
 import android.app.Application
-import com.directdev.portal.di.component.DaggerApplicationComponent
+import com.directdev.portal.di.DaggerApplicationComponent
 import com.facebook.stetho.Stetho
 import com.uphyca.stetho_realm.RealmInspectorModulesProvider
 import dagger.android.DispatchingAndroidInjector

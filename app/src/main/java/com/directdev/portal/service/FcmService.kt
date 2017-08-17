@@ -3,7 +3,7 @@ package com.directdev.portal.service
 import android.app.PendingIntent
 import android.support.v7.app.NotificationCompat
 import com.directdev.portal.R
-import com.directdev.portal.activity.SplashActivity
+import com.directdev.portal.features.SplashActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import org.jetbrains.anko.intentFor

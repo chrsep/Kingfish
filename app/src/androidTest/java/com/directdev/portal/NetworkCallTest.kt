@@ -2,7 +2,7 @@ package com.directdev.portal
 
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import com.directdev.portal.activity.SplashActivity
+import com.directdev.portal.features.SplashActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

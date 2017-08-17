@@ -3,7 +3,7 @@ package com.directdev.portal.network
 import android.content.Context
 import android.os.Bundle
 import com.crashlytics.android.Crashlytics
-import com.directdev.portal.model.CourseModel
+import com.directdev.portal.models.CourseModel
 import com.google.firebase.analytics.FirebaseAnalytics
 import io.realm.RealmResults
 import rx.Single

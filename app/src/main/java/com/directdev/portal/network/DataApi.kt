@@ -4,7 +4,7 @@ import android.content.Context
 import com.crashlytics.android.Crashlytics
 import com.directdev.portal.BuildConfig
 import com.directdev.portal.R
-import com.directdev.portal.model.*
+import com.directdev.portal.models.*
 import com.directdev.portal.utils.*
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import io.realm.Realm

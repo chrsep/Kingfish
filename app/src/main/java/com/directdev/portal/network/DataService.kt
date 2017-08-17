@@ -1,7 +1,7 @@
 package com.directdev.portal.network
 
 import com.directdev.portal.BuildConfig
-import com.directdev.portal.model.*
+import com.directdev.portal.models.*
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
