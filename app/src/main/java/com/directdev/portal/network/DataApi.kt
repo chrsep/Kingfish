@@ -360,7 +360,7 @@ object DataApi {
             .addConverterFactory(MoshiConverterFactory.create())
             .client(if (BuildConfig.DEBUG) buildDebugClient() else buildClient())
             .baseUrl(baseUrl)
-            .build().create(DataService::class.java)
+            .build().create(BimayService::class.java)
 
     /**---------------------------------------------------------------------------------------------
      * Build OkHttpClient WITH Stheto for DEBUG

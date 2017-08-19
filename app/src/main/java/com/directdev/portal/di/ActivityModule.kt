@@ -9,6 +9,9 @@ import dagger.android.ContributesAndroidInjector
  */
 @Module
 abstract class ActivityModule{
-    @ContributesAndroidInjector(modules = arrayOf(SigninModule::class))
+    @ContributesAndroidInjector(modules = arrayOf(
+            SigninModule::class,
+            RepositoryModule::class
+    ))
     abstract fun bindSigninActivity() : SigninActivity
 }

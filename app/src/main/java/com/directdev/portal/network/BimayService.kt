@@ -11,7 +11,7 @@ import rx.Single
  * Interface for building Retrofit service.
  *------------------------------------------------------------------------------------------------*/
 
-interface DataService {
+interface BimayService {
 
     @GET("https://binusmaya.binus.ac.id/login/index.php")
     @Headers("User-Agent: Portal App/"+BuildConfig.VERSION_NAME)
