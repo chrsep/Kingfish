@@ -1,7 +1,6 @@
 package com.directdev.portal.di
 
 import com.directdev.portal.network.BimayService
-import com.directdev.portal.repositories.RemoteRepository
 import com.directdev.portal.utils.NullConverterFactory
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import dagger.Module
@@ -14,13 +13,9 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
-/**
- * Created by chris on 8/19/17.
- */
-
 @Singleton
 @Module
-class RepositoryModule {
+class NetworkModule {
     @Provides
     fun provideInterceptor() : Interceptor = StethoInterceptor()
 
@@ -43,7 +38,4 @@ class RepositoryModule {
                     .client(client)
                     .baseUrl("https://binusmaya.binus.ac.id/services/ci/index.php/")
                     .build().create(BimayService::class.java)
-
-    @Provides
-    fun provideRemoteRepository(bimayService: BimayService) = RemoteRepository(bimayService)
 }

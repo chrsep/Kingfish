@@ -12,7 +12,7 @@
             android:summary="Sign Out from Portal">
             <intent
                 android:targetPackage="com.directdev.portal"
-                android:targetClass="com.directdev.portal.activity.SigninActivity" >
+                android:targetClass="com.directdev.portal.features.signin.SigninActivity" >
                 <extra
                     android:name="signout"
                     android:value="signout" />

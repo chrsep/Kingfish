@@ -102,6 +102,7 @@ dependencies {
     compile 'com.google.dagger:dagger-android-support:2.11'
     kapt 'com.google.dagger:dagger-android-processor:2.11'
     testCompile 'junit:junit:4.12'
+    testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
     androidTestCompile 'com.android.support.test:runner:0.6-alpha'
     androidTestCompile 'com.android.support.test:rules:0.6-alpha'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.3-alpha'

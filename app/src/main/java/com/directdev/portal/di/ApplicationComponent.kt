@@ -6,9 +6,6 @@ import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjectionModule
 
-/**
- * Created by chris on 8/17/17.
- */
 @Component(modules = arrayOf(
         AndroidInjectionModule::class,
         ActivityModule::class

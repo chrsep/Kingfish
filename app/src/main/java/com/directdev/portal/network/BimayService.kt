@@ -22,6 +22,16 @@ interface BimayService {
             "Origin: https://binusmaya.binus.ac.id",
             "User-Agent: Portal App/"+BuildConfig.VERSION_NAME)
     @POST("https://binusmaya.binus.ac.id/login/sys_login.php")
+    fun signIn2(@Header("Cookie") cookie: String,
+               @FieldMap fields: Map<String, String>,
+               @Field("ctl00\$ContentPlaceHolder1\$SubmitButtonBM") button: String = "Login")
+            : Single<Response<String>>
+
+    @FormUrlEncoded
+    @Headers("Referer: https://binusmaya.binus.ac.id/login/",
+            "Origin: https://binusmaya.binus.ac.id",
+            "User-Agent: Portal App/"+BuildConfig.VERSION_NAME)
+    @POST("https://binusmaya.binus.ac.id/login/sys_login.php")
     fun signIn(@Header("Cookie") cookie: String,
                @FieldMap uid: Map<String, String>,
                @FieldMap pass: Map<String, String>,
