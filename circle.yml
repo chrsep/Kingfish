@@ -14,8 +14,6 @@ dependencies:
 test:
   override:
     # start the emulator
-    - ./gradlew test
-
     - emulator -avd circleci-android24 -no-window:
         background: true
         parallel: true
