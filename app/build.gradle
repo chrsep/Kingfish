@@ -10,6 +10,7 @@ buildscript {
     dependencies {
         //noinspection GradleDynamicVersion
         classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'com.dicedmelon.gradle:jacoco-android:0.1.2'
     }
 }
 apply plugin: 'com.android.application'
@@ -19,6 +20,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'realm-android'
 apply plugin: 'io.fabric'
+apply plugin: 'jacoco-android'
 
 android {
     compileSdkVersion 26
@@ -42,6 +44,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             versionNameSuffix '-dev'
+            testCoverageEnabled true
         }
     }
     sourceSets {
