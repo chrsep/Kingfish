@@ -1,14 +1,14 @@
 package com.directdev.portal.interactors
 
-import com.directdev.portal.network.BimayApi
+import com.directdev.portal.network.NetworkHelper
 import retrofit2.Response
 import rx.Single
 
 /**-------------------------------------------------------------------------------------------------
- * Interactor that handles everything related to authenticating with Binusmaya
+ * Handles everything related to authenticating with Binusmaya
  *------------------------------------------------------------------------------------------------*/
 
-class AuthInteractor(val bimayApi: BimayApi) {
+class AuthInteractor(val bimayApi: NetworkHelper) {
     private val loaderPattern = "<script src=\".*login/loader.*\""
     private val fieldsPattern = "<input type=\"hidden\" name=\".*\" value=\".*\" />"
     private val usernamePattern = "<input type=\"text\" name=\".*placeholder=\"Username\""
@@ -19,29 +19,31 @@ class AuthInteractor(val bimayApi: BimayApi) {
     fun execute(username: String, password: String): Single<Response<String>> {
         var indexHtml = ""
         var cookie = ""
-
         val request = if (isRequesting) request else bimayApi.getIndexHtml().flatMap {
             indexHtml = it.body().string()
             cookie = it.headers().get("Set-Cookie") ?: ""
+
             val result = Regex(loaderPattern).find(indexHtml)?.value ?: ""
             val serial = decodeHtml(result.substring(40, result.length - 1))
+
             bimayApi.getRandomizedFields(cookie, serial)
         }.flatMap {
             val fieldsMap = constructFields(indexHtml, it.body().string(), username, password)
             bimayApi.authenticate(cookie, fieldsMap)
-        }.doAfterTerminate { isRequesting = false }
+        }.doAfterTerminate {
+            isRequesting = false
+        }
         isRequesting = true
 
         return request
     }
 
     /*----------------------------------------------------------------------------------------------
-    * To login, 4 fields are required:
-    * 1. Password field: randomized key, password as value (extracted from login page's Index.html)
-    * 2. Username field: randomized key, username as value (extracted from login page's Index.html)
-    * 3 & 4. Randomized field: randomized key and value  (extracted from  loader.php, which returned
-    * a js file)
-    *--------------------------------------------------------------------------------------------*/
+     * To login, 4 fields are required:
+     * 1. Password field: randomized key, password as value (extracted from login page's Index.html)
+     * 2. Username field: randomized key, username as value (extracted from login page's Index.html)
+     * 3&4. Field with randomized key and value  (extracted from  loader.php, which returned a js file)
+     *--------------------------------------------------------------------------------------------*/
 
     private fun constructFields(indexHtml: String, loaderJs: String, username: String, password: String): HashMap<String, String> {
         val user = Regex(usernamePattern).find(indexHtml)?.value ?: ""
