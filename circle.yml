@@ -26,4 +26,6 @@ test:
     # copy the test results to the test results directory.
     - cp -r ~/Kingfish/app/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
 
+    - ./gradlew jacocoTestReport
+
     - bash <(curl -s https://codecov.io/bash)
