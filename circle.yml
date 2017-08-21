@@ -14,6 +14,8 @@ dependencies:
 test:
   override:
     # start the emulator
+    - ./gradlew test
+
     - emulator -avd circleci-android24 -no-window:
         background: true
         parallel: true
@@ -22,7 +24,6 @@ test:
     # run tests  against the emulator.
     - ./gradlew connectedAndroidTest
 
-    - ./gradlew test
     # copy the build outputs to artifacts
     - cp -r ~/Kingfish/app/build/outputs $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.

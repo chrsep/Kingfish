@@ -4,11 +4,10 @@ import com.directdev.portal.network.NetworkHelper
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.then
 import okhttp3.MediaType
 import okhttp3.ResponseBody
-import org.junit.Before
 import org.junit.Test
-import org.mockito.MockitoAnnotations
 import retrofit2.Response
 import rx.Single
 
@@ -17,25 +16,22 @@ import rx.Single
  *------------------------------------------------------------------------------------------------*/
 
 class AuthInteractorUnitTest {
-    lateinit var authInteractor: AuthInteractor
-
-    @Before
-    fun setUp() {
-        MockitoAnnotations.initMocks(this)
-
-        val mock: NetworkHelper = mock {
-            on { getIndexHtml() } doReturn Single.just(Response.success(ResponseBody.create(MediaType.parse("text/html"), indexHtml)))
-            on { getRandomizedFields(any(), any()) } doReturn Single.just(Response.success(ResponseBody.create(MediaType.parse("text/js"), loaderJS)))
-            on { authenticate(any(), any()) } doReturn Single.just(Response.success("Success"))
-
-        }
-
-        authInteractor = AuthInteractor(mock)
-    }
 
     @Test
     fun testExecute() {
+        // Given
+        val bimayApi: NetworkHelper = mock {
+            on { getIndexHtml() } doReturn Single.just(Response.success(ResponseBody.create(MediaType.parse("text/html"), indexHtml)))
+            on { getRandomizedFields(any(), any()) } doReturn Single.just(Response.success(ResponseBody.create(MediaType.parse("text/js"), loaderJS)))
+            on { authenticate(any(), any()) } doReturn Single.just(Response.success("Success"))
+        }
+        val authInteractor = AuthInteractor(bimayApi)
+
+        // When
         authInteractor.execute("test", "test").subscribe({}, { throw it })
+
+        // Then
+        then(bimayApi)
     }
 
     private val indexHtml = """
