@@ -21,6 +21,8 @@ test:
     - circle-android wait-for-boot
     # run tests  against the emulator.
     - ./gradlew connectedAndroidTest
+
+    - ./gradlew test
     # copy the build outputs to artifacts
     - cp -r ~/Kingfish/app/build/outputs $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.
