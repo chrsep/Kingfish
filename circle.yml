@@ -1,6 +1,7 @@
 machine:
   environment:
-    _JAVA_OPTIONS: "-Xms256m -Xmx1280m -XX:MaxPermSize=350m"
+    _JAVA_OPTIONS: "-Xms512m -Xmx1024m -XX:MaxPermSize=350m"
+    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
 dependencies:
   pre:
     - chmod +x gradlew
