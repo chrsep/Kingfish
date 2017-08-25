@@ -38,7 +38,7 @@ class SigninActivity : AppCompatActivity(), SigninContract.View, AnkoLogger {
     override fun getPassword() = formPass.text.toString()
 
     override fun showAlert(message: String, title: String) {
-        alert(message, title) { negativeButton("Ok, Got it"){} }.show()
+        alert(message, title) { negativeButton("Ok, Got it") {} }.show()
     }
 
     override fun logSignout() = fbAnalytics.logEvent("logout", Bundle())
@@ -64,83 +64,61 @@ class SigninActivity : AppCompatActivity(), SigninContract.View, AnkoLogger {
         }
     }
 
-    private fun signIn() {
+    override fun hideKeyboard() {
         inputMethodManager.hideSoftInputFromWindow(signInCard.windowToken, 0)
-        if (!connectivityManager.isNetworkAvailable()) {
-            signinActivity.snack("No Network Connection")
-            return
-        }
+    }
+
+    override fun checkNetwork() = connectivityManager.isNetworkAvailable()
+
+    override fun showSnack(message: String) = signinActivity.snack(message)
+
+    private fun signIn() {
         if (DataApi.isActive) return
         saveUsernameAndPassword()
-        animateSigninButton()
         signInCallToServer()
     }
 
     private fun signInCallToServer() {
         SyncManager.sync(ctx, SyncManager.INIT, Action {
-            // An anonymous function, called On login success
-            //
-            // Analytic data to tell us where our app is popular, Ex. of data sent
-            // { undergraduate,Computer Science,18(generation) }
-            //
-            successLoginEvent()
             savePref(true, R.string.isLoggedIn)
-            startActivity<MainActivity>()
         }, Action {
-            // TODO: This is a hack
-            val it = Exception()
-            // Another anonymous function, called On login failure
-            failedLoginEvent(it)
-            animateSigninButton()
             savePref(false, R.string.isLoggedIn)
             savePref(false, R.string.isStaff)
-
-            //
-            // Shows a SnackBar telling user what went wrong with their login attempt
-            //
-
-            signinActivity.snack(DataApi.decideCauseOfFailure(it), Snackbar.LENGTH_INDEFINITE) {
-                when (it) {
-                    is SocketTimeoutException -> action("retry", Color.YELLOW, { signIn() })
-                    is IOException -> action("retry as staff", Color.YELLOW, {
-                        savePref(true, R.string.isStaff)
-                        signIn()
-                    })
-                }
-            }
         })
     }
 
-    override fun showError(err : Throwable) {
-             signinActivity.snack(DataApi.decideCauseOfFailure(err), Snackbar.LENGTH_INDEFINITE) {
-                when (err) {
-                    is SocketTimeoutException -> action("retry", Color.YELLOW, { signIn() })
-                    is IOException -> action("retry as staff", Color.YELLOW, {
-                        savePref(true, R.string.isStaff)
-                        signIn()
-                    })
-                }
+    override fun navigateToMainActivity() = startActivity<MainActivity>()
+
+    override fun showError(err: Throwable) {
+        signinActivity.snack(err.generateMessage(), Snackbar.LENGTH_INDEFINITE) {
+            when (err) {
+                is SocketTimeoutException -> action("retry", Color.YELLOW, { signIn() })
+                is IOException -> action("retry as staff", Color.YELLOW, {
+                    savePref(true, R.string.isStaff)
+                    signIn()
+                })
             }
+        }
     }
 
-    fun successLoginEvent() {
+    override fun logSuccessSignin() {
         fbAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, Bundle())
-        fbAnalytics.setUserProperty("degree", this.readPref(R.string.major, ""))
-        fbAnalytics.setUserProperty("major", this.readPref(R.string.degree, ""))
-        fbAnalytics.setUserProperty("generation", this.readPref(R.string.nim, "").substring(0, 3))
+        fbAnalytics.setUserProperty("degree", readPref(R.string.major, ""))
+        fbAnalytics.setUserProperty("major", readPref(R.string.degree, ""))
+        fbAnalytics.setUserProperty("generation", readPref(R.string.nim, "").substring(0, 3))
         Answers.getInstance().logLogin(LoginEvent()
                 .putSuccess(true)
-                .putCustomAttribute("Degree", this.readPref(R.string.major, ""))
-                .putCustomAttribute("Major", this.readPref(R.string.degree, ""))
-                .putCustomAttribute("Generation", this.readPref(R.string.nim, "").substring(0, 3)))
+                .putCustomAttribute("Degree", readPref(R.string.major, ""))
+                .putCustomAttribute("Major", readPref(R.string.degree, ""))
+                .putCustomAttribute("Generation", readPref(R.string.nim, "").substring(0, 3)))
     }
 
-    fun failedLoginEvent(it: Throwable) {
+    override fun logFailedSignin(err: Throwable) {
         fbAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, Bundle())
         Answers.getInstance().logLogin(LoginEvent()
                 .putSuccess(false)
-                .putCustomAttribute("Error Message", it.message)
-                .putCustomAttribute("Error Log", it.toString())
+                .putCustomAttribute("Error Message", err.message)
+                .putCustomAttribute("Error Log", err.toString())
                 .putCustomAttribute("Build Number", BuildConfig.VERSION_CODE))
     }
 

@@ -7,6 +7,7 @@ import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
 import android.view.KeyEvent
 import android.view.View
+import com.crashlytics.android.Crashlytics
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -15,8 +16,14 @@ import org.jetbrains.anko.alert
 import org.jetbrains.anko.runOnUiThread
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
+import retrofit2.HttpException
+import java.io.IOException
+import java.net.ConnectException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import java.text.NumberFormat
 import java.util.*
+import javax.net.ssl.SSLException
 
 /*--------------------------------------------------------------------------------------------------
  *
@@ -107,7 +114,7 @@ fun Snackbar.action(action: String, color: Int? = null, listener: (View) -> Unit
  *------------------------------------------------------------------------------------------------*/
 
 fun View.onEnter(callback: () -> Unit) {
-    setOnKeyListener {  _, _, keyEvent ->
+    setOnKeyListener { _, _, keyEvent ->
         if (keyEvent?.action == KeyEvent.ACTION_DOWN && keyEvent.keyCode == KeyEvent.KEYCODE_ENTER)
             callback()
         false
@@ -154,4 +161,31 @@ fun <T> List<List<T>>.flatten(): MutableList<T> {
     val newList = mutableListOf<T>()
     forEach { newList.addAll(it) }
     return newList
+}
+
+fun Throwable.generateMessage(): String {
+    Crashlytics.logException(this)
+    return when (this) {
+        is SocketTimeoutException -> "Request Timed Out"
+        is HttpException -> {
+            Crashlytics.log("HttpException")
+            Crashlytics.logException(this)
+            "Binusmaya's server seems to be offline, try again later"
+        }
+        is ConnectException -> "Failed to connect to Binusmaya"
+        is SSLException -> "Failed to connect to Binusmaya"
+        is UnknownHostException -> "Failed to connect to Binusmaya"
+        is IOException -> "Failed to authenticate with Bimay, wrong pass/username?"
+        is NoSuchMethodException -> "Captcha cancelled"
+        is IndexOutOfBoundsException -> {
+            Crashlytics.log("IndexOutOfBoundsException")
+            Crashlytics.logException(this)
+            "Binusmaya server is acting weird, try again later"
+        }
+        else -> {
+            Crashlytics.log("Unknown CrashOnSignIn")
+            Crashlytics.logException(this)
+            "We have no idea what went wrong, but we have received the error log, we'll look into this"
+        }
+    }
 }

@@ -13,6 +13,12 @@ interface SigninContract {
         fun getUsername(): String
         fun getPassword(): String
         fun showError(err: Throwable)
+        fun logSuccessSignin()
+        fun logFailedSignin(err: Throwable)
+        fun navigateToMainActivity()
+        fun hideKeyboard()
+        fun checkNetwork() : Boolean
+        fun showSnack(message: String)
     }
 
     interface Presenter: BasePresenter {

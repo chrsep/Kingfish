@@ -12,13 +12,20 @@ class SigninPresenter @Inject constructor(
         val authInteractor: AuthInteractor
 ) : SigninContract.Presenter {
     override fun signin() {
+        if (!view.checkNetwork()) {
+            view.showSnack("No Network Connection")
+            return
+        }
         authInteractor.execute(view.getUsername(), view.getPassword()).doOnSubscribe {
             view.animateSigninButton()
+            view.hideKeyboard()
         }.subscribe({
-            view.animateSigninButton()
+            view.logSuccessSignin()
+            view.navigateToMainActivity()
         }, {
-            view.animateSigninButton()
+            view.logFailedSignin(it)
             view.showError(it)
+            view.animateSigninButton()
         })
     }
 
@@ -28,8 +35,5 @@ class SigninPresenter @Inject constructor(
         if (intent.getStringExtra("signout") != null) view.logSignout()
         // TODO: Clean DB should be done by an interactor instead of by a view
         view.cleanDb()
-    }
-
-    override fun start() {
     }
 }
