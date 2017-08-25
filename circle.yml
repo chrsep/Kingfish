@@ -1,32 +1,27 @@
-machine:
-  environment:
-    _JAVA_OPTIONS: "-Xms512m -Xmx1024m -XX:MaxPermSize=350m"
-    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
-dependencies:
-  pre:
-    - chmod +x gradlew
-    - echo y | android update sdk --no-ui --all --filter build-tools-25.0.2
-    - echo y | android update sdk --no-ui --all --filter extra-google-m2repository
-    - mkdir "$ANDROID_HOME/licenses" || true
-    - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
-    - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
-
-test:
-  override:
-    - ./gradlew test
-    # start the emulator
-    - emulator -avd circleci-android24 -no-window:
-        background: true
-        parallel: true
-    # wait for it to have booted
-    - circle-android wait-for-boot
-    # run tests  against the emulator.
-    - ./gradlew connectedAndroidTest
-    # copy the build outputs to artifacts
-    - cp -r ~/Kingfish/app/build/outputs $CIRCLE_ARTIFACTS
-    # copy the test results to the test results directory.
-    - cp -r ~/Kingfish/app/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
-    # generate Jacoco Test Report
-    - ./gradlew jacocoTestReport
-    # upload test report
-    - bash <(curl -s https://codecov.io/bash)
+version: 2
+jobs:
+  build:
+    working_directory: ~/Kingfish
+    docker:
+      - image: circleci/android:api-25-alpha
+    environment:
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - checkout
+      - restore_cache:
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Run Tests
+          command: ./gradlew lint test
+      - store_artifacts:
+          path: app/build/reports
+          destination: reports
+      - store_test_results:
+          path: app/build/test-results

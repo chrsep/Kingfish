@@ -1,7 +1,7 @@
 package com.directdev.portal
 
 import android.app.Activity
-import android.app.Application
+import android.support.multidex.MultiDexApplication
 import com.directdev.portal.di.DaggerApplicationComponent
 import com.facebook.stetho.Stetho
 import com.uphyca.stetho_realm.RealmInspectorModulesProvider
@@ -18,7 +18,7 @@ import javax.inject.Inject
  *
  *------------------------------------------------------------------------------------------------*/
 
-class Portal : Application() , HasActivityInjector{
+class Portal : MultiDexApplication(), HasActivityInjector {
     @Inject lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Activity>
 
     override fun activityInjector() = dispatchingAndroidInjector
