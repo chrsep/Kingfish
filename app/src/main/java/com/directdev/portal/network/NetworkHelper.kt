@@ -12,4 +12,5 @@ interface NetworkHelper {
     fun getIndexHtml(): Single<Response<ResponseBody>>
     fun getRandomizedFields(cookie: String, serial: String): Single<Response<ResponseBody>>
     fun authenticate(cookie: String, fieldMap: HashMap<String, String>): Single<Response<String>>
+    fun switchRole(cookie: String): Single<Response<ResponseBody>>
 }

@@ -13,4 +13,6 @@ class BimayApi @Inject constructor(override val bimayService: BimayService) : Ne
 
     override fun authenticate(cookie: String, fieldMap: HashMap<String, String>) =
             bimayService.signIn2(cookie, fieldMap).subscribeOn(Schedulers.io())
+
+    override fun switchRole(cookie: String) = bimayService.switchRole(cookie)
 }

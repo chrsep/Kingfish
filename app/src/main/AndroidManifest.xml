@@ -25,7 +25,7 @@
             android:value="e2f91483c94217ff3e141cda751f285d0415b76f" />
 
         <activity
-            android:name=".features.signin.SigninActivity"
+            android:name=".features.signin.SignInActivity"
             android:noHistory="true"
             android:launchMode="singleTop">
             <intent-filter>

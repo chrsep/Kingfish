@@ -62,3 +62,5 @@
 -dontwarn okhttp3.*
 
 -dontwarn com.roughike.bottombar.**
+
+-dontwarn com.google.errorprone.annotations.*

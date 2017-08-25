@@ -1,6 +1,6 @@
 package com.directdev.portal.di
 
-import com.directdev.portal.features.signin.SigninActivity
+import com.directdev.portal.features.signin.SignInActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -8,7 +8,9 @@ import dagger.android.ContributesAndroidInjector
 abstract class ActivityModule{
     @ContributesAndroidInjector(modules = arrayOf(
             SigninModule::class,
-            NetworkModule::class
+            NetworkModule::class,
+            FirebaseAnalyticsModule::class,
+            RealmModule::class
     ))
-    abstract fun bindSigninActivity() : SigninActivity
+    abstract fun bindSigninActivity(): SignInActivity
 }

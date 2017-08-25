@@ -1,16 +1,20 @@
 package com.directdev.portal.di
 
-import com.directdev.portal.features.signin.SigninActivity
-import com.directdev.portal.features.signin.SigninContract
-import com.directdev.portal.features.signin.SigninPresenter
+import android.content.Context
+import com.directdev.portal.features.signin.SignInActivity
+import com.directdev.portal.features.signin.SignInContract
+import com.directdev.portal.features.signin.SignInPresenter
 import dagger.Module
 import dagger.Provides
 
 @Module
 class SigninModule {
     @Provides
-    fun providePresenter(signinPresenter: SigninPresenter): SigninContract.Presenter = signinPresenter
+    fun providePresenter(signInPresenter: SignInPresenter): SignInContract.Presenter = signInPresenter
 
     @Provides
-    fun provideView(activity: SigninActivity): SigninContract.View = activity
+    fun provideView(activity: SignInActivity): SignInContract.View = activity
+
+    @Provides
+    fun provideContext(activity: SignInActivity): Context = activity
 }

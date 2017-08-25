@@ -249,7 +249,7 @@ object DataApi {
                     fields[3].substring(6, fields[3].length - 1).removeHtmlEncoding())
             pair2.put(fields[6].substring(6, fields[6].length - 1).removeHtmlEncoding(),
                     fields[7].substring(6, fields[7].length - 1).removeHtmlEncoding())
-            ctx.savePref(cookie, R.string.cookie)
+            ctx.savePref(R.string.cookie, cookie)
             RandomTokens(userStr, passStr, pair1, pair2)
         }.defaultThreads()
     }
@@ -288,11 +288,11 @@ object DataApi {
     private fun saveProfile(ctx: Context, response: ResponseBody) {
         try {
             val profile = JSONObject(response.string()).getJSONArray("Profile").getJSONObject(0)
-            ctx.savePref(profile.getString("ACAD_PROG_DESCR"), R.string.major)
-            ctx.savePref(profile.getString("ACAD_CAREER_DESCR"), R.string.degree)
-            ctx.savePref(profile.getString("BIRTHDATE"), R.string.birthday)
-            ctx.savePref(profile.getString("NAMA"), R.string.name)
-            ctx.savePref(profile.getString("NIM"), R.string.nim)
+            ctx.savePref(R.string.major, profile.getString("ACAD_PROG_DESCR"))
+            ctx.savePref(R.string.degree, profile.getString("ACAD_CAREER_DESCR"))
+            ctx.savePref(R.string.birthday, profile.getString("BIRTHDATE"))
+            ctx.savePref(R.string.name, profile.getString("NAMA"))
+            ctx.savePref(R.string.nim, profile.getString("NIM"))
         } catch (e: JSONException) {
             Crashlytics.log(response.string())
             Crashlytics.logException(e)
@@ -388,7 +388,7 @@ object DataApi {
             .build()
 
     private fun setLastUpdate(ctx: Context) =
-            ctx.savePref(DateTime.now().toString(), R.string.last_update)
+            ctx.savePref(R.string.last_update, DateTime.now().toString())
 
     private fun DateTime.closeToLastUpdate(ctx: Context): Boolean {
         val lastUpdate = DateTime.parse(ctx.readPref(R.string.last_update, "2007-07-18T20:25:58.941+07:00"))

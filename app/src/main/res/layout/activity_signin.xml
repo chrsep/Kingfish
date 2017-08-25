@@ -89,7 +89,7 @@
                     android:layout_toLeftOf="@+id/emailExtension">
 
                     <android.support.design.widget.TextInputEditText
-                        android:id="@+id/formUsername"
+                        android:id="@+id/usernameField"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Username"
@@ -107,7 +107,7 @@
                     android:layout_marginTop="8dp">
 
                     <android.support.design.widget.TextInputEditText
-                        android:id="@+id/formPass"
+                        android:id="@+id/passwordField"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Password"
@@ -116,7 +116,7 @@
                 </android.support.design.widget.TextInputLayout>
 
                 <TextView
-                    android:id="@+id/troubleTextView"
+                    android:id="@+id/githubIssueLink"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
@@ -124,7 +124,7 @@
                     android:textAlignment="center" />
 
                 <RelativeLayout
-                    android:id="@+id/formSignIn"
+                    android:id="@+id/signInButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/tilFormPassword"
@@ -138,7 +138,7 @@
                     android:padding="16dp">
 
                     <ViewSwitcher
-                        android:id="@+id/textSwitch"
+                        android:id="@+id/textSwitcher"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
@@ -165,12 +165,12 @@
                     </ViewSwitcher>
 
                     <ViewSwitcher
-                        android:id="@+id/iconSwitch"
+                        android:id="@+id/iconSwitcher"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentRight="true"
-                        android:layout_alignTop="@+id/textSwitch"
+                        android:layout_alignTop="@+id/textSwitcher"
                         android:layout_centerHorizontal="true"
                         android:inAnimation="@android:anim/slide_in_left"
                         android:outAnimation="@android:anim/slide_out_right">

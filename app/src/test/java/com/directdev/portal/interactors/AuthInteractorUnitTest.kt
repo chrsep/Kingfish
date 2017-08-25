@@ -1,6 +1,8 @@
 package com.directdev.portal.interactors
 
 import com.directdev.portal.network.NetworkHelper
+import com.directdev.portal.repositories.FlagRepository
+import com.directdev.portal.repositories.UserCredRepository
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
@@ -24,7 +26,9 @@ class AuthInteractorUnitTest {
             on { getRandomizedFields(any(), any()) } doReturn Single.just(Response.success(ResponseBody.create(MediaType.parse("text/js"), loaderJS)))
             on { authenticate(any(), any()) } doReturn Single.just(Response.success("Success"))
         }
-        val authInteractor = AuthInteractor(bimayApi)
+        val userCredRepo: UserCredRepository = mock { }
+        val flagRepo: FlagRepository = mock { }
+        val authInteractor = AuthInteractor(bimayApi, userCredRepo, flagRepo)
 
         // When
         authInteractor.execute("test", "test").subscribe({}, { throw it })

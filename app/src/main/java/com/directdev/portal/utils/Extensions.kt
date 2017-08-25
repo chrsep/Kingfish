@@ -39,7 +39,7 @@ import javax.net.ssl.SSLException
  *------------------------------------------------------------------------------------------------*/
 
 @SuppressLint("CommitPrefEdits")
-fun Context.savePref(data: Any, @StringRes id: Int) {
+fun Context.savePref(@StringRes id: Int, data: Any): Context {
     val key = getString(id)
     val editor = getSharedPreferences("com.kingfish", Context.MODE_PRIVATE).edit()
     when (data) {
@@ -48,9 +48,10 @@ fun Context.savePref(data: Any, @StringRes id: Int) {
         is Float -> editor.putFloat(key, data)
         is Int -> editor.putInt(key, data)
         is Long -> editor.putLong(key, data)
-        else -> return
+        else -> return this
     }
     editor.commit()
+    return this
 }
 
 /**-------------------------------------------------------------------------------------------------
@@ -164,28 +165,30 @@ fun <T> List<List<T>>.flatten(): MutableList<T> {
 }
 
 fun Throwable.generateMessage(): String {
-    Crashlytics.logException(this)
-    return when (this) {
+    val message = when (this) {
         is SocketTimeoutException -> "Request Timed Out"
-        is HttpException -> {
-            Crashlytics.log("HttpException")
-            Crashlytics.logException(this)
-            "Binusmaya's server seems to be offline, try again later"
-        }
+        is HttpException -> "Binusmaya's server seems to be offline, try again later"
         is ConnectException -> "Failed to connect to Binusmaya"
         is SSLException -> "Failed to connect to Binusmaya"
         is UnknownHostException -> "Failed to connect to Binusmaya"
-        is IOException -> "Failed to authenticate with Bimay, wrong pass/username?"
         is NoSuchMethodException -> "Captcha cancelled"
-        is IndexOutOfBoundsException -> {
-            Crashlytics.log("IndexOutOfBoundsException")
-            Crashlytics.logException(this)
-            "Binusmaya server is acting weird, try again later"
-        }
+        is IndexOutOfBoundsException -> "Binusmaya server is acting weird, try again later"
+        is SigninException -> getMessage(message ?: "")
+        is IOException -> "Binusmaya is giving us weird data, contact us on GitHub (Setting -> Issue Tracker)"
         else -> {
-            Crashlytics.log("Unknown CrashOnSignIn")
-            Crashlytics.logException(this)
+            Crashlytics.log("Unknown Crash")
             "We have no idea what went wrong, but we have received the error log, we'll look into this"
         }
     }
+    Crashlytics.logException(this)
+    return message
+}
+
+fun getMessage(message: String): String = when (message) {
+    "../login/?error=5" -> "User role haven't been mapped"
+    "../login/?error=4" -> "Invalid captcha"
+    "../login/?error=3" -> "Username/Password must be filled"
+    "../login/?error=2" -> "User not found"
+    "../login/?error=1" -> "Invalid username/password"
+    else -> "We have no idea what went wrong, but we have received the error log, we'll look into this"
 }
