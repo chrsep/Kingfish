@@ -1,14 +1,15 @@
 package com.directdev.portal.interactors
 
 import com.directdev.portal.network.NetworkHelper
+import io.reactivex.Single
 import retrofit2.Response
-import rx.Single
+import javax.inject.Inject
 
 /**-------------------------------------------------------------------------------------------------
  * Handles everything related to authenticating with Binusmaya
  *------------------------------------------------------------------------------------------------*/
 
-class AuthInteractor(val bimayApi: NetworkHelper) {
+class AuthInteractor @Inject constructor(val bimayApi: NetworkHelper) {
     private val loaderPattern = "<script src=\".*login/loader.*\""
     private val fieldsPattern = "<input type=\"hidden\" name=\".*\" value=\".*\" />"
     private val usernamePattern = "<input type=\"text\" name=\".*placeholder=\"Username\""
@@ -19,22 +20,22 @@ class AuthInteractor(val bimayApi: NetworkHelper) {
     fun execute(username: String, password: String): Single<Response<String>> {
         var indexHtml = ""
         var cookie = ""
-        val request = if (isRequesting) request else bimayApi.getIndexHtml().flatMap {
-            indexHtml = it.body().string()
+        request = if (isRequesting) request else bimayApi.getIndexHtml().flatMap {
+            indexHtml = it.body()?.string() ?: ""
             cookie = it.headers().get("Set-Cookie") ?: ""
 
             val result = Regex(loaderPattern).find(indexHtml)?.value ?: ""
             val serial = decodeHtml(result.substring(40, result.length - 1))
 
+            Thread.sleep(2000)
             bimayApi.getRandomizedFields(cookie, serial)
         }.flatMap {
-            val fieldsMap = constructFields(indexHtml, it.body().string(), username, password)
+            val fieldsMap = constructFields(indexHtml, it.body()?.string() ?: "", username, password)
             bimayApi.authenticate(cookie, fieldsMap)
         }.doAfterTerminate {
             isRequesting = false
         }
         isRequesting = true
-
         return request
     }
 

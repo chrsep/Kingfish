@@ -18,10 +18,10 @@ import com.directdev.portal.network.SyncManager
 import com.directdev.portal.utils.*
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.android.AndroidInjection
+import io.reactivex.functions.Action
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_signin.*
 import org.jetbrains.anko.*
-import rx.functions.Action1
 import java.io.IOException
 import java.net.SocketTimeoutException
 import javax.inject.Inject
@@ -33,6 +33,15 @@ import javax.inject.Inject
  *------------------------------------------------------------------------------------------------*/
 
 class SigninActivity : AppCompatActivity(), SigninContract.View, AnkoLogger {
+    override fun getUsername() = formUsername.text.toString()
+
+    override fun getPassword() = formPass.text.toString()
+
+    override fun showAlert(message: String, title: String) {
+        alert(message, title) { negativeButton("Ok, Got it"){} }.show()
+    }
+
+    override fun logSignout() = fbAnalytics.logEvent("logout", Bundle())
 
     private lateinit var fbAnalytics: FirebaseAnalytics
     @Inject override lateinit var presenter: SigninContract.Presenter
@@ -40,27 +49,19 @@ class SigninActivity : AppCompatActivity(), SigninContract.View, AnkoLogger {
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_signin)
         fbAnalytics = FirebaseAnalytics.getInstance(this)
+        presenter.onCreate(intent)
+        setContentView(R.layout.activity_signin)
         mainBanner.typeface = Typeface.createFromAsset(assets, "fonts/SpaceMono-BoldItalic.ttf")
-        formSignIn.onClick { signIn() }
-        formPass.onEnter { signIn() }
+        formSignIn.setOnClickListener { presenter.signin() }
+        formPass.onEnter { presenter.signin() }
         troubleTextView.movementMethod = LinkMovementMethod.getInstance()
         troubleTextView.isClickable = true
-
         troubleTextView.text = if (Build.VERSION.SDK_INT >= 24) {
             Html.fromHtml("Having trouble? Visit <a href='https://goo.gl/93vrOc'> Github Issue </a>", Html.FROM_HTML_MODE_LEGACY) // for 24 api and more
         } else {
             Html.fromHtml("Having trouble? Visit <a href='https://goo.gl/93vrOc'> Github Issue </a>") // or for older api
         }
-
-        if (DataApi.isActive) animateSigninButton()
-        else deleteDbData()
-        if (intent.getStringExtra("signout") != null){
-            val bundle = Bundle()
-            fbAnalytics.logEvent("logout", bundle)
-        }
-        getNotif()
     }
 
     private fun signIn() {
@@ -76,25 +77,20 @@ class SigninActivity : AppCompatActivity(), SigninContract.View, AnkoLogger {
     }
 
     private fun signInCallToServer() {
-        fbAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, Bundle())
-        SyncManager.sync(ctx, SyncManager.INIT, Action1 {
+        SyncManager.sync(ctx, SyncManager.INIT, Action {
             // An anonymous function, called On login success
             //
             // Analytic data to tell us where our app is popular, Ex. of data sent
             // { undergraduate,Computer Science,18(generation) }
             //
-
-            fbAnalytics.setUserProperty("degree", this.readPref(R.string.major, ""))
-            fbAnalytics.setUserProperty("major", this.readPref(R.string.degree, ""))
-            fbAnalytics.setUserProperty("generation", this.readPref(R.string.nim, "").substring(0, 3))
-            Answers.getInstance().logLogin(successLoginEvent())
-
+            successLoginEvent()
             savePref(true, R.string.isLoggedIn)
             startActivity<MainActivity>()
-        }, Action1 {
+        }, Action {
+            // TODO: This is a hack
+            val it = Exception()
             // Another anonymous function, called On login failure
-            Answers.getInstance().logLogin(failedLoginEvent(it))
-
+            failedLoginEvent(it)
             animateSigninButton()
             savePref(false, R.string.isLoggedIn)
             savePref(false, R.string.isStaff)
@@ -115,25 +111,37 @@ class SigninActivity : AppCompatActivity(), SigninContract.View, AnkoLogger {
         })
     }
 
-    private fun successLoginEvent() = LoginEvent()
-            .putSuccess(true)
-            .putCustomAttribute("Degree", this.readPref(R.string.major, ""))
-            .putCustomAttribute("Major", this.readPref(R.string.degree, ""))
-            .putCustomAttribute("Generation", this.readPref(R.string.nim, "").substring(0, 3))
+    override fun showError(err : Throwable) {
+             signinActivity.snack(DataApi.decideCauseOfFailure(err), Snackbar.LENGTH_INDEFINITE) {
+                when (err) {
+                    is SocketTimeoutException -> action("retry", Color.YELLOW, { signIn() })
+                    is IOException -> action("retry as staff", Color.YELLOW, {
+                        savePref(true, R.string.isStaff)
+                        signIn()
+                    })
+                }
+            }
+    }
 
-    private fun failedLoginEvent(it: Throwable) = LoginEvent()
-            .putSuccess(false)
-            .putCustomAttribute("Error Message", it.message)
-            .putCustomAttribute("Error Log", it.toString())
-            .putCustomAttribute("Build Number", BuildConfig.VERSION_CODE)
+    fun successLoginEvent() {
+        fbAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, Bundle())
+        fbAnalytics.setUserProperty("degree", this.readPref(R.string.major, ""))
+        fbAnalytics.setUserProperty("major", this.readPref(R.string.degree, ""))
+        fbAnalytics.setUserProperty("generation", this.readPref(R.string.nim, "").substring(0, 3))
+        Answers.getInstance().logLogin(LoginEvent()
+                .putSuccess(true)
+                .putCustomAttribute("Degree", this.readPref(R.string.major, ""))
+                .putCustomAttribute("Major", this.readPref(R.string.degree, ""))
+                .putCustomAttribute("Generation", this.readPref(R.string.nim, "").substring(0, 3)))
+    }
 
-    private fun getNotif() {
-        val notifyExtra = intent.getBundleExtra("Notify")
-        if (notifyExtra != null && notifyExtra.getString("message") != null) {
-            alert(notifyExtra.getString("message"), notifyExtra.getString("title")) {
-                negativeButton("Ok, Got it")
-            }.show()
-        }
+    fun failedLoginEvent(it: Throwable) {
+        fbAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, Bundle())
+        Answers.getInstance().logLogin(LoginEvent()
+                .putSuccess(false)
+                .putCustomAttribute("Error Message", it.message)
+                .putCustomAttribute("Error Log", it.toString())
+                .putCustomAttribute("Build Number", BuildConfig.VERSION_CODE))
     }
 
     /*----------------------------------------------------------------------------------------------
@@ -142,11 +150,11 @@ class SigninActivity : AppCompatActivity(), SigninContract.View, AnkoLogger {
      *
      *--------------------------------------------------------------------------------------------*/
 
-    private fun deleteDbData() {
+    override fun cleanDb() {
         val realm = Realm.getDefaultInstance()
         savePref(false, R.string.isStaff)
         if (!realm.isEmpty)
-            realm.executeTransaction {
+            realm.executeTransactionAsync {
                 it.deleteAll()
                 clearPref()
             }

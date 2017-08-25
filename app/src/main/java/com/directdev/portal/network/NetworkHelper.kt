@@ -1,8 +1,8 @@
 package com.directdev.portal.network
 
+import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Response
-import rx.Single
 
 /**-------------------------------------------------------------------------------------------------
  * Created by chris on 8/21/17.

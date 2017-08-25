@@ -21,14 +21,13 @@ import com.directdev.portal.models.TermModel
 import com.directdev.portal.network.SyncManager
 import com.directdev.portal.utils.snack
 import com.google.firebase.analytics.FirebaseAnalytics
+import io.reactivex.functions.Action
 import io.realm.Realm
 import io.realm.RealmResults
 import kotlinx.android.synthetic.main.fragment_resources.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.ctx
-import org.jetbrains.anko.onClick
 import org.jetbrains.anko.runOnUiThread
-import rx.functions.Action1
 import kotlin.properties.Delegates
 
 class ResourceFragment : Fragment(), AnkoLogger {
@@ -56,14 +55,14 @@ class ResourceFragment : Fragment(), AnkoLogger {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             refreshresourceButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(ctx.getString(R.color.colorAccent)))
         }
-        refreshresourceButton.onClick {
+        refreshresourceButton.setOnClickListener {
             view.snack("Refreshing data, please wait...", Snackbar.LENGTH_INDEFINITE)
-            SyncManager.sync(ctx, SyncManager.RESOURCES, Action1 {
+            SyncManager.sync(ctx, SyncManager.RESOURCES, Action {
                 view?.snack("Success")
                 runOnUiThread {
                     setRecycler(courseResourceSpinner.selectedView as TextView, courses)
                 }
-            }, Action1 {
+            }, Action {
                 view?.snack("Failed")
             }, courses)
         }

@@ -9,8 +9,7 @@ import dagger.Provides
 @Module
 class SigninModule {
     @Provides
-    fun providePresenter(view : SigninContract.View): SigninContract.Presenter =
-            SigninPresenter(view)
+    fun providePresenter(signinPresenter: SigninPresenter): SigninContract.Presenter = signinPresenter
 
     @Provides
     fun provideView(activity: SigninActivity): SigninContract.View = activity

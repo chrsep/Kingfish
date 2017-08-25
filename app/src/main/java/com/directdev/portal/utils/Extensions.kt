@@ -7,17 +7,14 @@ import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
 import android.view.KeyEvent
 import android.view.View
-import android.view.ViewManager
-import io.realm.Realm
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.AlertDialogBuilder
 import org.jetbrains.anko.alert
-import org.jetbrains.anko.onKey
 import org.jetbrains.anko.runOnUiThread
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import rx.Single
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
 import java.text.NumberFormat
 import java.util.*
 
@@ -110,7 +107,7 @@ fun Snackbar.action(action: String, color: Int? = null, listener: (View) -> Unit
  *------------------------------------------------------------------------------------------------*/
 
 fun View.onEnter(callback: () -> Unit) {
-    onKey { _, _, keyEvent ->
+    setOnKeyListener {  _, _, keyEvent ->
         if (keyEvent?.action == KeyEvent.ACTION_DOWN && keyEvent.keyCode == KeyEvent.KEYCODE_ENTER)
             callback()
         false
@@ -141,7 +138,7 @@ fun ConnectivityManager.isNetworkAvailable(): Boolean =
 
 fun Context.showDialog(name: String, view: AlertDialogBuilder.() -> Unit) {
     runOnUiThread {
-        alert(name, "", view).show()
+        alert(name, "").show()
     }
 }
 

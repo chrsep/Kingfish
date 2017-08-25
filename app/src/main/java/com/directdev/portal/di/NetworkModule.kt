@@ -1,6 +1,8 @@
 package com.directdev.portal.di
 
+import com.directdev.portal.network.BimayApi
 import com.directdev.portal.network.BimayService
+import com.directdev.portal.network.NetworkHelper
 import com.directdev.portal.utils.NullConverterFactory
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import dagger.Module
@@ -8,7 +10,7 @@ import dagger.Provides
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -32,10 +34,13 @@ class NetworkModule {
     @Provides
     fun provideBimayService(client: OkHttpClient) : BimayService =
             Retrofit.Builder()
-                    .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .addConverterFactory(NullConverterFactory())
                     .addConverterFactory(MoshiConverterFactory.create())
                     .client(client)
                     .baseUrl("https://binusmaya.binus.ac.id/services/ci/index.php/")
                     .build().create(BimayService::class.java)
+
+    @Provides
+    fun provideNetworkHelper(bimayApi: BimayApi) : NetworkHelper = bimayApi
 }

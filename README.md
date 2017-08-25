@@ -7,6 +7,7 @@ Let us know If you're interested in keeping Portal alive, well after 2018.*
 ---
 
 [![CircleCI](https://circleci.com/gh/chrsep/Kingfish.svg?style=svg)](https://circleci.com/gh/chrsep/Kingfish)
+[![codecov](https://codecov.io/gh/chrsep/Kingfish/branch/master/graph/badge.svg)](https://codecov.io/gh/chrsep/Kingfish)
 
 Portal gives you instant and easy access to your schedules and other
 university-related data that are available on Binusmaya, online or offline.

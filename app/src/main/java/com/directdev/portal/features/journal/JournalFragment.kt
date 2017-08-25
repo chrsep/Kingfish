@@ -16,16 +16,15 @@ import com.directdev.portal.utils.action
 import com.directdev.portal.utils.readPref
 import com.directdev.portal.utils.snack
 import com.google.firebase.analytics.FirebaseAnalytics
+import io.reactivex.functions.Action
 import io.realm.Realm
 import io.realm.RealmResults
 import kotlinx.android.synthetic.main.fragment_journal.*
-import org.jetbrains.anko.appcompat.v7.onMenuItemClick
 import org.jetbrains.anko.ctx
 import org.jetbrains.anko.startActivity
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.format.DateTimeFormat
-import rx.functions.Action1
 import kotlin.properties.Delegates
 
 class JournalFragment : Fragment() {
@@ -89,7 +88,7 @@ class JournalFragment : Fragment() {
             journalToolbar.inflateMenu(R.menu.menu_journal)
             menuInflated = true
         }
-        journalToolbar.onMenuItemClick {
+        journalToolbar.setOnMenuItemClickListener {
             when (it?.itemId) {
                 R.id.action_refresh -> {
                     update()
@@ -98,7 +97,7 @@ class JournalFragment : Fragment() {
                     startActivity<SettingsActivity>()
                     true
                 }
-                else -> return@onMenuItemClick true
+                else -> return@setOnMenuItemClickListener true
             }
         }
     }
@@ -106,10 +105,11 @@ class JournalFragment : Fragment() {
     private fun update(): Boolean {
         view?.snack("Updating", Snackbar.LENGTH_INDEFINITE)
         if (DataApi.isActive) return true
-        SyncManager.sync(ctx, SyncManager.COMMON, Action1 {
+        SyncManager.sync(ctx, SyncManager.COMMON, Action {
             view?.snack("Success")
-        }, Action1 {
-            view?.snack(DataApi.decideCauseOfFailure(it))
+        }, Action {
+            // TODO: This is not how it suppose to be
+            view?.snack(DataApi.decideCauseOfFailure(Exception()))
         })
         return true
     }

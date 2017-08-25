@@ -2,10 +2,10 @@ package com.directdev.portal.network
 
 import com.directdev.portal.BuildConfig
 import com.directdev.portal.models.*
+import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
-import rx.Single
 
 /**-------------------------------------------------------------------------------------------------
  * Interface for building Retrofit service.

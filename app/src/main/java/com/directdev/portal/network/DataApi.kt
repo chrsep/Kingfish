@@ -7,6 +7,8 @@ import com.directdev.portal.R
 import com.directdev.portal.models.*
 import com.directdev.portal.utils.*
 import com.facebook.stetho.okhttp3.StethoInterceptor
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import io.realm.RealmObject
 import io.realm.RealmResults
@@ -17,11 +19,9 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava.HttpException
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
+import retrofit2.adapter.rxjava2.HttpException
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
-import rx.Single
-import rx.schedulers.Schedulers
 import java.io.IOException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
@@ -43,6 +43,7 @@ import javax.net.ssl.SSLException
  * A singleton that handles all of Portal API calls, Using ReactiveX and Retrofit.
  *------------------------------------------------------------------------------------------------*/
 
+@Deprecated("User the BimayApi Network Helper")
 object DataApi {
     var isActive = false
     private val baseUrl = "https://binusmaya.binus.ac.id/services/ci/index.php/"
@@ -54,7 +55,7 @@ object DataApi {
                             val pair1: Map<String, String> = HashMap<String, String>(),
                             val pair2: Map<String, String> = HashMap<String, String>())
 
-    fun initializeApp(ctx: Context): Single<Unit> {
+ /*   fun initializeApp(ctx: Context): Single<Unit> {
         val cookie = ctx.readPref(R.string.cookie, "")
         return api.getTerms(cookie).subscribeOnIo().flatMap { terms ->
             Crashlytics.log("initializeApp Term Data: " + terms.map { it.value }.toString())
@@ -66,6 +67,7 @@ object DataApi {
                     Crashlytics.setInt("grade_size", grades.size)
                     grades[0].map { arrayOf<Any>(it) }
                 }
+                0 -> Single.just(arrayOf())
                 else -> Single.zip(fetchGrades(terms, cookie)) { grades -> grades }
             }
             Crashlytics.setInt("login_level", 2)
@@ -90,10 +92,10 @@ object DataApi {
         }.bindToIsActive().doOnSuccess {
             setLastUpdate(ctx)
         }
-    }
+    }*/
 
 
-    fun fetchData(ctx: Context): Single<Unit> {
+ /*   fun fetchData(ctx: Context): Single<Unit> {
         val cookie = ctx.readPref(R.string.cookie, "")
         val realm = Realm.getDefaultInstance()
         val terms = realm.where(TermModel::class.java).findAllSorted("value").takeLast(3)
@@ -105,9 +107,9 @@ object DataApi {
             realm.close()
             isActive = false
         }
-    }
+    }*/
 
-    private fun fetchRecent(ctx: Context, cookie: String, terms: List<TermModel>, lastTerm: String) = Single.zip(
+ /*   private fun fetchRecent(ctx: Context, cookie: String, terms: List<TermModel>, lastTerm: String) = Single.zip(
             api.getFinances(cookie).subscribeOnIo(),
             api.getSessions(cookie).subscribeOnIo(),
             api.getExams(ExamRequestBody(terms.takeLast(2).first().value.toString()), cookie).subscribeOnIo(),
@@ -133,7 +135,7 @@ object DataApi {
                 }
                 realm.close()
                 isActive = false
-            }).defaultThreads()
+            }).defaultThreads()*/
 
     fun fetchResources(ctx: Context, data: RealmResults<CourseModel>): Single<Unit> {
         isActive = true
@@ -227,7 +229,7 @@ object DataApi {
         var cookie: String = ""
         if (DateTime.now().closeToLastUpdate(ctx)) return Single.just(RandomTokens())
         return api.getIndexHtml().flatMap {
-            val body = it.body().string()
+            val body = it.body()?.string() ?: ""
             val loader = Regex(loaderPattern).find(body)?.value ?: ""
             val user = Regex(usernamePattern).find(body)?.value ?: ""
             val pass = Regex(passPattern).find(body)?.value ?: ""
@@ -238,7 +240,7 @@ object DataApi {
             api.getSerial(cookie, loaderStr)
         }.map {
             val pattern = "<input type=\"hidden\" name=\".*\" value=\".*\" />"
-            val body = it.body().string()
+            val body = it.body()?.string() ?: ""
             val extraInputs = Regex(pattern).findAll(body).toList()
             val fields = extraInputs[0].value.split(" ")
             val pair1 = HashMap<String, String>()
@@ -355,7 +357,7 @@ object DataApi {
      *--------------------------------------------------------------------------------------------*/
 
     private fun buildRetrofit() = Retrofit.Builder()
-            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(NullConverterFactory())
             .addConverterFactory(MoshiConverterFactory.create())
             .client(if (BuildConfig.DEBUG) buildDebugClient() else buildClient())

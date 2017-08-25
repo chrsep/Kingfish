@@ -15,7 +15,6 @@ import com.directdev.portal.models.ResResourcesModel
 import kotlinx.android.synthetic.main.item_resources.view.*
 import org.jetbrains.anko.downloadManager
 import org.jetbrains.anko.layoutInflater
-import org.jetbrains.anko.onClick
 
 class ResourcesRecyclerAdapter(
         val context: Context,
@@ -42,11 +41,11 @@ class ResourcesRecyclerAdapter(
                         .valueOf(Color.parseColor(ctx.getString(R.color.colorAccent)))
             } catch (e: NoSuchMethodError) {
             }
-            itemView.presentationDownload.onClick {
+            itemView.presentationDownload.setOnClickListener {
                 val selectedDownload = resources.path.filter {
                     it.mediaTypeId == "01" && it.courseOutlineTopicID == item[0].courseOutlineTopicID
                 }
-                if (selectedDownload.isEmpty()) return@onClick
+                if (selectedDownload.isEmpty()) return@setOnClickListener
                 val path = (selectedDownload[0].path
                         + selectedDownload[0].location
                         + "/"

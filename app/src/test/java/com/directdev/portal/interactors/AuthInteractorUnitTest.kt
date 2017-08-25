@@ -4,12 +4,11 @@ import com.directdev.portal.network.NetworkHelper
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.then
+import io.reactivex.Single
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import org.junit.Test
 import retrofit2.Response
-import rx.Single
 
 /**-------------------------------------------------------------------------------------------------
  * Created by chris on 8/20/17.
@@ -21,7 +20,7 @@ class AuthInteractorUnitTest {
     fun testExecute() {
         // Given
         val bimayApi: NetworkHelper = mock {
-            on { getIndexHtml() } doReturn Single.just(Response.success(ResponseBody.create(MediaType.parse("text/html"), indexHtml)))
+            on { getIndexHtml() } doReturn Single.just(Response.success(ResponseBody.create(MediaType.parse("test"), indexHtml)))
             on { getRandomizedFields(any(), any()) } doReturn Single.just(Response.success(ResponseBody.create(MediaType.parse("text/js"), loaderJS)))
             on { authenticate(any(), any()) } doReturn Single.just(Response.success("Success"))
         }
@@ -31,7 +30,7 @@ class AuthInteractorUnitTest {
         authInteractor.execute("test", "test").subscribe({}, { throw it })
 
         // Then
-        then(bimayApi)
+
     }
 
     private val indexHtml = """
