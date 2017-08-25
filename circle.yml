@@ -17,15 +17,14 @@ jobs:
           paths:
             - ~/.gradle
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
-
       - store_artifacts:
           path: app/build/reports
           destination: reports
       - store_test_results:
           path: app/build/test-results
-      - report:
+      - run:
           name: Generate report
           command: ./gradlew jacocoTestReport
-      - upload_report:
+      - run:
           name: Upload report to codecov
           command: bash <(curl -s https://codecov.io/bash)
