@@ -21,12 +21,13 @@ class AuthInteractor @Inject constructor(
     private val usernamePattern = "<input type=\"text\" name=\".*placeholder=\"Username\""
     private val passwordPattern = "<input type=\"password\" name=\".*placeholder=\"Password\""
     private var isRequesting = false
-    private lateinit var request: Single<Unit>
+    private lateinit var request: Single<String>
 
+    // Returns a Single containing the cookie
     fun execute(
             username: String = userCredRepo.getUsername(),
             password: String = userCredRepo.getPassword()
-    ): Single<Unit> {
+    ): Single<String> {
         var indexHtml = ""
         var cookie = ""
         request = if (isRequesting) request else bimayApi.getIndexHtml().flatMap {
@@ -39,13 +40,13 @@ class AuthInteractor @Inject constructor(
             val loaderJs = it.body()?.string() ?: ""
             val fieldsMap = constructFields(indexHtml, loaderJs, username, password)
             bimayApi.authenticate(cookie, fieldsMap)
-        }.flatMap {
+        }.map {
             val redirectLocation = it.headers().get("Location") ?: "none"
             if (redirectLocation != "https://binusmaya.binus.ac.id/block_user.php")
                 throw SigninException(redirectLocation)
             bimayApi.switchRole(cookie)
-        }.doAfterSuccess {
-            userCredRepo.save(username, password, cookie)
+        }.map { cookie }.doAfterSuccess {
+            userCredRepo.saveAll(username, password, cookie)
             flagRepo.save(isLoggedIn = true)
         }.doAfterTerminate {
             isRequesting = false

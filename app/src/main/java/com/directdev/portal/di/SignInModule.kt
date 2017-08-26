@@ -6,9 +6,11 @@ import com.directdev.portal.features.signIn.SignInContract
 import com.directdev.portal.features.signIn.SignInPresenter
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
+@Singleton
 @Module
-class SigninModule {
+class SignInModule {
     @Provides
     fun providePresenter(signInPresenter: SignInPresenter): SignInContract.Presenter = signInPresenter
 

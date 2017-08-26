@@ -19,8 +19,10 @@ class SignInPresenter @Inject constructor(
 
     override fun onCreate(intent: Intent) {
         val extra = intent.getBundleExtra("Notify")
-        if (extra != null) view.showAlert(extra.getString("message"), extra.getString("title"))
-        if (intent.getStringExtra("signout") != null) view.logSignOut()
+        if (extra?.getString("message") != null)
+            view.showAlert(extra.getString("message"), extra.getString("title"))
+        if (intent.getStringExtra("signout") != null)
+            view.logSignOut()
         mainRepo.cleanData()
     }
 
@@ -36,7 +38,7 @@ class SignInPresenter @Inject constructor(
             view.hideKeyboard()
             subscribedToAuth = true
         }.flatMap {
-            profileInteractor.execute()
+            profileInteractor.execute(it)
         }.doFinally {
             subscribedToAuth = false
         }.subscribe({

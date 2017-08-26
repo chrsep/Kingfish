@@ -1,5 +1,6 @@
 package com.directdev.portal.network
 
+import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -12,6 +13,6 @@ interface NetworkHelper {
     fun getIndexHtml(): Single<Response<ResponseBody>>
     fun getRandomizedFields(cookie: String, serial: String): Single<Response<ResponseBody>>
     fun authenticate(cookie: String, fieldMap: HashMap<String, String>): Single<Response<String>>
-    fun switchRole(cookie: String): Single<Unit>
+    fun switchRole(cookie: String): Completable
     fun getUserProfile(cookie: String): Single<ResponseBody>
 }

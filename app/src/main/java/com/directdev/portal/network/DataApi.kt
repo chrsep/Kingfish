@@ -206,7 +206,7 @@ object DataApi {
         passPair.put(tokens.pass, ctx.readPref(R.string.password, ""))
 
         val single = if (!DateTime.now().closeToLastUpdate(ctx))
-            api.signIn(ctx.readPref(R.string.cookie), usernamePair, passPair, tokens.pair1, tokens.pair2).flatMap {
+            api.signIn(ctx.readPref(R.string.cookie), usernamePair, passPair, tokens.pair1, tokens.pair2).map {
                 Crashlytics.setString("returned_header", it.headers().get("Location") ?: "none")
                 Crashlytics.setString("user_field", tokens.user)
                 Crashlytics.setString("pass_field", tokens.pass)

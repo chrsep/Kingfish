@@ -7,7 +7,7 @@ import dagger.android.ContributesAndroidInjector
 @Module
 abstract class ActivityModule{
     @ContributesAndroidInjector(modules = arrayOf(
-            SigninModule::class,
+            SignInModule::class,
             NetworkModule::class,
             FirebaseAnalyticsModule::class,
             RealmModule::class

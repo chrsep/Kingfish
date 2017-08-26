@@ -10,7 +10,8 @@ class UserCredRepository @Inject constructor(val ctx: Context) {
 
     data class Credentials(val username: String, val password: String, val cookie: String)
 
-    fun save(username: String, password: String, cookie: String) {
+    fun saveCookie(cookie: String) = ctx.readPref(R.string.cookie, cookie)
+    fun saveAll(username: String, password: String, cookie: String) {
         ctx.savePref(R.string.username, username)
                 .savePref(R.string.password, password)
                 .savePref(R.string.cookie, cookie)

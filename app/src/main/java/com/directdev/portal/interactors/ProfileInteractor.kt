@@ -15,9 +15,8 @@ class ProfileInteractor @Inject constructor(
         private val profileRepo: ProfileRepository,
         private val bimayApi: NetworkHelper
 ) {
-    fun execute(): Single<Unit> {
-        val cookie = userCredRepo.getCookie()
-        return bimayApi.getUserProfile(cookie).map {
+    fun execute(it: String): Single<Unit> {
+        return bimayApi.getUserProfile(it).map {
             val profileObject = JSONObject(it.string())
                     .getJSONArray("Profile")
                     .getJSONObject(0)

@@ -2,6 +2,7 @@ package com.directdev.portal.network
 
 import com.directdev.portal.BuildConfig
 import com.directdev.portal.models.*
+import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -44,7 +45,7 @@ interface BimayService {
             "Origin: https://binusmaya.binus.ac.id",
             "User-Agent: Portal App/"+BuildConfig.VERSION_NAME)
     @POST("https://binusmaya.binus.ac.id/services/ci/index.php/login/switchrole/2/104")
-    fun switchRole(@Header("Cookie") cookie: String): Single<Unit>
+    fun switchRole(@Header("Cookie") cookie: String): Completable
 
     @Headers("Referer: https://binusmaya.binus.ac.id/newStudent/",
             "User-Agent: Portal/"+BuildConfig.VERSION_NAME)
