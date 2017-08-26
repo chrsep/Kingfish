@@ -1,9 +1,9 @@
 package com.directdev.portal.di
 
 import android.content.Context
-import com.directdev.portal.features.signin.SignInActivity
-import com.directdev.portal.features.signin.SignInContract
-import com.directdev.portal.features.signin.SignInPresenter
+import com.directdev.portal.features.signIn.SignInActivity
+import com.directdev.portal.features.signIn.SignInContract
+import com.directdev.portal.features.signIn.SignInPresenter
 import dagger.Module
 import dagger.Provides
 

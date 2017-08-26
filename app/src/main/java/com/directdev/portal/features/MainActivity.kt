@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
 
     private fun handleNotification() {
         val extra = intent.getBundleExtra("Notify")
-        if (extra != null && extra.getString("message") != null) {
+        if (extra?.getString("message") != null) {
             alert(extra.getString("message"), extra.getString("title")) {
                 negativeButton("Ok, Got it"){}
             }.show()

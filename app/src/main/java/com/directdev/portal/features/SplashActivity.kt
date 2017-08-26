@@ -7,7 +7,7 @@ import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.core.CrashlyticsCore
 import com.directdev.portal.BuildConfig
 import com.directdev.portal.R
-import com.directdev.portal.features.signin.SignInActivity
+import com.directdev.portal.features.signIn.SignInActivity
 import com.directdev.portal.utils.readPref
 import io.fabric.sdk.android.Fabric
 import org.jetbrains.anko.AnkoLogger

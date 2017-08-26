@@ -1,6 +1,6 @@
 package com.directdev.portal.di
 
-import com.directdev.portal.features.signin.SignInActivity
+import com.directdev.portal.features.signIn.SignInActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 

@@ -1,4 +1,4 @@
-package com.directdev.portal.features.signin
+package com.directdev.portal.features.signIn
 
 import android.content.Intent
 import com.directdev.portal.BasePresenter

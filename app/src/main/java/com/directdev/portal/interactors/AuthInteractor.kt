@@ -25,21 +25,21 @@ class AuthInteractor @Inject constructor(
     private var isRequesting = false
     private lateinit var request: Single<Response<ResponseBody>>
 
-    fun execute(username: String, password: String): Single<Response<ResponseBody>> {
+    fun execute(
+            username: String = userCredRepo.getUsername(),
+            password: String = userCredRepo.getPassword()
+    ): Single<Response<ResponseBody>> {
         var indexHtml = ""
         var cookie = ""
         request = if (isRequesting) request else bimayApi.getIndexHtml().flatMap {
             indexHtml = it.body()?.string() ?: ""
             cookie = it.headers().get("Set-Cookie") ?: ""
-
             val result = Regex(loaderPattern).find(indexHtml)?.value ?: ""
             val serial = decodeHtml(result.substring(40, result.length - 1))
-
-            Thread.sleep(2000)
             bimayApi.getRandomizedFields(cookie, serial)
         }.flatMap {
-            val loaderjs = it.body()?.string() ?: ""
-            val fieldsMap = constructFields(indexHtml, loaderjs, username, password)
+            val loaderJs = it.body()?.string() ?: ""
+            val fieldsMap = constructFields(indexHtml, loaderJs, username, password)
             bimayApi.authenticate(cookie, fieldsMap)
         }.flatMap {
             val redirectLocation = it.headers().get("Location") ?: "none"
@@ -47,7 +47,7 @@ class AuthInteractor @Inject constructor(
                 throw SigninException(redirectLocation)
             bimayApi.switchRole(cookie)
         }.doAfterSuccess {
-            userCredRepo.save(cookie, username, password)
+            userCredRepo.save(username, password, cookie)
             flagRepo.save(isLoggedIn = true)
         }.doAfterTerminate {
             isRequesting = false
@@ -56,8 +56,6 @@ class AuthInteractor @Inject constructor(
         return request
     }
 
-    fun getCredentials() = userCredRepo.getAll()
-
     /*----------------------------------------------------------------------------------------------
      * To login, 4 fields are required:
      * 1. Password field: randomized key, password as value (extracted from login page's Index.html)
@@ -65,7 +63,12 @@ class AuthInteractor @Inject constructor(
      * 3&4. Field with randomized key and value  (extracted from  loader.php, which returned a js file)
      *--------------------------------------------------------------------------------------------*/
 
-    private fun constructFields(indexHtml: String, loaderJs: String, username: String, password: String): HashMap<String, String> {
+    private fun constructFields(
+            indexHtml: String,
+            loaderJs: String,
+            username: String,
+            password: String
+    ): HashMap<String, String> {
         val user = Regex(usernamePattern).find(indexHtml)?.value ?: ""
         val pass = Regex(passwordPattern).find(indexHtml)?.value ?: ""
         val extraFields = Regex(fieldsPattern).findAll(loaderJs).toList()[0].value.split(" ")

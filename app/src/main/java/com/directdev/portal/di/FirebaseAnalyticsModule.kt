@@ -11,5 +11,5 @@ import dagger.Provides
 @Module
 class FirebaseAnalyticsModule {
     @Provides
-    fun providesFirebaseAnalytics(context: Context) = FirebaseAnalytics.getInstance(context)
+    fun providesFirebaseAnalytics(context: Context): FirebaseAnalytics = FirebaseAnalytics.getInstance(context)
 }

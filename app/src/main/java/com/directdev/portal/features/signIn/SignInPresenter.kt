@@ -1,7 +1,8 @@
-package com.directdev.portal.features.signin
+package com.directdev.portal.features.signIn
 
 import android.content.Intent
 import com.directdev.portal.interactors.AuthInteractor
+import com.directdev.portal.interactors.ProfileInteractor
 import com.directdev.portal.repositories.MainRepository
 import javax.inject.Inject
 
@@ -11,14 +12,15 @@ import javax.inject.Inject
 class SignInPresenter @Inject constructor(
         private val view: SignInContract.View,
         private val authInteractor: AuthInteractor,
+        private val profileInteractor: ProfileInteractor,
         private val mainRepo: MainRepository
 ) : SignInContract.Presenter {
+    private var subscribedToAuth = false
 
     override fun onCreate(intent: Intent) {
         val extra = intent.getBundleExtra("Notify")
         if (extra != null) view.showAlert(extra.getString("message"), extra.getString("title"))
         if (intent.getStringExtra("signout") != null) view.logSignOut()
-        // TODO: Clean DB should be done by an interactor instead of by a view
         mainRepo.cleanData()
     }
 
@@ -28,9 +30,15 @@ class SignInPresenter @Inject constructor(
             return
         }
         view.hideKeyboard()
+        if (subscribedToAuth) return
         authInteractor.execute(view.getUsername(), view.getPassword()).doOnSubscribe {
             view.animateSignInButton()
             view.hideKeyboard()
+            subscribedToAuth = true
+        }.flatMap {
+            profileInteractor.execute()
+        }.doFinally {
+            subscribedToAuth = false
         }.subscribe({
             view.logSuccessSignIn()
             view.navigateToMainActivity()
@@ -40,6 +48,4 @@ class SignInPresenter @Inject constructor(
             view.animateSignInButton()
         })
     }
-
-
 }

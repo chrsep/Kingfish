@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.directdev.portal">
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:name=".Portal"
         android:allowBackup="true"
@@ -25,14 +27,15 @@
             android:value="e2f91483c94217ff3e141cda751f285d0415b76f" />
 
         <activity
-            android:name=".features.signin.SignInActivity"
-            android:noHistory="true"
-            android:launchMode="singleTop">
+            android:name=".features.signIn.SignInActivity"
+            android:launchMode="singleTop"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
                     android:host="binusmaya.binus.ac.id"
                     android:pathPrefix="/newDefault/login.html"
@@ -44,9 +47,9 @@
             android:launchMode="singleTop" />
         <activity
             android:name=".features.SettingsActivity"
-            android:parentActivityName=".features.MainActivity"
+            android:label="Settings"
             android:noHistory="true"
-            android:label="Settings">
+            android:parentActivityName=".features.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".features.MainActivity" />

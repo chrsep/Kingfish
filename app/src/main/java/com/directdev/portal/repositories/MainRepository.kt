@@ -11,11 +11,10 @@ import javax.inject.Inject
 class MainRepository @Inject constructor(val ctx: Context, val realm: Realm) {
 
     fun cleanData() {
-        if (!realm.isEmpty)
-            realm.executeTransactionAsync {
-                it.deleteAll()
-                ctx.clearPref()
-            }
+        if (!realm.isEmpty) realm.executeTransactionAsync {
+            it.deleteAll()
+        }
         realm.close()
+        ctx.clearPref()
     }
 }

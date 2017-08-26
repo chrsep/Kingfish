@@ -1,4 +1,4 @@
-package com.directdev.portal.features.signin
+package com.directdev.portal.features.signIn
 
 import android.graphics.Color
 import android.graphics.Typeface
