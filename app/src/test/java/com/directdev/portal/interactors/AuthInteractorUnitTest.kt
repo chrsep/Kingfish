@@ -4,9 +4,11 @@ import com.directdev.portal.network.NetworkHelper
 import com.directdev.portal.repositories.FlagRepository
 import com.directdev.portal.repositories.UserCredRepository
 import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.doNothing
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import io.reactivex.Single
+import okhttp3.Headers
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import org.junit.Test
@@ -19,15 +21,21 @@ import retrofit2.Response
 class AuthInteractorUnitTest {
 
     @Test
-    fun testExecute() {
+    fun succesfulLogin() {
         // Given
         val bimayApi: NetworkHelper = mock {
             on { getIndexHtml() } doReturn Single.just(Response.success(ResponseBody.create(MediaType.parse("test"), indexHtml)))
             on { getRandomizedFields(any(), any()) } doReturn Single.just(Response.success(ResponseBody.create(MediaType.parse("text/js"), loaderJS)))
-            on { authenticate(any(), any()) } doReturn Single.just(Response.success("Success"))
+            on { authenticate(any(), any()) } doReturn Single.just(authenticateResponse)
         }
-        val userCredRepo: UserCredRepository = mock { }
-        val flagRepo: FlagRepository = mock { }
+        val userCredRepo: UserCredRepository = mock {
+            on { getUsername() } doReturn "charlesdickens"
+            on { getPassword() } doReturn "b!Nu$07021812"
+        }
+        doNothing().`when`(userCredRepo).saveAll(any(), any(), any())
+        val flagRepo: FlagRepository = mock {
+
+        }
         val authInteractor = AuthInteractor(bimayApi, userCredRepo, flagRepo)
 
         // When
@@ -36,6 +44,8 @@ class AuthInteractorUnitTest {
         // Then
 
     }
+
+    private val authenticateResponse = Response.success("Success", Headers.Builder().add("Location", "https://binusmaya.binus.ac.id/block_user.php").build())
 
     private val indexHtml = """
     <!DOCTYPE HTML>
