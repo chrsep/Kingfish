@@ -25,11 +25,11 @@ class SignInPresenter @Inject constructor(
     }
 
     override fun signIn() {
+        view.hideKeyboard()
         if (!view.checkNetwork()) {
             view.showSnack("No Network Connection")
             return
         }
-        view.hideKeyboard()
         if (subscribedToAuth) return
         authInteractor.execute(view.getUsername(), view.getPassword()).doOnSubscribe {
             view.animateSignInButton()

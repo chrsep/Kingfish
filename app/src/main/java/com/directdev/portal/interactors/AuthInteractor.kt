@@ -5,8 +5,6 @@ import com.directdev.portal.repositories.FlagRepository
 import com.directdev.portal.repositories.UserCredRepository
 import com.directdev.portal.utils.SigninException
 import io.reactivex.Single
-import okhttp3.ResponseBody
-import retrofit2.Response
 import javax.inject.Inject
 
 /**-------------------------------------------------------------------------------------------------
@@ -23,12 +21,12 @@ class AuthInteractor @Inject constructor(
     private val usernamePattern = "<input type=\"text\" name=\".*placeholder=\"Username\""
     private val passwordPattern = "<input type=\"password\" name=\".*placeholder=\"Password\""
     private var isRequesting = false
-    private lateinit var request: Single<Response<ResponseBody>>
+    private lateinit var request: Single<Unit>
 
     fun execute(
             username: String = userCredRepo.getUsername(),
             password: String = userCredRepo.getPassword()
-    ): Single<Response<ResponseBody>> {
+    ): Single<Unit> {
         var indexHtml = ""
         var cookie = ""
         request = if (isRequesting) request else bimayApi.getIndexHtml().flatMap {

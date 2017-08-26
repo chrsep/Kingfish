@@ -6,22 +6,22 @@ import com.directdev.portal.BaseView
 
 interface SignInContract {
     interface View: BaseView<Presenter> {
-        fun animateSignInButton()
-        fun logSignOut()
         fun showAlert(message: String, title: String)
+        fun showError(err: Throwable)
+        fun showSnack(message: String)
         fun getUsername(): String
         fun getPassword(): String
-        fun showError(err: Throwable)
+        fun logSignOut()
         fun logSuccessSignIn()
         fun logFailedSignIn(err: Throwable)
-        fun navigateToMainActivity()
-        fun hideKeyboard()
+        fun animateSignInButton()
         fun checkNetwork() : Boolean
-        fun showSnack(message: String)
+        fun hideKeyboard()
+        fun navigateToMainActivity()
     }
 
     interface Presenter: BasePresenter {
-        fun signIn()
         fun onCreate(intent: Intent)
+        fun signIn()
     }
 }
