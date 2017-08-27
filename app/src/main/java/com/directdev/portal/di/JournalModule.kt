@@ -1,11 +1,14 @@
 package com.directdev.portal.di
 
 import android.content.Context
+import com.directdev.portal.features.MainActivity
 import com.directdev.portal.features.journal.JournalContract
 import com.directdev.portal.features.journal.JournalFragment
 import com.directdev.portal.features.journal.JournalPresenter
+import com.directdev.portal.features.journal.JournalRecyclerAdapter
 import dagger.Module
 import dagger.Provides
+import io.realm.Realm
 
 /**-------------------------------------------------------------------------------------------------
  * Created by chris on 8/26/17.
@@ -19,5 +22,15 @@ class JournalModule {
     fun provideView(fragment: JournalFragment): JournalContract.View = fragment
 
     @Provides
-    fun provideContext(fragment: JournalFragment): Context = fragment.activity
+    fun provideActivity(fragment: JournalFragment): MainActivity = fragment.activity as MainActivity
+
+    @Provides
+    fun provideContext(activity: MainActivity): Context = activity
+
+    @Provides
+    fun provideFragmentRealm(activity: MainActivity): Realm = activity.realm
+
+    @Provides
+    fun providejournalRecyclerAdapter(ctx: Context): JournalRecyclerAdapter =
+            JournalRecyclerAdapter(ctx)
 }

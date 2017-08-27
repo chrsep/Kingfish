@@ -19,22 +19,18 @@ import com.directdev.portal.utils.snack
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.android.AndroidInjection
 import io.reactivex.functions.Action
-import io.realm.Realm
-import io.realm.RealmResults
 import kotlinx.android.synthetic.main.fragment_journal.*
 import org.jetbrains.anko.ctx
 import org.jetbrains.anko.startActivity
 import org.joda.time.DateTime
 import org.joda.time.Hours
-import org.joda.time.format.DateTimeFormat
 import javax.inject.Inject
-import kotlin.properties.Delegates
 
 class JournalFragment : Fragment(), JournalContract.View {
+
     @Inject override lateinit var fbAnalytics: FirebaseAnalytics
     @Inject override lateinit var presenter: JournalContract.Presenter
 
-    private var realm: Realm by Delegates.notNull()
     private var menuInflated = false
 
     override fun onAttach(context: Context?) {
@@ -47,21 +43,41 @@ class JournalFragment : Fragment(), JournalContract.View {
 
     override fun onStart() {
         super.onStart()
-        // Analytics
+        presenter.onStart()
+        if (!menuInflated) {
+            journalToolbar.inflateMenu(R.menu.menu_journal)
+            menuInflated = true
+        }
+        journalToolbar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.action_refresh -> {
+                    update()
+                }
+                R.id.action_setting -> {
+                    startActivity<SettingsActivity>()
+                }
+            }
+            true
+        }
+    }
+
+    override fun setRecyclerAdapter(layoutManager: LinearLayoutManager, adapter: JournalRecyclerAdapter) {
+        recyclerContent.layoutManager = layoutManager
+        recyclerContent.adapter = adapter
+    }
+
+    override fun setupToolbar(schedules: List<JournalModel>, dateString: String) {
+        journalToolbar.title = if (schedules.isNotEmpty() &&
+                (schedules[0].session.size > 0 || schedules[0].exam.size > 0))
+            "Today - " + dateString
+        else
+            "Today - Holiday"
+    }
+
+    override fun logContentOpened() {
         val bundle = Bundle()
         bundle.putString("content", "journal")
         fbAnalytics.logEvent("content_opened", bundle)
-        try {
-            realm = Realm.getDefaultInstance()
-        } catch (err: IllegalStateException) {
-            Realm.init(ctx.applicationContext)
-            realm = Realm.getDefaultInstance()
-        }
-
-        if (DataApi.isActive) view?.snack("Updating", Snackbar.LENGTH_INDEFINITE)
-        val journalDates = setupRecycler()
-        setupToolbar(journalDates)
-        checkLastUpdate()
     }
 
     private fun checkLastUpdate() {
@@ -80,33 +96,6 @@ class JournalFragment : Fragment(), JournalContract.View {
             }
     }
 
-
-    private fun setupToolbar(journalDates: RealmResults<JournalModel>?) {
-        val today = DateTime.now().withTimeAtStartOfDay()
-        val journalToday = journalDates?.filter {
-            it.date == today.toDate()
-        } ?: return
-        if (journalToday.isNotEmpty() && (journalToday[0].session.size > 0 || journalToday[0].exam.size > 0)) {
-            journalToolbar.title = "Today - " + today.toString(DateTimeFormat.forPattern("dd MMMM"))
-        } else journalToolbar.title = "Today - Holiday"
-        if (!menuInflated) {
-            journalToolbar.inflateMenu(R.menu.menu_journal)
-            menuInflated = true
-        }
-        journalToolbar.setOnMenuItemClickListener {
-            when (it?.itemId) {
-                R.id.action_refresh -> {
-                    update()
-                }
-                R.id.action_setting -> {
-                    startActivity<SettingsActivity>()
-                    true
-                }
-                else -> return@setOnMenuItemClickListener true
-            }
-        }
-    }
-
     private fun update(): Boolean {
         view?.snack("Updating", Snackbar.LENGTH_INDEFINITE)
         if (DataApi.isActive) return true
@@ -117,20 +106,5 @@ class JournalFragment : Fragment(), JournalContract.View {
             view?.snack(DataApi.decideCauseOfFailure(Exception()))
         })
         return true
-    }
-
-    private fun setupRecycler(): RealmResults<JournalModel>? {
-        val today = DateTime().withTimeAtStartOfDay()
-        val data = realm.where(JournalModel::class.java)
-                .greaterThanOrEqualTo("date", today.toDate())
-                .findAllSorted("date")
-        recyclerContent.layoutManager = LinearLayoutManager(ctx)
-        recyclerContent.adapter = JournalRecyclerAdapter(realm, ctx, data, true)
-        return data
-    }
-
-    override fun onStop() {
-        super.onStop()
-        realm.close()
     }
 }

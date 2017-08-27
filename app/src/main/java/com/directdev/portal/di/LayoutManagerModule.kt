@@ -1,15 +1,16 @@
 package com.directdev.portal.di
 
 import android.content.Context
-import com.google.firebase.analytics.FirebaseAnalytics
+import android.support.v7.widget.LinearLayoutManager
 import dagger.Module
 import dagger.Provides
 
 /**-------------------------------------------------------------------------------------------------
- * Created by chris on 8/25/17.
+ * Created by chris on 8/27/17.
  *------------------------------------------------------------------------------------------------*/
+
 @Module
-class FirebaseAnalyticsModule {
+class LayoutManagerModule {
     @Provides
-    fun providesFirebaseAnalytics(ctx: Context): FirebaseAnalytics = FirebaseAnalytics.getInstance(ctx)
+    fun providesLinearLayoutManager(ctx: Context): LinearLayoutManager = LinearLayoutManager(ctx)
 }

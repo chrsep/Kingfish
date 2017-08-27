@@ -13,6 +13,7 @@ import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasFragmentInjector
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.alert
@@ -28,6 +29,7 @@ import javax.inject.Inject
 
 class MainActivity : Activity(), AnkoLogger, HasFragmentInjector {
     @Inject lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
+    @Inject lateinit var realm: Realm
 
     override fun fragmentInjector(): AndroidInjector<Fragment> = dispatchingAndroidInjector
 
@@ -57,11 +59,16 @@ class MainActivity : Activity(), AnkoLogger, HasFragmentInjector {
         if (!readPref(R.string.isLoggedIn, false)) finishAffinity()
     }
 
-    /**-------------------------------------------------------------------------------------------------
-     * Handles notification from Firebase Cloud Messaging. When the notification is clicked, it will start
-     * MainActivity with an 'extra'. So we check if the extra is empty or not, and choose whether to
-     * show the alert containing the message or not.
-     *------------------------------------------------------------------------------------------------*/
+    override fun onDestroy() {
+        super.onDestroy()
+        realm.close()
+    }
+
+    /**---------------------------------------------------------------------------------------------
+     * Handles notification from Firebase Cloud Messaging. When the notification is clicked, it
+     * will start MainActivity with an 'extra'. So we check if the extra is empty or not, and choose
+     * whether to show the alert containing the message or not.
+     *--------------------------------------------------------------------------------------------*/
 
     private fun handleNotification() {
         val extra = intent.getBundleExtra("Notify")

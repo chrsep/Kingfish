@@ -16,7 +16,8 @@ abstract class ActivityModule{
     abstract fun bindSigninActivity(): SignInActivity
 
     @ContributesAndroidInjector(modules = arrayOf(
-            FirebaseAnalyticsModule::class
+            FirebaseAnalyticsModule::class,
+            RealmModule::class
     ))
     abstract fun bindMainActivity(): MainActivity
 }
