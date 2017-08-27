@@ -1,5 +1,6 @@
 package com.directdev.portal.di
 
+import com.directdev.portal.features.MainActivity
 import com.directdev.portal.features.signIn.SignInActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -13,4 +14,9 @@ abstract class ActivityModule{
             RealmModule::class
     ))
     abstract fun bindSigninActivity(): SignInActivity
+
+    @ContributesAndroidInjector(modules = arrayOf(
+            FirebaseAnalyticsModule::class
+    ))
+    abstract fun bindMainActivity(): MainActivity
 }

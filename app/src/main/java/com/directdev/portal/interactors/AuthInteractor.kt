@@ -16,12 +16,14 @@ class AuthInteractor @Inject constructor(
         private val userCredRepo: UserCredRepository,
         private val flagRepo: FlagRepository
 ) {
+    private var isRequesting = false
+    private lateinit var request: Single<String>
+
+    // Regex patterns to extract data from index.html and loader.js
     private val loaderPattern = "<script src=\".*login/loader.*\""
     private val fieldsPattern = "<input type=\"hidden\" name=\".*\" value=\".*\" />"
     private val usernamePattern = "<input type=\"text\" name=\".*placeholder=\"Username\""
     private val passwordPattern = "<input type=\"password\" name=\".*placeholder=\"Password\""
-    private var isRequesting = false
-    private lateinit var request: Single<String>
 
     // Returns a Single containing the cookie
     fun execute(
@@ -33,17 +35,27 @@ class AuthInteractor @Inject constructor(
         request = if (isRequesting) request else bimayApi.getIndexHtml().flatMap {
             indexHtml = it.body()?.string() ?: ""
             cookie = it.headers().get("Set-Cookie") ?: ""
+
+            // Extracts the link to loader.php from index.html
             val result = Regex(loaderPattern).find(indexHtml)?.value ?: ""
             val serial = decodeHtml(result.substring(40, result.length - 1))
-            bimayApi.getRandomizedFields(cookie, serial)
+
+            // Retrieve loader.js from loader.php
+            bimayApi.getLoaderJs(cookie, serial)
         }.flatMap {
             val loaderJs = it.body()?.string() ?: ""
             val fieldsMap = constructFields(indexHtml, loaderJs, username, password)
+
+            // Authenticate with Binusmaya using the extracted fields from index.html & loader.js as
+            // the request parameter
             bimayApi.authenticate(cookie, fieldsMap)
         }.map {
+            // Checks if login is successful
             val redirectLocation = it.headers().get("Location") ?: "none"
             if (redirectLocation != "https://binusmaya.binus.ac.id/block_user.php")
                 throw SigninException(redirectLocation)
+
+            // Make sure user is logged in as student, not as a staff etc.
             bimayApi.switchRole(cookie)
         }.map { cookie }.doAfterSuccess {
             userCredRepo.saveAll(username, password, cookie)
@@ -56,10 +68,12 @@ class AuthInteractor @Inject constructor(
     }
 
     /*----------------------------------------------------------------------------------------------
-     * To login, 4 fields are required:
+     * To sign in, 4 fields are required:
      * 1. Password field: randomized key, password as value (extracted from login page's Index.html)
      * 2. Username field: randomized key, username as value (extracted from login page's Index.html)
      * 3&4. Field with randomized key and value  (extracted from  loader.php, which returned a js file)
+     *
+     * The function below extracts all of this and combined them into one single HashMap.
      *--------------------------------------------------------------------------------------------*/
 
     private fun constructFields(

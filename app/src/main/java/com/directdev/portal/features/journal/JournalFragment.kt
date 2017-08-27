@@ -1,6 +1,7 @@
 package com.directdev.portal.features.journal
 
 import android.app.Fragment
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.Snackbar
@@ -16,6 +17,7 @@ import com.directdev.portal.utils.action
 import com.directdev.portal.utils.readPref
 import com.directdev.portal.utils.snack
 import com.google.firebase.analytics.FirebaseAnalytics
+import dagger.android.AndroidInjection
 import io.reactivex.functions.Action
 import io.realm.Realm
 import io.realm.RealmResults
@@ -25,30 +27,33 @@ import org.jetbrains.anko.startActivity
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.format.DateTimeFormat
+import javax.inject.Inject
 import kotlin.properties.Delegates
 
-class JournalFragment : Fragment() {
+class JournalFragment : Fragment(), JournalContract.View {
+    @Inject override lateinit var fbAnalytics: FirebaseAnalytics
+    @Inject override lateinit var presenter: JournalContract.Presenter
+
     private var realm: Realm by Delegates.notNull()
     private var menuInflated = false
+
+    override fun onAttach(context: Context?) {
+        AndroidInjection.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
             inflater?.inflate(R.layout.fragment_journal, container, false)
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onStart() {
         super.onStart()
         // Analytics
-        val mFirebaseAnalytics = FirebaseAnalytics.getInstance(ctx)
         val bundle = Bundle()
         bundle.putString("content", "journal")
-        mFirebaseAnalytics.logEvent("content_opened", bundle)
+        fbAnalytics.logEvent("content_opened", bundle)
         try {
             realm = Realm.getDefaultInstance()
-        } catch (err: IllegalStateException){
+        } catch (err: IllegalStateException) {
             Realm.init(ctx.applicationContext)
             realm = Realm.getDefaultInstance()
         }
@@ -81,7 +86,7 @@ class JournalFragment : Fragment() {
         val journalToday = journalDates?.filter {
             it.date == today.toDate()
         } ?: return
-        if (journalToday.isNotEmpty() && (journalToday[0].session.size > 0 || journalToday[0].exam.size > 0) ) {
+        if (journalToday.isNotEmpty() && (journalToday[0].session.size > 0 || journalToday[0].exam.size > 0)) {
             journalToolbar.title = "Today - " + today.toString(DateTimeFormat.forPattern("dd MMMM"))
         } else journalToolbar.title = "Today - Holiday"
         if (!menuInflated) {

@@ -1,11 +1,11 @@
 package com.directdev.portal.features.signIn
 
+import android.app.Activity
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
 import android.text.Html
 import android.text.method.LinkMovementMethod
 import com.crashlytics.android.answers.Answers
@@ -25,7 +25,7 @@ import javax.inject.Inject
  * Handles the user Signin. This class is mostly about login calls and anonymous analytics.
  *------------------------------------------------------------------------------------------------*/
 
-class SignInActivity : AppCompatActivity(), SignInContract.View, AnkoLogger {
+class SignInActivity : Activity(), SignInContract.View, AnkoLogger {
     @Inject override lateinit var fbAnalytics: FirebaseAnalytics
     @Inject override lateinit var presenter: SignInContract.Presenter
 
@@ -38,6 +38,7 @@ class SignInActivity : AppCompatActivity(), SignInContract.View, AnkoLogger {
         signInButton.setOnClickListener { presenter.signIn() }
         passwordField.onEnter { presenter.signIn() }
 
+        // Create link for textview
         githubIssueLink.movementMethod = LinkMovementMethod.getInstance()
         githubIssueLink.isClickable = true
         githubIssueLink.text = if (Build.VERSION.SDK_INT >= 24) {
@@ -49,10 +50,15 @@ class SignInActivity : AppCompatActivity(), SignInContract.View, AnkoLogger {
     }
 
     override fun navigateToMainActivity() = startActivity<MainActivity>()
+
     override fun checkNetwork() = connectivityManager.isNetworkAvailable()
+
     override fun getUsername() = usernameField.text.toString()
+
     override fun getPassword() = passwordField.text.toString()
+
     override fun showSnack(message: String) = signinActivity.snack(message)
+
     override fun showAlert(message: String, title: String) {
         alert(message, title) { negativeButton("Ok, Got it") {} }.show()
     }

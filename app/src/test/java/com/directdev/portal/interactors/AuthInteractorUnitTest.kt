@@ -25,7 +25,7 @@ class AuthInteractorUnitTest {
         // Given
         val bimayApi: NetworkHelper = mock {
             on { getIndexHtml() } doReturn Single.just(Response.success(ResponseBody.create(MediaType.parse("test"), indexHtml)))
-            on { getRandomizedFields(any(), any()) } doReturn Single.just(Response.success(ResponseBody.create(MediaType.parse("text/js"), loaderJS)))
+            on { getLoaderJs(any(), any()) } doReturn Single.just(Response.success(ResponseBody.create(MediaType.parse("text/js"), loaderJS)))
             on { authenticate(any(), any()) } doReturn Single.just(authenticateResponse)
         }
         val userCredRepo: UserCredRepository = mock {

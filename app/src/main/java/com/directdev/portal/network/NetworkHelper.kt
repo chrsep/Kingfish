@@ -11,7 +11,7 @@ import retrofit2.Response
 interface NetworkHelper {
     val bimayService: BimayService
     fun getIndexHtml(): Single<Response<ResponseBody>>
-    fun getRandomizedFields(cookie: String, serial: String): Single<Response<ResponseBody>>
+    fun getLoaderJs(cookie: String, serial: String): Single<Response<ResponseBody>>
     fun authenticate(cookie: String, fieldMap: HashMap<String, String>): Single<Response<String>>
     fun switchRole(cookie: String): Completable
     fun getUserProfile(cookie: String): Single<ResponseBody>

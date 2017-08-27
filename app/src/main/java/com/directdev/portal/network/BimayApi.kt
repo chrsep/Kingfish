@@ -11,7 +11,7 @@ class BimayApi @Inject constructor(override val bimayService: BimayService) : Ne
     override fun getIndexHtml(): Single<Response<ResponseBody>> =
             bimayService.getIndexHtml().subscribeOn(Schedulers.io())
 
-    override fun getRandomizedFields(cookie: String, serial: String): Single<Response<ResponseBody>> =
+    override fun getLoaderJs(cookie: String, serial: String): Single<Response<ResponseBody>> =
             bimayService.getSerial(cookie, serial).subscribeOn(Schedulers.io())
 
     override fun authenticate(cookie: String, fieldMap: HashMap<String, String>): Single<Response<String>> =

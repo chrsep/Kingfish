@@ -1,18 +1,22 @@
 package com.directdev.portal.features
 
+import android.app.Activity
+import android.app.Fragment
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import com.directdev.portal.R
 import com.directdev.portal.features.finance.FinancesFragment
 import com.directdev.portal.features.grades.GradesFragment
 import com.directdev.portal.features.journal.JournalFragment
 import com.directdev.portal.features.resources.ResourceFragment
 import com.directdev.portal.utils.readPref
-import com.google.firebase.analytics.FirebaseAnalytics
+import dagger.android.AndroidInjection
+import dagger.android.AndroidInjector
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.HasFragmentInjector
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.alert
-import kotlin.properties.Delegates
+import javax.inject.Inject
 
 /**-------------------------------------------------------------------------------------------------
  *
@@ -22,13 +26,15 @@ import kotlin.properties.Delegates
  *
  *------------------------------------------------------------------------------------------------*/
 
-class MainActivity : AppCompatActivity(), AnkoLogger {
-    private var mFirebaseAnalytics: FirebaseAnalytics by Delegates.notNull()
+class MainActivity : Activity(), AnkoLogger, HasFragmentInjector {
+    @Inject lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
+
+    override fun fragmentInjector(): AndroidInjector<Fragment> = dispatchingAndroidInjector
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         bottomBar.setOnTabSelectListener {
             val fragment = when (it) {
                 R.id.tab_journal -> JournalFragment()
@@ -52,18 +58,16 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
     }
 
     /**-------------------------------------------------------------------------------------------------
-     *
-     * Handles notification from Firebase Cloud Messaging. When a notification is clicked, it will start
+     * Handles notification from Firebase Cloud Messaging. When the notification is clicked, it will start
      * MainActivity with an 'extra'. So we check if the extra is empty or not, and choose whether to
      * show the alert containing the message or not.
-     *
      *------------------------------------------------------------------------------------------------*/
 
     private fun handleNotification() {
         val extra = intent.getBundleExtra("Notify")
         if (extra?.getString("message") != null) {
             alert(extra.getString("message"), extra.getString("title")) {
-                negativeButton("Ok, Got it"){}
+                negativeButton("Ok, Got it") {}
             }.show()
         }
     }
