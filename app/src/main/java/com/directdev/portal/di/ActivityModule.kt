@@ -11,7 +11,8 @@ abstract class ActivityModule{
             SignInModule::class,
             NetworkModule::class,
             FirebaseAnalyticsModule::class,
-            RealmModule::class
+            RealmModule::class,
+            JodaModule::class
     ))
     abstract fun bindSigninActivity(): SignInActivity
 

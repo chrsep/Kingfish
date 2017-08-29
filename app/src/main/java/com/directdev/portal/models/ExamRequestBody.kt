@@ -1,3 +1,3 @@
 package com.directdev.portal.models
 
-data class ExamRequestBody(val strm: String, val acad: String = "RS1")
+data class ExamRequestBody(val strm: Int, val acad: String = "RS1")

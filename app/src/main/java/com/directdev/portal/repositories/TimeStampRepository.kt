@@ -2,6 +2,7 @@ package com.directdev.portal.repositories
 
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormatter
+import java.util.*
 import javax.inject.Inject
 
 /**-------------------------------------------------------------------------------------------------
@@ -11,6 +12,6 @@ class TimeStampRepository @Inject constructor(
         private val dateProvider: DateTime,
         private val formatter: DateTimeFormatter
 ) {
-    fun today(): DateTime = dateProvider.withTimeAtStartOfDay()
-    fun todayString(): String = today().toString(formatter)
+    fun today(): Date = dateProvider.withTimeAtStartOfDay().toDate()
+    fun todayString(): String = dateProvider.withTimeAtStartOfDay().toString(formatter)
 }

@@ -3,7 +3,6 @@ package com.directdev.portal.features.signIn
 import android.content.Intent
 import com.directdev.portal.interactors.AuthInteractor
 import com.directdev.portal.interactors.ProfileInteractor
-import com.directdev.portal.repositories.MainRepository
 import javax.inject.Inject
 
 /**-------------------------------------------------------------------------------------------------
@@ -12,8 +11,7 @@ import javax.inject.Inject
 class SignInPresenter @Inject constructor(
         private val view: SignInContract.View,
         private val authInteractor: AuthInteractor,
-        private val profileInteractor: ProfileInteractor,
-        private val mainRepo: MainRepository
+        private val profileInteractor: ProfileInteractor
 ) : SignInContract.Presenter {
     private var subscribedToAuth = false
 
@@ -23,7 +21,7 @@ class SignInPresenter @Inject constructor(
             view.showAlert(extra.getString("message"), extra.getString("title"))
         if (intent.getStringExtra("signout") != null)
             view.logSignOut()
-        mainRepo.cleanData()
+        view.cleanData()
     }
 
     override fun signIn() {
@@ -33,12 +31,12 @@ class SignInPresenter @Inject constructor(
             return
         }
         if (subscribedToAuth) return
-        authInteractor.execute(view.getUsername(), view.getPassword()).doOnSubscribe {
+        authInteractor.execute(view.getUsername(), view.getPassword()).flatMap {
+            profileInteractor.execute(it)
+        }.doOnSubscribe {
             view.animateSignInButton()
             view.hideKeyboard()
             subscribedToAuth = true
-        }.flatMap {
-            profileInteractor.execute(it)
         }.doFinally {
             subscribedToAuth = false
         }.subscribe({

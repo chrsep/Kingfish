@@ -1,40 +1,57 @@
 package com.directdev.portal.features.journal
 
 import android.support.v7.widget.LinearLayoutManager
+import com.directdev.portal.R
 import com.directdev.portal.interactors.AuthInteractor
-import com.directdev.portal.repositories.JournalRepository
-import com.directdev.portal.repositories.TimeStampRepository
+import com.directdev.portal.interactors.JournalInteractor
 import javax.inject.Inject
 
 class JournalPresenter @Inject constructor(
         private val authInteractor: AuthInteractor,
         private val view: JournalContract.View,
-        private val timeStampRepo: TimeStampRepository,
         private val adapter: JournalRecyclerAdapter,
-        private val journalRepo: JournalRepository,
-        private val layoutManager: LinearLayoutManager
+        private val layoutManager: LinearLayoutManager,
+        private val journalInteractor: JournalInteractor
 ) : JournalContract.Presenter {
     private var isSyncing = false
+    private var menuInflated = false
 
     override fun onStart() {
-        val today = timeStampRepo.today()
-        val todayString = timeStampRepo.todayString()
-        val schedules = journalRepo.findFutureSchedules(today.toDate())
-        val todaySchedule = schedules.filter { it.date == today.toDate() }
-        adapter.updateData(schedules)
+        if (!menuInflated) {
+            view.inflateMenu()
+            menuInflated = true
+        }
+        val entries = journalInteractor.getFutureEntry()
+        adapter.updateData(entries)
+        view.setTitle(journalInteractor.checkIsHoliday())
         view.setRecyclerAdapter(layoutManager, adapter)
         view.logContentOpened()
-        view.setupToolbar(todaySchedule, todayString)
+        sync()
     }
 
-    override fun update() {
-        val syncChain = authInteractor.execute().doOnSubscribe {
+    override fun sync() {
+        if (isSyncing) return
+        authInteractor.execute().flatMap {
+            journalInteractor.sync(it)
+        }.doOnSubscribe {
+            view.showLoading()
             isSyncing = true
-        }
-        if (!isSyncing) syncChain.subscribe({
+        }.doFinally {
+            view.hideLoading()
+            isSyncing = false
+        }.subscribe({
 
         }, {
-
+            throw it
         })
     }
+
+    override fun onMenuItemClick(itemId: Int): Boolean {
+        when (itemId) {
+            R.id.action_refresh -> sync()
+            R.id.action_setting -> view.navigateToSettings()
+        }
+        return true
+    }
+
 }

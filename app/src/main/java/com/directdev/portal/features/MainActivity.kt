@@ -38,7 +38,10 @@ class MainActivity : Activity(), AnkoLogger, HasFragmentInjector {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         bottomBar.setOnTabSelectListener {
-            val fragment = when (it) {
+
+            // TODO: Fragment is aalways recreated, this causes mulltiple presenter to be created
+            // and multiple sync request created.
+            val fragment = fragmentManager.findFragmentByTag(it.toString()) ?: when (it) {
                 R.id.tab_journal -> JournalFragment()
                 R.id.tab_grades -> GradesFragment()
                 R.id.tab_finances -> FinancesFragment()
@@ -47,7 +50,7 @@ class MainActivity : Activity(), AnkoLogger, HasFragmentInjector {
             }
             fragmentManager
                     .beginTransaction()
-                    .replace(R.id.fragmentContainer, fragment)
+                    .replace(R.id.fragmentContainer, fragment, it.toString())
                     .commit()
         }
         handleNotification()

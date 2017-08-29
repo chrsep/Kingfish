@@ -11,6 +11,7 @@ import android.text.method.LinkMovementMethod
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.LoginEvent
 import com.directdev.portal.BuildConfig
+import com.directdev.portal.Portal
 import com.directdev.portal.R
 import com.directdev.portal.features.MainActivity
 import com.directdev.portal.utils.*
@@ -104,4 +105,6 @@ class SignInActivity : Activity(), SignInContract.View, AnkoLogger {
     }
 
     override fun logSignOut() = fbAnalytics.logEvent("logout", Bundle())
+
+    override fun cleanData() = (application as Portal).cleanData()
 }

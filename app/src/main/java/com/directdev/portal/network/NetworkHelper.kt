@@ -1,5 +1,8 @@
 package com.directdev.portal.network
 
+import com.directdev.portal.models.ExamModel
+import com.directdev.portal.models.JournalModel
+import com.directdev.portal.models.TermModel
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.ResponseBody
@@ -15,4 +18,7 @@ interface NetworkHelper {
     fun authenticate(cookie: String, fieldMap: HashMap<String, String>): Single<Response<String>>
     fun switchRole(cookie: String): Completable
     fun getUserProfile(cookie: String): Single<ResponseBody>
+    fun getJournalEntries(cookie: String, terms: List<Int>): Single<List<JournalModel>>
+    fun getExams(cookie: String, terms: List<Int>): Single<List<ExamModel>>
+    fun getTerms(cookie: String): Single<List<TermModel>>
 }

@@ -9,6 +9,7 @@ import com.directdev.portal.features.journal.JournalRecyclerAdapter
 import dagger.Module
 import dagger.Provides
 import io.realm.Realm
+import javax.inject.Named
 
 /**-------------------------------------------------------------------------------------------------
  * Created by chris on 8/26/17.
@@ -28,6 +29,7 @@ class JournalModule {
     fun provideContext(activity: MainActivity): Context = activity
 
     @Provides
+    @Named("MainThread")
     fun provideFragmentRealm(activity: MainActivity): Realm = activity.realm
 
     @Provides

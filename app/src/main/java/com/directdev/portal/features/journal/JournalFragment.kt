@@ -7,10 +7,10 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import com.directdev.portal.R
 import com.directdev.portal.features.SettingsActivity
-import com.directdev.portal.models.JournalModel
 import com.directdev.portal.network.DataApi
 import com.directdev.portal.network.SyncManager
 import com.directdev.portal.utils.action
@@ -21,6 +21,7 @@ import dagger.android.AndroidInjection
 import io.reactivex.functions.Action
 import kotlinx.android.synthetic.main.fragment_journal.*
 import org.jetbrains.anko.ctx
+import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.startActivity
 import org.joda.time.DateTime
 import org.joda.time.Hours
@@ -30,8 +31,6 @@ class JournalFragment : Fragment(), JournalContract.View {
 
     @Inject override lateinit var fbAnalytics: FirebaseAnalytics
     @Inject override lateinit var presenter: JournalContract.Presenter
-
-    private var menuInflated = false
 
     override fun onAttach(context: Context?) {
         AndroidInjection.inject(this)
@@ -44,20 +43,8 @@ class JournalFragment : Fragment(), JournalContract.View {
     override fun onStart() {
         super.onStart()
         presenter.onStart()
-        if (!menuInflated) {
-            journalToolbar.inflateMenu(R.menu.menu_journal)
-            menuInflated = true
-        }
         journalToolbar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.action_refresh -> {
-                    update()
-                }
-                R.id.action_setting -> {
-                    startActivity<SettingsActivity>()
-                }
-            }
-            true
+            presenter.onMenuItemClick(it.itemId)
         }
     }
 
@@ -66,12 +53,8 @@ class JournalFragment : Fragment(), JournalContract.View {
         recyclerContent.adapter = adapter
     }
 
-    override fun setupToolbar(schedules: List<JournalModel>, dateString: String) {
-        journalToolbar.title = if (schedules.isNotEmpty() &&
-                (schedules[0].session.size > 0 || schedules[0].exam.size > 0))
-            "Today - " + dateString
-        else
-            "Today - Holiday"
+    override fun setTitle(date: String) {
+        journalToolbar.title = "Today - " + date
     }
 
     override fun logContentOpened() {
@@ -79,6 +62,22 @@ class JournalFragment : Fragment(), JournalContract.View {
         bundle.putString("content", "journal")
         fbAnalytics.logEvent("content_opened", bundle)
     }
+
+    override fun showLoading() {
+        runOnUiThread {
+            journalSyncProgress.visibility = View.VISIBLE
+        }
+    }
+
+    override fun hideLoading() {
+        runOnUiThread {
+            journalSyncProgress.visibility = View.GONE
+        }
+    }
+
+    override fun inflateMenu() = journalToolbar.inflateMenu(R.menu.menu_journal)
+
+    override fun navigateToSettings() = startActivity<SettingsActivity>()
 
     private fun checkLastUpdate() {
         val savedData = ctx.readPref(R.string.last_update, "")

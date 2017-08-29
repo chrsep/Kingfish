@@ -6,6 +6,7 @@ import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.core.CrashlyticsCore
 import com.directdev.portal.di.DaggerApplicationComponent
+import com.directdev.portal.utils.clearPref
 import com.facebook.stetho.Stetho
 import com.uphyca.stetho_realm.RealmInspectorModulesProvider
 import dagger.android.DispatchingAndroidInjector
@@ -53,5 +54,12 @@ class Portal : MultiDexApplication(), HasActivityInjector {
                 .build()
         Fabric.with(this, Answers(), crashlyticsKit)
         super.onCreate()
+    }
+
+    fun cleanData() {
+        val realm = Realm.getDefaultInstance()
+        if (!realm.isEmpty) realm.executeTransactionAsync { it.deleteAll() }
+        realm.close()
+        clearPref()
     }
 }

@@ -18,6 +18,7 @@ interface SignInContract {
         fun checkNetwork() : Boolean
         fun hideKeyboard()
         fun navigateToMainActivity()
+        fun cleanData()
     }
 
     interface Presenter: BasePresenter {

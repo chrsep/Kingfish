@@ -70,7 +70,7 @@ interface BimayService {
     @Headers("Referer: https://binusmaya.binus.ac.id/newstudent/",
             "User-Agent: Portal App/"+BuildConfig.VERSION_NAME)
     @POST("newExam/Schedule/getOwnScheduleStudent")
-    fun getExams(@Body data: ExamRequestBody, @Header("Cookie") cookie: String): Single<List<ExamModel>>
+    fun getExams(@Header("Cookie") cookie: String, @Body body: ExamRequestBody): Single<List<ExamModel>>
 
     @Headers("Referer: https://binusmaya.binus.ac.id/newstudent/",
             "User-Agent: Portal App/"+BuildConfig.VERSION_NAME)
