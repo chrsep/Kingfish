@@ -51,6 +51,7 @@ class MainActivity : Activity(), AnkoLogger, HasFragmentInjector {
             fragmentManager
                     .beginTransaction()
                     .replace(R.id.fragmentContainer, fragment, it.toString())
+                    .addToBackStack(it.toString())
                     .commit()
         }
         handleNotification()

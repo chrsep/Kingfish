@@ -1,6 +1,7 @@
 package com.directdev.portal.features.journal
 
-import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import com.directdev.portal.BasePresenter
 import com.directdev.portal.BaseView
 
@@ -10,17 +11,18 @@ import com.directdev.portal.BaseView
 interface JournalContract {
     interface View : BaseView<Presenter> {
         fun logContentOpened()
-        fun setRecyclerAdapter(layoutManager: LinearLayoutManager, adapter: JournalRecyclerAdapter)
         fun navigateToSettings()
-        fun inflateMenu()
-        fun setTitle(date: String)
         fun showLoading()
         fun hideLoading()
+        fun setTitle(toolbar: Toolbar, date: String)
+        fun setRecyclerAdapter(view: RecyclerView, adapter: JournalRecyclerAdapter)
     }
 
     interface Presenter : BasePresenter {
-        fun onStart()
         fun sync()
         fun onMenuItemClick(itemId: Int): Boolean
+        fun onCreateView(toolbar: Toolbar, recyclerView: RecyclerView)
+        fun onStop()
+        fun onStart()
     }
 }

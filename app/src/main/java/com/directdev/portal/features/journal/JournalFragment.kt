@@ -6,6 +6,8 @@ import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,24 +39,36 @@ class JournalFragment : Fragment(), JournalContract.View {
         super.onAttach(context)
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
-            inflater?.inflate(R.layout.fragment_journal, container, false)
+    override fun onCreateView(inflater: LayoutInflater,
+                              container: ViewGroup,
+                              savedInstanceState: Bundle?): View? {
+        val view = inflater.inflate(R.layout.fragment_journal, container, false)
+        val toolbar = view.findViewById<Toolbar>(R.id.journalToolbar)
+        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerContent)
+        toolbar.inflateMenu(R.menu.menu_journal)
+        toolbar.setOnMenuItemClickListener { presenter.onMenuItemClick(it.itemId) }
+        presenter.onCreateView(toolbar, recyclerView)
+        return view
+    }
 
     override fun onStart() {
         super.onStart()
         presenter.onStart()
-        journalToolbar.setOnMenuItemClickListener {
-            presenter.onMenuItemClick(it.itemId)
-        }
     }
 
-    override fun setRecyclerAdapter(layoutManager: LinearLayoutManager, adapter: JournalRecyclerAdapter) {
-        recyclerContent.layoutManager = layoutManager
-        recyclerContent.adapter = adapter
+    override fun onStop() {
+        super.onStop()
+        presenter.onStop()
     }
 
-    override fun setTitle(date: String) {
-        journalToolbar.title = "Today - " + date
+    override fun setRecyclerAdapter(view: RecyclerView,
+                                    adapter: JournalRecyclerAdapter) {
+        view.layoutManager = LinearLayoutManager(activity)
+        view.adapter = adapter
+    }
+
+    override fun setTitle(toolbar: Toolbar, date: String) {
+        toolbar.title = "Today - " + date
     }
 
     override fun logContentOpened() {
@@ -74,8 +88,6 @@ class JournalFragment : Fragment(), JournalContract.View {
             journalSyncProgress.visibility = View.GONE
         }
     }
-
-    override fun inflateMenu() = journalToolbar.inflateMenu(R.menu.menu_journal)
 
     override fun navigateToSettings() = startActivity<SettingsActivity>()
 
