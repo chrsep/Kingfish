@@ -33,6 +33,6 @@ class JournalModule {
     fun provideFragmentRealm(activity: MainActivity): Realm = activity.realm
 
     @Provides
-    fun providejournalRecyclerAdapter(ctx: Context): JournalRecyclerAdapter =
+    fun provideJournalRecyclerAdapter(ctx: Context): JournalRecyclerAdapter =
             JournalRecyclerAdapter(ctx)
 }

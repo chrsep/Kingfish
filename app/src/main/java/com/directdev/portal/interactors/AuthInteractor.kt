@@ -3,10 +3,13 @@ package com.directdev.portal.interactors
 import com.directdev.portal.network.NetworkHelper
 import com.directdev.portal.repositories.FlagRepository
 import com.directdev.portal.repositories.TermRepository
+import com.directdev.portal.repositories.TimeStampRepository
 import com.directdev.portal.repositories.UserCredRepository
 import com.directdev.portal.utils.SigninException
 import io.reactivex.Single
+import org.joda.time.Minutes
 import javax.inject.Inject
+import javax.inject.Named
 
 /**-------------------------------------------------------------------------------------------------
  * Handles everything related to authenticating with Binusmaya
@@ -16,7 +19,8 @@ class AuthInteractor @Inject constructor(
         private val bimayApi: NetworkHelper,
         private val userCredRepo: UserCredRepository,
         private val flagRepo: FlagRepository,
-        private val termRepo: TermRepository
+        private val termRepo: TermRepository,
+        @Named("auth") private val timeStampRepo: TimeStampRepository
 ) {
     private var isRequesting = false
     private lateinit var request: Single<String>
@@ -27,11 +31,12 @@ class AuthInteractor @Inject constructor(
     private val usernamePattern = "<input type=\"text\" name=\".*placeholder=\"Username\""
     private val passwordPattern = "<input type=\"password\" name=\".*placeholder=\"Password\""
 
-    // Returns a Single containing the cookie
+    // Returns a Single containing the authenticated cookie
     fun execute(
             username: String = userCredRepo.getUsername(),
             password: String = userCredRepo.getPassword()
     ): Single<String> {
+        if (!isSyncOverdue()) return Single.just(userCredRepo.getCookie())
         var indexHtml = ""
         var cookie = ""
         request = if (isRequesting) request else bimayApi.getIndexHtml().flatMap {
@@ -66,6 +71,7 @@ class AuthInteractor @Inject constructor(
             cookie
         }.doAfterSuccess {
             userCredRepo.saveAll(username, password, cookie)
+            timeStampRepo.updateLastSyncDate()
             flagRepo.save(isLoggedIn = true)
         }.doAfterTerminate {
             isRequesting = false
@@ -106,4 +112,10 @@ class AuthInteractor @Inject constructor(
     }
 
     private fun decodeHtml(input: String) = input.replace("%2F", "/").replace("%3D", "=")
+
+    // TODO: This is similar to the one from journalInteractor, might be able to be refactored out
+    fun isSyncOverdue(): Boolean {
+        val minutesInt = Minutes.minutesBetween(timeStampRepo.getLastSync(), timeStampRepo.today()).minutes
+        return Math.abs(minutesInt) > 25
+    }
 }

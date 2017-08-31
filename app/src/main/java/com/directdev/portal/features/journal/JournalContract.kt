@@ -1,9 +1,10 @@
 package com.directdev.portal.features.journal
 
-import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import com.directdev.portal.BasePresenter
 import com.directdev.portal.BaseView
+import com.directdev.portal.models.JournalModel
+import io.realm.RealmResults
 
 /**-------------------------------------------------------------------------------------------------
  * Created by chris on 8/26/17.
@@ -15,16 +16,16 @@ interface JournalContract {
         fun showLoading()
         fun hideLoading()
         fun setTitle(toolbar: Toolbar, date: String)
-        fun setRecyclerAdapter(view: RecyclerView, adapter: JournalRecyclerAdapter)
         fun showSuccess(message: String)
         fun showFailed(message: String)
+        fun updateAdapterData(data: RealmResults<JournalModel>)
     }
 
     interface Presenter : BasePresenter {
-        fun sync()
         fun onMenuItemClick(itemId: Int): Boolean
-        fun onCreateView(toolbar: Toolbar, recyclerView: RecyclerView)
         fun onStop()
         fun onStart()
+        fun sync(bypass: Boolean = false)
+        fun onCreateView(toolbar: Toolbar)
     }
 }

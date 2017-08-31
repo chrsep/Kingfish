@@ -13,40 +13,36 @@ import android.view.View
 import android.view.ViewGroup
 import com.directdev.portal.R
 import com.directdev.portal.features.SettingsActivity
-import com.directdev.portal.network.DataApi
-import com.directdev.portal.network.SyncManager
+import com.directdev.portal.models.JournalModel
 import com.directdev.portal.utils.action
-import com.directdev.portal.utils.readPref
 import com.directdev.portal.utils.snack
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.android.AndroidInjection
-import io.reactivex.functions.Action
+import io.realm.RealmResults
 import kotlinx.android.synthetic.main.fragment_journal.*
-import org.jetbrains.anko.ctx
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.startActivity
-import org.joda.time.DateTime
-import org.joda.time.Hours
 import javax.inject.Inject
 
 class JournalFragment : Fragment(), JournalContract.View {
     @Inject override lateinit var fbAnalytics: FirebaseAnalytics
     @Inject override lateinit var presenter: JournalContract.Presenter
+    @Inject lateinit var adapter: JournalRecyclerAdapter
 
     override fun onAttach(context: Context?) {
         AndroidInjection.inject(this)
         super.onAttach(context)
     }
 
-    override fun onCreateView(inflater: LayoutInflater,
-                              container: ViewGroup,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_journal, container, false)
         val toolbar = view.findViewById<Toolbar>(R.id.journalToolbar)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerContent)
         toolbar.inflateMenu(R.menu.menu_journal)
         toolbar.setOnMenuItemClickListener { presenter.onMenuItemClick(it.itemId) }
-        presenter.onCreateView(toolbar, recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(activity)
+        recyclerView.adapter = adapter
+        presenter.onCreateView(toolbar)
         return view
     }
 
@@ -60,12 +56,6 @@ class JournalFragment : Fragment(), JournalContract.View {
         presenter.onStop()
     }
 
-    override fun setRecyclerAdapter(view: RecyclerView,
-                                    adapter: JournalRecyclerAdapter) {
-        view.layoutManager = LinearLayoutManager(activity)
-        view.adapter = adapter
-    }
-
     override fun setTitle(toolbar: Toolbar, date: String) {
         toolbar.title = "Today - " + date
     }
@@ -76,57 +66,21 @@ class JournalFragment : Fragment(), JournalContract.View {
         fbAnalytics.logEvent("content_opened", bundle)
     }
 
-    override fun showLoading() {
-        runOnUiThread {
-            journalSyncProgress.visibility = View.VISIBLE
-        }
-    }
-
-    override fun hideLoading() {
-        runOnUiThread {
-            journalSyncProgress.visibility = View.GONE
-        }
-    }
-
     override fun showSuccess(message: String) {
         view?.snack(message, Snackbar.LENGTH_SHORT)
     }
 
     override fun showFailed(message: String) {
         view?.snack(message, Snackbar.LENGTH_INDEFINITE) {
-            action("RETRY", Color.YELLOW, {
-                presenter.sync()
-            })
+            action("RETRY", Color.YELLOW, { presenter.sync(true) })
         }
     }
+
+    override fun updateAdapterData(data: RealmResults<JournalModel>) = adapter.updateData(data)
 
     override fun navigateToSettings() = startActivity<SettingsActivity>()
 
-    private fun checkLastUpdate() {
-        val savedData = ctx.readPref(R.string.last_update, "")
-        var hours = "ages"
-        var hoursInt = 0
-        if (savedData != "") {
-            val lastUpdate = DateTime.parse(savedData)
-            val today = DateTime.now()
-            hoursInt = Hours.hoursBetween(lastUpdate, today).hours
-            hours = hoursInt.toString() + " hours"
-        }
-        if (hoursInt > 36)
-            view.snack("""You last updated $hours ago""", Snackbar.LENGTH_LONG) {
-                action("Update", Color.YELLOW) { update() }
-            }
-    }
+    override fun showLoading() = runOnUiThread { journalSyncProgress.visibility = View.VISIBLE }
 
-    private fun update(): Boolean {
-        view?.snack("Updating", Snackbar.LENGTH_INDEFINITE)
-        if (DataApi.isActive) return true
-        SyncManager.sync(ctx, SyncManager.COMMON, Action {
-            view?.snack("Success")
-        }, Action {
-            // TODO: This is not how it suppose to be
-            view?.snack(DataApi.decideCauseOfFailure(Exception()))
-        })
-        return true
-    }
+    override fun hideLoading() = runOnUiThread { journalSyncProgress.visibility = View.GONE }
 }

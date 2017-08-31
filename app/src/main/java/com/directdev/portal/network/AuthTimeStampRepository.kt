@@ -1,14 +1,15 @@
-package com.directdev.portal.repositories
+package com.directdev.portal.network
 
 import android.content.Context
 import com.directdev.portal.R
+import com.directdev.portal.repositories.TimeStampRepository
 import org.joda.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 /**-------------------------------------------------------------------------------------------------
  * Created by chris on 8/31/17.
  *------------------------------------------------------------------------------------------------*/
-class JournalTimeStampRepository @Inject constructor(
+class AuthTimeStampRepository @Inject constructor(
         formatter: DateTimeFormatter,
         ctx: Context
 ) : TimeStampRepository(formatter, ctx) {
