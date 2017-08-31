@@ -5,6 +5,7 @@ import android.support.v7.widget.Toolbar
 import com.directdev.portal.R
 import com.directdev.portal.interactors.AuthInteractor
 import com.directdev.portal.interactors.JournalInteractor
+import com.directdev.portal.utils.generateMessage
 import javax.inject.Inject
 
 class JournalPresenter @Inject constructor(
@@ -41,9 +42,9 @@ class JournalPresenter @Inject constructor(
             if (!isStopped) view.hideLoading()
             isSyncing = false
         }.subscribe({
-
+            view.showSuccess("Journal & Finance updated")
         }, {
-            throw it
+            view.showFailed(it.generateMessage())
         })
     }
 

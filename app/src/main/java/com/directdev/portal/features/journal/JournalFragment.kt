@@ -30,7 +30,6 @@ import org.joda.time.Hours
 import javax.inject.Inject
 
 class JournalFragment : Fragment(), JournalContract.View {
-
     @Inject override lateinit var fbAnalytics: FirebaseAnalytics
     @Inject override lateinit var presenter: JournalContract.Presenter
 
@@ -86,6 +85,18 @@ class JournalFragment : Fragment(), JournalContract.View {
     override fun hideLoading() {
         runOnUiThread {
             journalSyncProgress.visibility = View.GONE
+        }
+    }
+
+    override fun showSuccess(message: String) {
+        view?.snack(message, Snackbar.LENGTH_SHORT)
+    }
+
+    override fun showFailed(message: String) {
+        view?.snack(message, Snackbar.LENGTH_INDEFINITE) {
+            action("RETRY", Color.YELLOW, {
+                presenter.sync()
+            })
         }
     }
 

@@ -13,7 +13,7 @@ import org.joda.time.format.DateTimeFormatter
 class JodaModule {
 
     @Provides
-    fun provideDateTime(): DateTime = DateTime()
+    fun provideDateTime(): DateTime = DateTime.now()
 
     @Provides
     fun provideDateTimeFormatter(): DateTimeFormatter = DateTimeFormat.forPattern("dd MMMM")

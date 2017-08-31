@@ -14,7 +14,8 @@ abstract class FragmentModule {
             NetworkModule::class,
             FirebaseAnalyticsModule::class,
             JodaModule::class,
-            LayoutManagerModule::class
+            LayoutManagerModule::class,
+            TimeStampRepositoryModule::class
     ))
     abstract fun bindJournalFragment(): JournalFragment
 }

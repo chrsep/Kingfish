@@ -16,4 +16,5 @@
     <string name="last_update">lastUpdate</string>
     <string name="campus_setting">campusDisabled</string>
     <string name="isStaff">isStaff</string>
+    <string name="journal_last_sync">journal_last_sync</string>
 </resources>

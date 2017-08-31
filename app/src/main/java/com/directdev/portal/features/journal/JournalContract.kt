@@ -16,6 +16,8 @@ interface JournalContract {
         fun hideLoading()
         fun setTitle(toolbar: Toolbar, date: String)
         fun setRecyclerAdapter(view: RecyclerView, adapter: JournalRecyclerAdapter)
+        fun showSuccess(message: String)
+        fun showFailed(message: String)
     }
 
     interface Presenter : BasePresenter {
