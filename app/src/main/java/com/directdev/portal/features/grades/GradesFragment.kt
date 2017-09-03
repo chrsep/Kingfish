@@ -1,51 +1,83 @@
 package com.directdev.portal.features.grades
 
 import android.app.Fragment
+import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.directdev.portal.R
-import com.directdev.portal.models.CourseModel
 import com.directdev.portal.models.CreditModel
 import com.directdev.portal.models.ScoreModel
+import com.directdev.portal.utils.action
+import com.directdev.portal.utils.snack
 import com.google.firebase.analytics.FirebaseAnalytics
-import io.realm.Realm
+import dagger.android.AndroidInjection
 import io.realm.RealmResults
 import kotlinx.android.synthetic.main.fragment_grades.*
 import lecho.lib.hellocharts.formatter.SimpleAxisValueFormatter
 import lecho.lib.hellocharts.listener.LineChartOnValueSelectListener
 import lecho.lib.hellocharts.model.*
+import lecho.lib.hellocharts.view.LineChartView
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.ctx
-import kotlin.properties.Delegates
+import org.jetbrains.anko.runOnUiThread
+import javax.inject.Inject
 
-class GradesFragment : Fragment(), AnkoLogger, LineChartOnValueSelectListener {
+class GradesFragment : Fragment(), AnkoLogger, LineChartOnValueSelectListener, GradesContract.View {
+    @Inject override lateinit var fbAnalytics: FirebaseAnalytics
+    @Inject override lateinit var presenter: GradesContract.Presenter
+    @Inject lateinit var adapter: GradesRecyclerAdapter
 
-    private var realm: Realm by Delegates.notNull()
-    private val termAndValueMap = mutableMapOf<Int, Int>()
+    override fun onAttach(context: Context?) {
+        AndroidInjection.inject(this)
+        super.onAttach(context)
+    }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater?.inflate(R.layout.fragment_grades, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view = inflater.inflate(R.layout.fragment_grades, container, false)
+        val gpaGraph = view.findViewById<LineChartView>(R.id.chart)
+        val gradesRecycler = view.findViewById<RecyclerView>(R.id.gradesRecycler)
+        val viewport = Viewport(
+                gpaGraph.currentViewport.left,
+                gpaGraph.currentViewport.top + 0.1f,
+                gpaGraph.currentViewport.right,
+                gpaGraph.currentViewport.bottom - 0.1f
+        )
+        gpaGraph.onValueTouchListener = this
+        gpaGraph.isZoomEnabled = false
+        gpaGraph.isValueSelectionEnabled = true
+        gpaGraph.maximumViewport = viewport
+        gpaGraph.currentViewport = viewport
+        gradesRecycler.layoutManager = LinearLayoutManager(activity)
+        gradesRecycler.adapter = adapter
         return view
     }
 
     override fun onStart() {
         super.onStart()
-        // Analytics
-        val mFirebaseAnalytics = FirebaseAnalytics.getInstance(ctx)
-        val bundle = Bundle()
-        bundle.putString("content", "grades")
-        mFirebaseAnalytics.logEvent("content_opened", bundle)
+        presenter.onStart()
+    }
 
-        realm = Realm.getDefaultInstance()
+    override fun onResume() {
+        super.onResume()
+        presenter.onResume()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        presenter.onStop()
+    }
+
+    override fun setGpaGraphData(credits: RealmResults<CreditModel>) {
         val lines = mutableListOf<Line>()
-        val credit = realm.where(CreditModel::class.java).findAll().sort("term")
-        val pointValues = turnGpaToPointValue(credit)
-        val line = Line(pointValues)
-                .setCubic(true)
+        val pointValues = turnGpaToPointValue(credits)
+        val line = Line(pointValues).setCubic(true)
                 .setColor(ContextCompat.getColor(ctx, R.color.colorAccent))
         lines.add(line)
         val data = LineChartData(lines)
@@ -53,82 +85,70 @@ class GradesFragment : Fragment(), AnkoLogger, LineChartOnValueSelectListener {
         xAxis.formatter = SimpleAxisValueFormatter(1)
         xAxis.setHasSeparationLine(false)
         data.axisYLeft = xAxis
-        setupChart(data)
-        setDataByTerm(pointValues.size)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        realm.close()
-    }
-
-    override fun onValueSelected(p0: Int, p1: Int, p2: PointValue?) {
-        setDataByTerm(p2?.x?.toInt())
-    }
-
-    override fun onValueDeselected() {
-    }
-
-    private fun setupChart(data: LineChartData) {
         chart.lineChartData = data
-        chart.onValueTouchListener = this
-        chart.isZoomEnabled = false
-        chart.isValueSelectionEnabled = true
         val viewport = Viewport(
                 chart.currentViewport.left,
                 chart.currentViewport.top + 0.1f,
                 chart.currentViewport.right,
-                chart.currentViewport.bottom - 0.1f)
+                chart.currentViewport.bottom - 0.1f
+        )
+        chart.onValueTouchListener = this
+        chart.isZoomEnabled = false
+        chart.isValueSelectionEnabled = true
         chart.maximumViewport = viewport
         chart.currentViewport = viewport
+    }
+
+    override fun onValueSelected(p0: Int, p1: Int, p2: PointValue?) {
+        p2?.x?.toInt()?.let { presenter.switchTerm(it) }
     }
 
     private fun turnGpaToPointValue(grades: RealmResults<CreditModel>): List<PointValue> {
         var i = 0
         val termAndGradesMap = grades.associateBy({ it.term }, { it.gpaCummulative.toFloat() })
-        val valueMap = termAndGradesMap.map {
+        return termAndGradesMap.map {
             i++
-            termAndValueMap.put(i, it.key)
-            i to it.value
-        }.toMap()
-        return valueMap.map { PointValue(it.key.toFloat(), it.value) }
-    }
-
-    private fun setDataByTerm(index: Int?) {
-        val firstTermCode = termAndValueMap[1]
-        val chosenTermCode = termAndValueMap[index]
-        if (firstTermCode != null && chosenTermCode != null) {
-            val year = ((chosenTermCode.toInt() + 99) / 100) - ((firstTermCode.toInt() + 99) / 100)
-            val term = when (chosenTermCode.toString().substring(2)) {
-                "10" -> ((year * 2) + 1).toString()
-                "20" -> ((year * 2) + 2).toString()
-                "30" -> ((year * 2) + 2).toString() + " ( SP )"
-                else -> "N/A"
-            }
-            gradesToolbar.title = "Semester " + term
-            val course = realm
-                    .where(CourseModel::class.java)
-                    .equalTo("term", chosenTermCode)
-                    .findAll()
-                    .map { it.courseId }
-                    .toSet()
-            val scoreResultList = mutableListOf<RealmResults<ScoreModel>>()
-            course.forEach {
-                val result = realm.where(ScoreModel::class.java).equalTo("courseId", it).findAll()
-                if (!result.isEmpty()) scoreResultList.add(result)
-            }
-
-            if (scoreResultList.isEmpty()) {
-                empty_placeholder.visibility = View.VISIBLE
-                gradesRecycler.visibility = View.GONE
-                return
-            } else {
-                empty_placeholder.visibility = View.GONE
-                gradesRecycler.visibility = View.VISIBLE
-            }
-
-            gradesRecycler.layoutManager = LinearLayoutManager(ctx)
-            gradesRecycler.adapter = GradesRecyclerAdapter(realm, scoreResultList, chosenTermCode)
+            PointValue(i.toFloat(), it.value)
         }
     }
+
+    override fun updateRecycler(grades: List<RealmResults<ScoreModel>>, credits: CreditModel) {
+        adapter.updateData(grades, credits)
+    }
+
+    override fun hideGradesRecycler() {
+        empty_placeholder.visibility = View.VISIBLE
+        gradesRecycler.visibility = View.GONE
+    }
+
+    override fun showGradesRecycler() {
+        empty_placeholder.visibility = View.GONE
+        gradesRecycler.visibility = View.VISIBLE
+    }
+
+    override fun logAnalytics() {
+        val bundle = Bundle()
+        bundle.putString("content", "grades")
+        fbAnalytics.logEvent("content_opened", bundle)
+    }
+
+    override fun showSuccess(message: String) {
+        view?.snack(message, Snackbar.LENGTH_SHORT)
+    }
+
+    override fun showFailed(message: String) {
+        view?.snack(message, Snackbar.LENGTH_INDEFINITE) {
+            action("RETRY", Color.YELLOW, { presenter.sync(true) })
+        }
+    }
+
+    override fun setToolbarTitle(title: String) {
+        gradesToolbar.title = title
+    }
+
+    override fun showLoading() = runOnUiThread { gradesSyncProgress.visibility = View.VISIBLE }
+
+    override fun hideLoading() = runOnUiThread { gradesSyncProgress.visibility = View.INVISIBLE }
+
+    override fun onValueDeselected() {}
 }

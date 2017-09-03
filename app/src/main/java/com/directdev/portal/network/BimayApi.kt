@@ -37,6 +37,10 @@ class BimayApi @Inject constructor(override val bimayService: BimayService) : Ne
         list
     })
 
+    override fun getGrades(cookie: String, terms: List<Int>): Single<Array<Any>> = Single.zip(terms.map {
+        bimayService.getGrades(it.toString(), cookie).subscribeOn(Schedulers.io())
+    }, { it })
+
     override fun getIndexHtml(): Single<Response<ResponseBody>> =
             bimayService.getIndexHtml().subscribeOn(Schedulers.io())
 

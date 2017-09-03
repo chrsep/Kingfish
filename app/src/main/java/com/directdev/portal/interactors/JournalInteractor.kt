@@ -17,9 +17,9 @@ import javax.inject.Named
  *------------------------------------------------------------------------------------------------*/
 class JournalInteractor @Inject constructor(
         private val journalRepo: JournalRepository,
-        @Named("journal") private val timeStampRepo: TimeStampRepository,
         private val bimayApi: NetworkHelper,
-        private val termRepo: TermRepository
+        private val termRepo: TermRepository,
+        @Named("journal") private val timeStampRepo: TimeStampRepository
 ) {
     fun getFutureEntry(): RealmResults<JournalModel> =
             journalRepo.getEntryFromDate(timeStampRepo.today().toDate())

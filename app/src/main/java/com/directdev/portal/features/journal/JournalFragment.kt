@@ -60,7 +60,7 @@ class JournalFragment : Fragment(), JournalContract.View {
         toolbar.title = "Today - " + date
     }
 
-    override fun logContentOpened() {
+    override fun logAnalytics() {
         val bundle = Bundle()
         bundle.putString("content", "journal")
         fbAnalytics.logEvent("content_opened", bundle)
@@ -82,5 +82,5 @@ class JournalFragment : Fragment(), JournalContract.View {
 
     override fun showLoading() = runOnUiThread { journalSyncProgress.visibility = View.VISIBLE }
 
-    override fun hideLoading() = runOnUiThread { journalSyncProgress.visibility = View.GONE }
+    override fun hideLoading() = runOnUiThread { journalSyncProgress.visibility = View.INVISIBLE }
 }

@@ -30,4 +30,11 @@ class TermRepository @Inject constructor(
             it.insertOrUpdate(terms)
         }
     }
+
+    fun getLatestTerm(): Int = Realm.getDefaultInstance().use {
+        it.where(TermModel::class.java)
+                .findAllSorted("value")
+                .map { it.value }
+                .last()
+    }
 }

@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import com.directdev.portal.R
 import com.directdev.portal.models.CreditModel
 import com.directdev.portal.models.ScoreModel
-import io.realm.Realm
 import io.realm.RealmResults
 import kotlinx.android.synthetic.main.item_grades.view.*
 import kotlinx.android.synthetic.main.item_grades_header.view.*
@@ -21,16 +20,15 @@ import kotlinx.android.synthetic.main.item_grades_header.view.*
  *------------------------------------------------------------------------------------------------*/
 
 class GradesRecyclerAdapter(
-        val realm: Realm,
-        val data: List<RealmResults<ScoreModel>>,
-        val term: Int) :
+        var grades: MutableList<RealmResults<ScoreModel>> = mutableListOf(),
+        var credit: CreditModel = CreditModel()) :
         RecyclerView.Adapter<GradesRecyclerAdapter.ViewHolder>() {
 
     private val HEADER = 1
 
     // +1 because of the added header
     override fun getItemCount(): Int {
-        return data.size + 1
+        return grades.size + 1
     }
 
     // returns view type of header when position is 0
@@ -42,15 +40,16 @@ class GradesRecyclerAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         // on position 0, bind the first data into the viewholder
         // on the next position, bind the data normally, starting from data 0
-        if (position == 0) holder.bindData(data[position])
-        else holder.bindData(data[position - 1])
+        if (grades.isEmpty()) return
+        if (position == 0) holder.bindData(grades[position])
+        else holder.bindData(grades[position - 1])
     }
 
     // Return the correct viewHolder based on the viewtype return by getItemViewType
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent?.context)
         return if (viewType == HEADER)
-            HeaderViewHolder(inflater.inflate(R.layout.item_grades_header, parent, false), term, realm)
+            HeaderViewHolder(inflater.inflate(R.layout.item_grades_header, parent, false), credit)
         else
             NormalViewHolder(inflater.inflate(R.layout.item_grades, parent, false))
     }
@@ -149,12 +148,18 @@ class GradesRecyclerAdapter(
         }
     }
 
-    private class HeaderViewHolder(view: View, val term: Int, val realm: Realm) : ViewHolder(view) {
+    private class HeaderViewHolder(view: View, val data: CreditModel) : ViewHolder(view) {
         override fun bindData(score: RealmResults<ScoreModel>) {
-            val data = realm.where(CreditModel::class.java).equalTo("term", term).findFirst()
             itemView.totalCreditCount.text = "${data.scuFinished} SCU"
             itemView.cumulativeGpaCount.text = data.gpaCummulative
             itemView.semesterGpaCount.text = if(data.gpaCurrent.equals("0.00")) "N/A" else data.gpaCurrent
         }
+    }
+
+    fun updateData(grades: List<RealmResults<ScoreModel>>, credit: CreditModel) {
+        this.grades.clear()
+        this.grades.addAll(grades)
+        this.credit = credit
+        notifyDataSetChanged()
     }
 }

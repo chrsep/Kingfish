@@ -21,4 +21,5 @@ interface NetworkHelper {
     fun getJournalEntries(cookie: String, terms: List<Int>): Single<List<JournalModel>>
     fun getExams(cookie: String, terms: List<Int>): Single<List<ExamModel>>
     fun getTerms(cookie: String): Single<List<TermModel>>
+    fun getGrades(cookie: String, terms: List<Int>): Single<Array<Any>>
 }

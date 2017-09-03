@@ -20,7 +20,7 @@ class JournalPresenter @Inject constructor(
         val entries = journalInteractor.getFutureEntry()
         view.updateAdapterData(entries)
         view.setTitle(toolbar, journalInteractor.checkIsHoliday())
-        view.logContentOpened()
+        view.logAnalytics()
     }
 
     override fun onStart() {

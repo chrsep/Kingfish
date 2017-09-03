@@ -11,7 +11,7 @@ import io.realm.RealmResults
  *------------------------------------------------------------------------------------------------*/
 interface JournalContract {
     interface View : BaseView<Presenter> {
-        fun logContentOpened()
+        fun logAnalytics()
         fun navigateToSettings()
         fun showLoading()
         fun hideLoading()

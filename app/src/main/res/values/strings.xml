@@ -18,4 +18,5 @@
     <string name="isStaff">isStaff</string>
     <string name="journal_last_sync">journal_last_sync</string>
     <string name="auth_last_try">auth_last_try</string>
+    <string name="grade_last_try">grade_last_try</string>
 </resources>

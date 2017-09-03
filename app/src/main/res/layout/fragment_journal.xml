@@ -24,9 +24,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="-7dp"
-            android:layout_marginTop="-4dp"
+            android:layout_marginTop="-10dp"
             android:indeterminate="true"
-            android:visibility="gone" />
+            android:visibility="invisible" />
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView

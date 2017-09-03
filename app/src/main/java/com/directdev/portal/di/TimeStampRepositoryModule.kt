@@ -1,6 +1,7 @@
 package com.directdev.portal.di
 
 import com.directdev.portal.network.AuthTimeStampRepository
+import com.directdev.portal.repositories.GradeTimeStampRepository
 import com.directdev.portal.repositories.JournalTimeStampRepository
 import com.directdev.portal.repositories.TimeStampRepository
 import dagger.Module
@@ -25,6 +26,11 @@ class TimeStampRepositoryModule {
     @Provides
     @Named("auth")
     fun providesAuthTimeStampRepository(timeStampRepo: AuthTimeStampRepository): TimeStampRepository =
+            timeStampRepo
+
+    @Provides
+    @Named("grade")
+    fun provideGradeTimeStampRepository(timeStampRepo: GradeTimeStampRepository): TimeStampRepository =
             timeStampRepo
 
 }
