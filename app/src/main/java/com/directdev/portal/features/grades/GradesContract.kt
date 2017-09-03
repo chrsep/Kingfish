@@ -22,12 +22,12 @@ interface GradesContract {
         fun setToolbarTitle(title: String)
         fun showSuccess(message: String)
         fun showFailed(message: String)
+        fun setGraphStyle()
     }
 
     interface Presenter : BasePresenter {
-        fun switchTerm(term: Int = -1)
+        fun switchTerm(creditIndex: Int)
         fun onResume()
-        fun setToolbarTitle(firstTerm: Int, chosenTerm: Int)
         fun sync(bypass: Boolean = false)
         fun onStop()
         fun onStart()

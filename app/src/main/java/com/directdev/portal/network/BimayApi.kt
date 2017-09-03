@@ -22,7 +22,8 @@ class BimayApi @Inject constructor(private val bimayService: BimayService) : Net
                 it.map { it as List<CourseModel> }.flatten()
             })
 
-    override fun getTerms(cookie: String): Single<List<TermModel>> = bimayService.getTerms(cookie)
+    override fun getTerms(cookie: String): Single<List<TermModel>> =
+            bimayService.getTerms(cookie).subscribeOn(Schedulers.io())
 
     override fun getJournalEntries(cookie: String, terms: List<Int>): Single<List<JournalModel>> = Single.zip(
             bimayService.getFinances(cookie).subscribeOn(Schedulers.io()),

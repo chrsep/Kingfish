@@ -7,7 +7,6 @@ import com.directdev.portal.R
 import com.directdev.portal.features.finance.FinancesFragment
 import com.directdev.portal.features.grades.GradesFragment
 import com.directdev.portal.features.journal.JournalFragment
-import com.directdev.portal.features.resources.ResourceFragment
 import com.directdev.portal.utils.readPref
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
@@ -39,13 +38,13 @@ class MainActivity : Activity(), AnkoLogger, HasFragmentInjector {
         setContentView(R.layout.activity_main)
         bottomBar.setOnTabSelectListener {
 
-            // TODO: Fragment is aalways recreated, this causes mulltiple presenter to be created
+            // TODO: Fragment is aalways recreated, this causes multiple presenter to be created
             // and multiple sync request created.
             val fragment = fragmentManager.findFragmentByTag(it.toString()) ?: when (it) {
                 R.id.tab_journal -> JournalFragment()
                 R.id.tab_grades -> GradesFragment()
                 R.id.tab_finances -> FinancesFragment()
-                R.id.tab_resources -> ResourceFragment()
+            // R.id.tab_resources -> ResourceFragment()
                 else -> JournalFragment()
             }
             fragmentManager

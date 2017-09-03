@@ -23,7 +23,6 @@ import kotlinx.android.synthetic.main.fragment_grades.*
 import lecho.lib.hellocharts.formatter.SimpleAxisValueFormatter
 import lecho.lib.hellocharts.listener.LineChartOnValueSelectListener
 import lecho.lib.hellocharts.model.*
-import lecho.lib.hellocharts.view.LineChartView
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.ctx
 import org.jetbrains.anko.runOnUiThread
@@ -41,19 +40,7 @@ class GradesFragment : Fragment(), AnkoLogger, LineChartOnValueSelectListener, G
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_grades, container, false)
-        val gpaGraph = view.findViewById<LineChartView>(R.id.chart)
         val gradesRecycler = view.findViewById<RecyclerView>(R.id.gradesRecycler)
-        val viewport = Viewport(
-                gpaGraph.currentViewport.left,
-                gpaGraph.currentViewport.top + 0.1f,
-                gpaGraph.currentViewport.right,
-                gpaGraph.currentViewport.bottom - 0.1f
-        )
-        gpaGraph.onValueTouchListener = this
-        gpaGraph.isZoomEnabled = false
-        gpaGraph.isValueSelectionEnabled = true
-        gpaGraph.maximumViewport = viewport
-        gpaGraph.currentViewport = viewport
         gradesRecycler.layoutManager = LinearLayoutManager(activity)
         gradesRecycler.adapter = adapter
         return view
@@ -86,6 +73,9 @@ class GradesFragment : Fragment(), AnkoLogger, LineChartOnValueSelectListener, G
         xAxis.setHasSeparationLine(false)
         data.axisYLeft = xAxis
         chart.lineChartData = data
+    }
+
+    override fun setGraphStyle() {
         val viewport = Viewport(
                 chart.currentViewport.left,
                 chart.currentViewport.top + 0.1f,

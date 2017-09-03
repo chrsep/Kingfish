@@ -7,22 +7,11 @@ import javax.inject.Inject
 /**-------------------------------------------------------------------------------------------------
  * Created by chris on 8/29/17.
  *------------------------------------------------------------------------------------------------*/
-class TermRepository @Inject constructor(
-        private val timeStampRepo: TimeStampRepository
-) {
-    fun getTerms(): List<Int> {
-        val savedTerms = Realm.getDefaultInstance().use {
-            it.where(TermModel::class.java)
-                    .findAllSorted("value")
-                    .map { term -> term.value }
-        }
-        return if (savedTerms.isEmpty()) calculateTerm() else savedTerms
-    }
-
-    private fun calculateTerm(): List<Int> {
-        val dateString = timeStampRepo.today().toString()
-        val year = dateString.takeLast(2) + "10"
-        return arrayListOf(year.toInt())
+class TermRepository @Inject constructor() {
+    fun getTerms(): List<Int> = Realm.getDefaultInstance().use {
+        it.where(TermModel::class.java)
+                .findAllSorted("value")
+                .map { term -> term.value }
     }
 
     fun save(terms: List<TermModel>) = Realm.getDefaultInstance().use {
@@ -37,4 +26,13 @@ class TermRepository @Inject constructor(
                 .map { it.value }
                 .last()
     }
+
+    fun getFirstTerm(): Int = Realm.getDefaultInstance().use {
+        it.where(TermModel::class.java)
+                .findAllSorted("value")
+                .map { it.value }
+                .first()
+    }
+
+
 }

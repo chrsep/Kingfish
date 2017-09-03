@@ -19,6 +19,7 @@ class CourseInteractor @Inject constructor(
             val courses = courseRepo.getCourses(it)
             courses.isEmpty()
         }
+        if (emptyTerms.isEmpty()) return Single.just(cookie)
         return bimayApi.getCourses(cookie, emptyTerms).map {
             courseRepo.saveCourses(it)
             cookie

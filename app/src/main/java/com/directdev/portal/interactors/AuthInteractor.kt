@@ -2,7 +2,6 @@ package com.directdev.portal.interactors
 
 import com.directdev.portal.network.NetworkHelper
 import com.directdev.portal.repositories.FlagRepository
-import com.directdev.portal.repositories.TermRepository
 import com.directdev.portal.repositories.TimeStampRepository
 import com.directdev.portal.repositories.UserCredRepository
 import com.directdev.portal.utils.SigninException
@@ -19,7 +18,6 @@ class AuthInteractor @Inject constructor(
         private val bimayApi: NetworkHelper,
         private val userCredRepo: UserCredRepository,
         private val flagRepo: FlagRepository,
-        private val termRepo: TermRepository,
         @Named("auth") private val timeStampRepo: TimeStampRepository
 ) {
     private var isRequesting = false
@@ -64,10 +62,7 @@ class AuthInteractor @Inject constructor(
 
             // Make sure user is logged in as student, not as a staff etc.
             bimayApi.switchRole(cookie)
-        }.flatMap {
-            bimayApi.getTerms(cookie)
         }.map {
-            termRepo.save(it)
             cookie
         }.doAfterSuccess {
             userCredRepo.saveAll(username, password, cookie)

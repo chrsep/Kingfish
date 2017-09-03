@@ -6,11 +6,11 @@ import org.joda.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 /**-------------------------------------------------------------------------------------------------
- * Created by chris on 8/31/17.
+ * Created by chris on 9/2/17.
  *------------------------------------------------------------------------------------------------*/
-class JournalTimeStampRepository @Inject constructor(
+class TermTimeStampRepository @Inject constructor(
         formatter: DateTimeFormatter,
         ctx: Context
 ) : TimeStampRepository(formatter, ctx) {
-    override fun getId() = R.string.journal_last_sync
+    override fun getId() = R.string.term_last_try
 }

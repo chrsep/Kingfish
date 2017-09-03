@@ -4,10 +4,10 @@
         icon="@drawable/ic_journal"
         id="@+id/tab_journal"
         title="Journal" />
-    <tab
+    <!--<tab
         icon="@drawable/ic_resources"
         id="@+id/tab_resources"
-        title="Resources" />
+        title="Resources" />-->
     <!--<tab-->
     <!--icon="@drawable/ic_assignment"-->
     <!--id="@+id/tab_assignments"-->

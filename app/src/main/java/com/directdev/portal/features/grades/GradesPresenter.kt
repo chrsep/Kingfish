@@ -3,17 +3,20 @@ package com.directdev.portal.features.grades
 import com.directdev.portal.interactors.AuthInteractor
 import com.directdev.portal.interactors.CourseInteractor
 import com.directdev.portal.interactors.GradesInteractor
+import com.directdev.portal.interactors.TermInteractor
 import com.directdev.portal.utils.generateMessage
+import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
 
 /**-------------------------------------------------------------------------------------------------
  * Created by chris on 8/31/17.
  *------------------------------------------------------------------------------------------------*/
 class GradesPresenter @Inject constructor(
-        private val gradesInteractor: GradesInteractor,
         private val view: GradesContract.View,
+        private val gradesInteractor: GradesInteractor,
         private val authInteractor: AuthInteractor,
-        private val courseInteractor: CourseInteractor
+        private val courseInteractor: CourseInteractor,
+        private val termInteractor: TermInteractor
 ) : GradesContract.Presenter {
     private var isSyncing = false
     private var isStopped = false
@@ -23,39 +26,34 @@ class GradesPresenter @Inject constructor(
     }
 
     override fun onResume() {
-        switchTerm()
+        val credits = gradesInteractor.getTermCreditAndGpa()
+        view.setGpaGraphData(credits)
+        view.setGraphStyle()
+        switchTerm(credits.size)
         sync()
+        if (isSyncing) view.showLoading()
     }
 
     override fun onStop() {
         isStopped = true
     }
 
-    override fun switchTerm(term: Int) {
-        val credits = if (term == -1) gradesInteractor.getTermCreditAndGpa()
-        else gradesInteractor.getTermCreditAndGpa(term)
+    override fun switchTerm(creditIndex: Int) {
+        val credits = gradesInteractor.getTermCreditAndGpa()
+        if (credits.isEmpty()) {
+            view.hideGradesRecycler()
+            return
+        }
+        val term = credits[creditIndex - 1].term
+        view.setToolbarTitle(termInteractor.getSemesterName(term))
 
-        val grades = if (term == -1) gradesInteractor.getAllGradesByTerm()
-        else gradesInteractor.getAllGradesByTerm(term)
-
-        view.setGpaGraphData(credits)
+        val grades = gradesInteractor.getAllGradesByTerm(term)
         if (grades.isEmpty()) {
             view.hideGradesRecycler()
             return
         }
         view.showGradesRecycler()
-        view.updateRecycler(grades, credits.first())
-    }
-
-    override fun setToolbarTitle(firstTerm: Int, chosenTerm: Int) {
-        val year = ((chosenTerm + 99) / 100) - ((firstTerm + 99) / 100)
-        val title = "Semester " + when (chosenTerm.toString().substring(2)) {
-            "10" -> ((year * 2) + 1).toString()
-            "20" -> ((year * 2) + 2).toString()
-            "30" -> ((year * 2) + 2).toString() + " ( SP )"
-            else -> "N/A"
-        }
-        view.setToolbarTitle(title)
+        view.updateRecycler(grades, credits[creditIndex - 1])
     }
 
     override fun sync(bypass: Boolean) {
@@ -70,8 +68,14 @@ class GradesPresenter @Inject constructor(
         }.doFinally {
             if (!isStopped) view.hideLoading()
             isSyncing = false
-        }.subscribe({
-            view.showSuccess("Journal & Finance updated")
+        }.observeOn(AndroidSchedulers.mainThread()).subscribe({
+            view.showSuccess("Grades Updated")
+            if (!isStopped) {
+                val credits = gradesInteractor.getTermCreditAndGpa()
+                view.setGpaGraphData(credits)
+                view.setGraphStyle()
+                switchTerm(credits.size)
+            }
         }, {
             view.showFailed(it.generateMessage())
         })

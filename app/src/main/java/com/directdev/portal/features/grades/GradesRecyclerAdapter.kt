@@ -41,28 +41,28 @@ class GradesRecyclerAdapter(
         // on position 0, bind the first data into the viewholder
         // on the next position, bind the data normally, starting from data 0
         if (grades.isEmpty()) return
-        if (position == 0) holder.bindData(grades[position])
-        else holder.bindData(grades[position - 1])
+        if (position == 0) holder.bindData(grades[position], credit)
+        else holder.bindData(grades[position - 1], credit)
     }
 
     // Return the correct viewHolder based on the viewtype return by getItemViewType
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent?.context)
         return if (viewType == HEADER)
-            HeaderViewHolder(inflater.inflate(R.layout.item_grades_header, parent, false), credit)
+            HeaderViewHolder(inflater.inflate(R.layout.item_grades_header, parent, false))
         else
             NormalViewHolder(inflater.inflate(R.layout.item_grades, parent, false))
     }
 
     abstract class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        abstract fun bindData(score: RealmResults<ScoreModel>)
+        abstract fun bindData(score: RealmResults<ScoreModel>, credit: CreditModel)
     }
 
     // TODO: REFACTOR | Recent binusmaya changes blows up the when statement, better alternative needed
     private class NormalViewHolder(view: View) : ViewHolder(view) {
         val gone = View.GONE
         val visible = View.VISIBLE
-        override fun bindData(score: RealmResults<ScoreModel>) {
+        override fun bindData(score: RealmResults<ScoreModel>, credit: CreditModel) {
             itemView.item_grades_cardview.visibility = visible
             if (score.isEmpty()) {
                 itemView.item_grades_cardview.visibility = gone
@@ -148,11 +148,11 @@ class GradesRecyclerAdapter(
         }
     }
 
-    private class HeaderViewHolder(view: View, val data: CreditModel) : ViewHolder(view) {
-        override fun bindData(score: RealmResults<ScoreModel>) {
+    private class HeaderViewHolder(view: View) : ViewHolder(view) {
+        override fun bindData(score: RealmResults<ScoreModel>, data: CreditModel) {
             itemView.totalCreditCount.text = "${data.scuFinished} SCU"
             itemView.cumulativeGpaCount.text = data.gpaCummulative
-            itemView.semesterGpaCount.text = if(data.gpaCurrent.equals("0.00")) "N/A" else data.gpaCurrent
+            itemView.semesterGpaCount.text = if (data.gpaCurrent == "0.00") "N/A" else data.gpaCurrent
         }
     }
 

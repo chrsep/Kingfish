@@ -22,10 +22,10 @@ class GradesInteractor @Inject constructor(
         private val termRepo: TermRepository,
         @Named("grade") private val timeStampRepo: TimeStampRepository
 ) {
-    fun getTermCreditAndGpa(term: Int = termRepo.getLatestTerm()): RealmResults<CreditModel> =
-            gradesRepo.getCreditAndGpa(term)
+    fun getTermCreditAndGpa(): RealmResults<CreditModel> =
+            gradesRepo.getCreditAndGpa()
 
-    fun getAllGradesByTerm(term: Int = termRepo.getLatestTerm()) = courseRepo.getCourses(term).map {
+    fun getAllGradesByTerm(term: Int) = courseRepo.getCourses(term).map {
         gradesRepo.getGrades(it.courseId)
     }.filter {
         it.isNotEmpty()

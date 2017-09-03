@@ -4,14 +4,16 @@ import android.support.v7.widget.Toolbar
 import com.directdev.portal.R
 import com.directdev.portal.interactors.AuthInteractor
 import com.directdev.portal.interactors.JournalInteractor
+import com.directdev.portal.interactors.TermInteractor
 import com.directdev.portal.utils.generateMessage
 import javax.inject.Inject
 
 // TODO: Presenter should not be dependent on Android libraries
 class JournalPresenter @Inject constructor(
-        private val authInteractor: AuthInteractor,
         private val view: JournalContract.View,
-        private val journalInteractor: JournalInteractor
+        private val authInteractor: AuthInteractor,
+        private val journalInteractor: JournalInteractor,
+        private val termInteractor: TermInteractor
 ) : JournalContract.Presenter {
     private var isSyncing = false
     private var isStopped = false
@@ -32,6 +34,8 @@ class JournalPresenter @Inject constructor(
     override fun sync(bypass: Boolean) {
         if (!bypass and (isSyncing or !journalInteractor.isSyncOverdue())) return
         authInteractor.execute().flatMap {
+            termInteractor.sync(it)
+        }.flatMap {
             journalInteractor.sync(it)
         }.doOnSubscribe {
             if (!isStopped) view.showLoading()

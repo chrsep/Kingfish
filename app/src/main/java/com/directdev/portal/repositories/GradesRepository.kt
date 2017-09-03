@@ -17,7 +17,7 @@ class GradesRepository @Inject constructor(
             .equalTo("courseId", courseId)
             .findAll()
 
-    fun getCreditAndGpa(term: Int): RealmResults<CreditModel> = realm.where(CreditModel::class.java)
+    fun getCreditAndGpa(): RealmResults<CreditModel> = realm.where(CreditModel::class.java)
             .findAllSorted("term")
 
     fun saveGrades(grade: GradeModel) = Realm.getDefaultInstance().use {

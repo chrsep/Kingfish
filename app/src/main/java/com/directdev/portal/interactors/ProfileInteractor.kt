@@ -13,12 +13,13 @@ class ProfileInteractor @Inject constructor(
         private val profileRepo: ProfileRepository,
         private val bimayApi: NetworkHelper
 ) {
-    fun execute(it: String): Single<Unit> {
-        return bimayApi.getUserProfile(it).map {
+    fun sync(cookie: String): Single<String> {
+        return bimayApi.getUserProfile(cookie).map {
             val profileObject = JSONObject(it.string())
                     .getJSONArray("Profile")
                     .getJSONObject(0)
             profileRepo.save(profileObject)
+            cookie
         }
     }
 }
