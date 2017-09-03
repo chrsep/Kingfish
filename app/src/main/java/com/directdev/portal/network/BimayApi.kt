@@ -9,7 +9,19 @@ import retrofit2.Response
 import javax.inject.Inject
 
 
-class BimayApi @Inject constructor(override val bimayService: BimayService) : NetworkHelper {
+class BimayApi @Inject constructor(private val bimayService: BimayService) : NetworkHelper {
+    override fun getCourses(cookie: String, terms: List<Int>): Single<List<CourseModel>> =
+            Single.zip(terms.map { term ->
+                bimayService.getCourse(term.toString(), cookie)
+                        .subscribeOn(Schedulers.io())
+                        .map {
+                            it.courses.forEach { it.term = term }
+                            it.courses
+                        }
+            }, {
+                it.map { it as List<CourseModel> }.flatten()
+            })
+
     override fun getTerms(cookie: String): Single<List<TermModel>> = bimayService.getTerms(cookie)
 
     override fun getJournalEntries(cookie: String, terms: List<Int>): Single<List<JournalModel>> = Single.zip(

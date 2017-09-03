@@ -1,6 +1,7 @@
 package com.directdev.portal.features.grades
 
 import com.directdev.portal.interactors.AuthInteractor
+import com.directdev.portal.interactors.CourseInteractor
 import com.directdev.portal.interactors.GradesInteractor
 import com.directdev.portal.utils.generateMessage
 import javax.inject.Inject
@@ -11,11 +12,24 @@ import javax.inject.Inject
 class GradesPresenter @Inject constructor(
         private val gradesInteractor: GradesInteractor,
         private val view: GradesContract.View,
-        private val authInteractor: AuthInteractor
+        private val authInteractor: AuthInteractor,
+        private val courseInteractor: CourseInteractor
 ) : GradesContract.Presenter {
-
     private var isSyncing = false
     private var isStopped = false
+
+    override fun onStart() {
+        isStopped = false
+    }
+
+    override fun onResume() {
+        switchTerm()
+        sync()
+    }
+
+    override fun onStop() {
+        isStopped = true
+    }
 
     override fun switchTerm(term: Int) {
         val credits = if (term == -1) gradesInteractor.getTermCreditAndGpa()
@@ -33,19 +47,6 @@ class GradesPresenter @Inject constructor(
         view.updateRecycler(grades, credits.first())
     }
 
-    override fun onResume() {
-        switchTerm()
-        sync()
-    }
-
-    override fun onStop() {
-        isStopped = true
-    }
-
-    override fun onStart() {
-        isStopped = false
-    }
-
     override fun setToolbarTitle(firstTerm: Int, chosenTerm: Int) {
         val year = ((chosenTerm + 99) / 100) - ((firstTerm + 99) / 100)
         val title = "Semester " + when (chosenTerm.toString().substring(2)) {
@@ -60,6 +61,8 @@ class GradesPresenter @Inject constructor(
     override fun sync(bypass: Boolean) {
         if (!bypass and (isSyncing or !gradesInteractor.isSyncOverdue())) return
         authInteractor.execute().flatMap {
+            courseInteractor.sync(it)
+        }.flatMap {
             gradesInteractor.sync(it)
         }.doOnSubscribe {
             if (!isStopped) view.showLoading()

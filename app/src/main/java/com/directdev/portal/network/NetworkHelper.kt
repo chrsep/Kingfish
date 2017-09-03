@@ -1,5 +1,6 @@
 package com.directdev.portal.network
 
+import com.directdev.portal.models.CourseModel
 import com.directdev.portal.models.ExamModel
 import com.directdev.portal.models.JournalModel
 import com.directdev.portal.models.TermModel
@@ -12,7 +13,6 @@ import retrofit2.Response
  * Created by chris on 8/21/17.
  *------------------------------------------------------------------------------------------------*/
 interface NetworkHelper {
-    val bimayService: BimayService
     fun getIndexHtml(): Single<Response<ResponseBody>>
     fun getLoaderJs(cookie: String, serial: String): Single<Response<ResponseBody>>
     fun authenticate(cookie: String, fieldMap: HashMap<String, String>): Single<Response<String>>
@@ -22,4 +22,5 @@ interface NetworkHelper {
     fun getExams(cookie: String, terms: List<Int>): Single<List<ExamModel>>
     fun getTerms(cookie: String): Single<List<TermModel>>
     fun getGrades(cookie: String, terms: List<Int>): Single<Array<Any>>
+    fun getCourses(cookie: String, terms: List<Int>): Single<List<CourseModel>>
 }

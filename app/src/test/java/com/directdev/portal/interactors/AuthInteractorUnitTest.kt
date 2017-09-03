@@ -2,6 +2,7 @@ package com.directdev.portal.interactors
 
 import com.directdev.portal.network.NetworkHelper
 import com.directdev.portal.repositories.FlagRepository
+import com.directdev.portal.repositories.TermRepository
 import com.directdev.portal.repositories.UserCredRepository
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doNothing
@@ -33,10 +34,9 @@ class AuthInteractorUnitTest {
             on { getPassword() } doReturn "b!Nu$07021812"
         }
         doNothing().`when`(userCredRepo).saveAll(any(), any(), any())
-        val flagRepo: FlagRepository = mock {
-
-        }
-        val authInteractor = AuthInteractor(bimayApi, userCredRepo, flagRepo)
+        val flagRepo: FlagRepository = mock {}
+        val termRepo: TermRepository = mock {}
+        val authInteractor = AuthInteractor(bimayApi, userCredRepo, flagRepo, termRepo, mock {})
 
         // When
         authInteractor.execute("test", "test").subscribe({}, { throw it })

@@ -17,6 +17,7 @@ buildscript {
         //noinspection GradleDynamicVersion
         classpath 'io.fabric.tools:gradle:1.+'
         classpath 'com.dicedmelon.gradle:jacoco-android:0.1.2'
+        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.7.3'
     }
 }
 apply plugin: 'com.android.application'
@@ -27,6 +28,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'realm-android'
 apply plugin: 'io.fabric'
 apply plugin: 'jacoco-android'
+apply plugin: 'com.getkeepsafe.dexcount'
 
 android {
     compileSdkVersion 26
@@ -82,7 +84,6 @@ dependencies {
     }
     compile 'com.android.support:multidex:1.0.2'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile "com.android.support:appcompat-v7:$support_library_version"
     compile "com.android.support:cardview-v7:$support_library_version"
     compile "com.android.support:recyclerview-v7:$support_library_version"
     compile "com.android.support:design:$support_library_version"
