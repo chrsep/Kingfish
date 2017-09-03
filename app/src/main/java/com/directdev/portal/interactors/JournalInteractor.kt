@@ -41,6 +41,6 @@ class JournalInteractor @Inject constructor(
 
     fun isSyncOverdue(): Boolean {
         val minutesInt = Minutes.minutesBetween(timeStampRepo.getLastSync(), timeStampRepo.today()).minutes
-        return Math.abs(minutesInt) > 5
+        return Math.abs(minutesInt) > 10
     }
 }
