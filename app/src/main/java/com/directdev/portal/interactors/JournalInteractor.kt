@@ -22,9 +22,9 @@ class JournalInteractor @Inject constructor(
         @Named("journal") private val timeStampRepo: TimeStampRepository
 ) {
     fun getFutureEntry(): RealmResults<JournalModel> =
-            journalRepo.getEntryFromDate(timeStampRepo.today().toDate())
+            journalRepo.getEntryFromDate(timeStampRepo.today().withTimeAtStartOfDay().toDate())
 
-    fun getEntryByDate(date: Date = timeStampRepo.today().toDate()) =
+    fun getEntryByDate(date: Date = timeStampRepo.today().withTimeAtStartOfDay().toDate()) =
             getFutureEntry().filter { it.date == date }
 
     fun checkIsHoliday(): String =
