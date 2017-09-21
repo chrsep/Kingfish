@@ -1,7 +1,7 @@
 # Kingfish
 
 *I will (at least I expect to) be graduating on 2018.
-From then on I won't be maintaining Portal anymore since I will no longer be studying on Binus.
+From then in I won't be maintaining Portal anymore since I will no longer be studying on Binus.
 Let us know If you're interested in keeping Portal alive, well after 2018.*
 
 ---
