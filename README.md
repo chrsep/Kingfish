@@ -1,7 +1,7 @@
 # Kingfish
 
-*We will (at least we expect to) be graduating on 2018.
-From then on we won't be maintaining Portal anymore since we will no longer be studying on Binus.
+*I will (at least I expect to) be graduating on 2018.
+From then on I won't be maintaining Portal anymore since I will no longer be studying on Binus.
 Let us know If you're interested in keeping Portal alive, well after 2018.*
 
 ---
@@ -18,7 +18,7 @@ language will be required to understand this codebase.
 
 #### [Kotlin (Programming language)](https://kotlinlang.org/)
 A programming language developed by jetbrains, the team behind Intellij
-and Android Studio. It reduces boilerplate significantly. To learn or try kotlin, you can use the the
+and Android Studio. It reduces boilerplate significantly and a lot more `fun` to use than java. To learn or try kotlin, you can use the the
 [Kotlin Koans](http://try.kotlinlang.org/)
 
 #### [Realm (Database)](https://realm.io/)
@@ -33,30 +33,43 @@ An object database built from the ground up for mobile application
 #### Other DevTools
 1. [Stetho](http://facebook.github.io/stetho/), basically a chrome devtool for android by facebook, insanely awesome and useful
 
-*To build this project, Android Studio 2.3 or newer with the Kotlin plugin
-installed will be required. This is sort of like an experimental project for us to try new technologies,
-so we tend to go with experimental stuff here too (Eg. dependencies and tools that's still on beta or
+#### Architecture
+This is my first time implementing somekind of software design pattern and architecture for real, so it's still a bit rough and probably messy. Feedback will be very appriciated.
+
+1. [Dagger 2](https://google.github.io/dagger/), Dependency Injection (DI)
+2. Portal tries to mimic the MVP+Clean architecture, below are the type of classes Portal currently have
+    1. *Presenter*, binds any interaction with the view (show snackbars, clicks, etc) to the interactors
+    2. *Interactor*, contains all of the bussines logics (Filter journal items, calculate semester)
+    3. *Repositories*, provides and manages data (save and retrieve cookies from sharedpreferencees, save and retrieve schedules from realm)
+    4. *Networks*, handles and creates all the network calls to Binusmaya APIs
+    5. *Models*, simple objects that will be used to store data.
+    
+
+*To build this project, Android Studio 3.0 or newer with the Kotlin plugin
+installed will be required. This is sort of like an experimental project for me to try new technologies,
+so I tend to go with experimental stuff here too (Eg. dependencies and tools that's still on beta or
 alpha stage).*
 
 ### Contributing
 
-This codebase is open, we would love if you would help to try to fix bugs
-and defects that you find, or even implements new functionality (like attendance info for example).
+This codebase is open, _If you want to learn about android_, trying to contribute, fix bugs and defects, or even implements new functionality (like attendance info for example) in Portal is one of the best way to learn android quickly. I always believe that working in real projects is the only way to truly learn how to do something.
+
+I wanted Portal to be a community project where anyone can contribute because i don't believe i can fix all the problems it have alone, since I'm still not an expert and I don't know or have full access to Binusmaya's infrastructure. Besides, great  softwares aren't build by one guy 😎.
 
 In the end, we are here to learn and experiment to better work and collaborate
-with multiple people and build better software. We would love if anyone
-wanted to contribute to this project :).
+with multiple people and build better software. I would love if anyone
+wanted to contribute to this project 😁.
 
-#### How To
+#### How To contribute
 
-This is our first time dealing with open source contribution, but here are our suggestion on how to start contributing:
+This is my first time dealing with open source contribution, but here are my suggestion on how to start:
 
-1. Create a new issue, telling us your suggestion or what you wanted to do so that we can have a discussion.
-2. Fork the repository and push your changes into that repository
+1. Create a new issue, introduce your suggestion or what you wanted to do so that we can have a discussion.
+2. Fork the repository and push your changes into your repository
 3. Create a pull request to the develop branch
 4. We'll review the code changes and discuss any possible improvement together
-5. When the code is ready we'll merge it.
+5. When the code is ready it'll be merged to develop.
 
-We are also trying to follow [GitFlow's](https://datasift.github.io/gitflow/IntroducingGitFlow.html) branching model.
-We are still figuring out how to do this so this is just a suggestion from us.
+I'm trying to follow [GitFlow's](https://datasift.github.io/gitflow/IntroducingGitFlow.html) branching model.
+I'm still figuring out how to do this so this is just a suggestion from me.
 
