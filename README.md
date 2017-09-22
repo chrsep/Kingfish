@@ -45,12 +45,12 @@ This is my first time implementing software design pattern and architecture for 
     5. **Models**, simple objects that will be used to store data.
     
 
-*To build Portal, Android Studio 3.0+ with Kotlin plugin is required. This consider this as an experimental project to try new technologies, so I tend to go with experimental stuff here (Eg. dependencies and tools that's still on beta or
+*To build Portal, Android Studio 3.0+ with Kotlin plugin is required. I consider this as an experimental project to try new technologies, so I tend to go with experimental stuff here (Eg. dependencies and tools that's still on beta or
 alpha stage).*
 
 ### Contributing
 
-This codebase is open, **If you want to learn about android**, contributing to fix bugs and defects, or even implements new functionality (like attendance info for example) in Portal is one of the best way to learn quickly. I always believe that working in real projects is the only way to truly learn how to do something.
+This codebase is open, **If you want to learn about android**, contributing to fix bugs and defects, and implementing new functionality (like attendance info for example) in Portal is one of the best way to learn quickly. I always believe that working in real projects is the only way to truly learn how to do something.
 
 I wanted Portal to be a community project where anyone can contribute because i don't believe i can fix all the problems it have alone, since I'm still not an expert and I don't know or have full access to Binusmaya's infrastructure. Besides, great  softwares aren't build by one guy 😎.
 
