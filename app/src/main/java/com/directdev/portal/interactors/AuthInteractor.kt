@@ -7,6 +7,8 @@ import com.directdev.portal.repositories.UserCredRepository
 import com.directdev.portal.utils.SigninException
 import io.reactivex.Single
 import org.joda.time.Minutes
+import java.net.URLDecoder
+import java.net.URLEncoder
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -106,7 +108,7 @@ class AuthInteractor @Inject constructor(
         return fieldsMap
     }
 
-    private fun decodeHtml(input: String) = input.replace("%2F", "/").replace("%3D", "=")
+    private fun decodeHtml(input: String) = URLDecoder.decode(input,"UTF-8")
 
     // TODO: This is similar to the one from journalInteractor, might be able to be refactored out
     fun isSyncOverdue(): Boolean {
