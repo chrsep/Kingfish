@@ -1,5 +1,6 @@
 package com.directdev.portal.features.journal
 
+import android.app.Activity
 import android.app.Fragment
 import android.content.Context
 import android.graphics.Color
@@ -30,8 +31,13 @@ class JournalFragment : Fragment(), JournalContract.View {
     @Inject lateinit var adapter: JournalRecyclerAdapter
 
     override fun onAttach(context: Context?) {
-        AndroidInjection.inject(this)
+        if (android.os.Build.VERSION.SDK_INT >= 23) AndroidInjection.inject(this)
         super.onAttach(context)
+    }
+
+    override fun onAttach(activity: Activity?) {
+        if (android.os.Build.VERSION.SDK_INT < 23) AndroidInjection.inject(this)
+        super.onAttach(activity)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle?): View? {

@@ -176,7 +176,7 @@ fun Throwable.generateMessage(): String {
         is SigninException -> getMessage(message ?: "")
         is IOException -> "Binusmaya is giving us weird data, contact us on GitHub (Setting -> Issue Tracker)"
         else -> {
-            Crashlytics.log("Unknown Crash")
+            Crashlytics.setBool("unknownCrash", true)
             "We have no idea what went wrong, but we have received the error log, we'll look into this"
         }
     }
