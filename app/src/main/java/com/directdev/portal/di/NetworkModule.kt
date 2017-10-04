@@ -27,6 +27,8 @@ class NetworkModule {
             // Prevents cookie, username, password, and anything sensitive from being sent to crashlytics
             if (!it.contains("cookie", true) && !it.contains("Login"))
                 Crashlytics.log(it)
+            else
+                Crashlytics.log(it.take(5) + "-redacted-" +  it.takeLast(5))
         })
         httpLoggingIntercepter.level = HttpLoggingInterceptor.Level.BODY
         return if (BuildConfig.DEBUG) StethoInterceptor() else httpLoggingIntercepter
