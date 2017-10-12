@@ -1,5 +1,6 @@
 package com.directdev.portal.features.grades
 
+import android.app.Activity
 import android.app.Fragment
 import android.content.Context
 import android.graphics.Color
@@ -34,8 +35,14 @@ class GradesFragment : Fragment(), AnkoLogger, LineChartOnValueSelectListener, G
     @Inject lateinit var adapter: GradesRecyclerAdapter
 
     override fun onAttach(context: Context?) {
-        AndroidInjection.inject(this)
+        if (android.os.Build.VERSION.SDK_INT >= 23) AndroidInjection.inject(this)
         super.onAttach(context)
+    }
+
+    // This doesn't get called on android 23 and up
+    override fun onAttach(activity: Activity?) {
+        if (android.os.Build.VERSION.SDK_INT < 23) AndroidInjection.inject(this)
+        super.onAttach(activity)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -61,6 +68,7 @@ class GradesFragment : Fragment(), AnkoLogger, LineChartOnValueSelectListener, G
         presenter.onStop()
     }
 
+    // Setup the GPA Graph from the given data (credit)
     override fun setGpaGraphData(credits: RealmResults<CreditModel>) {
         val lines = mutableListOf<Line>()
         val pointValues = turnGpaToPointValue(credits)
@@ -75,6 +83,7 @@ class GradesFragment : Fragment(), AnkoLogger, LineChartOnValueSelectListener, G
         chart.lineChartData = data
     }
 
+    // Setup the styling of the GPA Graph
     override fun setGraphStyle() {
         val viewport = Viewport(
                 chart.currentViewport.left,
@@ -89,13 +98,15 @@ class GradesFragment : Fragment(), AnkoLogger, LineChartOnValueSelectListener, G
         chart.currentViewport = viewport
     }
 
+    // Called when the dots on the GPA graph is tapped
     override fun onValueSelected(p0: Int, p1: Int, p2: PointValue?) {
         p2?.x?.toInt()?.let { presenter.switchTerm(it) }
     }
 
-    private fun turnGpaToPointValue(grades: RealmResults<CreditModel>): List<PointValue> {
+    // Turns list of GPA from database, into point values for the GPA graph
+    private fun turnGpaToPointValue(credits: RealmResults<CreditModel>): List<PointValue> {
         var i = 0
-        val termAndGradesMap = grades.associateBy({ it.term }, { it.gpaCummulative.toFloat() })
+        val termAndGradesMap = credits.associateBy({ it.term }, { it.gpaCummulative.toFloat() })
         return termAndGradesMap.map {
             i++
             PointValue(i.toFloat(), it.value)
