@@ -11,9 +11,6 @@ import com.crashlytics.android.Crashlytics
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import org.jetbrains.anko.AlertDialogBuilder
-import org.jetbrains.anko.alert
-import org.jetbrains.anko.runOnUiThread
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import retrofit2.HttpException
@@ -144,11 +141,6 @@ fun DateTime.toString(pattern: String): String = toString(DateTimeFormat.forPatt
 fun ConnectivityManager.isNetworkAvailable(): Boolean =
         activeNetworkInfo != null && activeNetworkInfo.isConnected
 
-fun Context.showDialog(name: String, view: AlertDialogBuilder.() -> Unit) {
-    runOnUiThread {
-        alert(name, "").show()
-    }
-}
 
 fun <T> Single<T>.observeOnMainThread(): Single<T> = observeOn(AndroidSchedulers.mainThread())
 

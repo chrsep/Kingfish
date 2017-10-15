@@ -34,7 +34,11 @@ abstract class FragmentModule {
 
     @ContributesAndroidInjector(modules = arrayOf(
             ResourcesModule::class,
-            FirebaseAnalyticsModule::class
+            FirebaseAnalyticsModule::class,
+            JodaModule::class,
+            NetworkModule::class,
+            RealmModule::class,
+            TimeStampRepositoryModule::class
     ))
     abstract fun bindResourcesFragment(): ResourcesFragment
 }

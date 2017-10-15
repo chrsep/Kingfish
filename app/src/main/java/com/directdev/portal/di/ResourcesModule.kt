@@ -7,6 +7,8 @@ import com.directdev.portal.features.resources.ResourcesFragment
 import com.directdev.portal.features.resources.ResourcesPresenter
 import dagger.Module
 import dagger.Provides
+import io.realm.Realm
+import javax.inject.Named
 
 /**
  * Created by chris on 04/10/17.
@@ -24,4 +26,8 @@ class ResourcesModule {
 
     @Provides
     fun provideActivity(fragment: ResourcesFragment): MainActivity = fragment.activity as MainActivity
+
+    @Provides
+    @Named("MainThread")
+    fun provideFragmentRealm(activity: MainActivity): Realm = activity.realm
 }
