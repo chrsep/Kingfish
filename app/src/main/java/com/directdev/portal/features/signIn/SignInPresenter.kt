@@ -4,6 +4,7 @@ import android.content.Intent
 import com.directdev.portal.interactors.AuthInteractor
 import com.directdev.portal.interactors.ProfileInteractor
 import com.directdev.portal.interactors.TermInteractor
+import java.io.IOException
 import javax.inject.Inject
 
 /**-------------------------------------------------------------------------------------------------
@@ -47,6 +48,7 @@ class SignInPresenter @Inject constructor(
             view.logSuccessSignIn()
             view.navigateToMainActivity()
         }, {
+            authInteractor.resetLastSyncDate()
             view.logFailedSignIn(it)
             view.showError(it)
             view.animateSignInButton()

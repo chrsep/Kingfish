@@ -2,6 +2,7 @@ package com.directdev.portal.di
 
 import com.directdev.portal.features.grades.GradesFragment
 import com.directdev.portal.features.journal.JournalFragment
+import com.directdev.portal.features.resources.ResourcesFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -30,4 +31,10 @@ abstract class FragmentModule {
             RealmModule::class
     ))
     abstract fun bindGradesFragment(): GradesFragment
+
+    @ContributesAndroidInjector(modules = arrayOf(
+            ResourcesModule::class,
+            FirebaseAnalyticsModule::class
+    ))
+    abstract fun bindResourcesFragment(): ResourcesFragment
 }

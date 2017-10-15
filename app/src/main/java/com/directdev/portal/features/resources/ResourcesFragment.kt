@@ -1,6 +1,7 @@
 package com.directdev.portal.features.resources
 
 import android.app.Fragment
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
@@ -15,6 +16,7 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import com.crashlytics.android.Crashlytics
 import com.directdev.portal.R
+import com.directdev.portal.features.journal.JournalContract
 import com.directdev.portal.models.CourseModel
 import com.directdev.portal.models.ResModel
 import com.directdev.portal.models.TermModel
@@ -28,10 +30,17 @@ import kotlinx.android.synthetic.main.fragment_resources.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.ctx
 import org.jetbrains.anko.runOnUiThread
+import javax.inject.Inject
 import kotlin.properties.Delegates
 
-class ResourceFragment : Fragment(), AnkoLogger {
+class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
+    @Inject override lateinit var fbAnalytics: FirebaseAnalytics
+    @Inject override lateinit var presenter: ResourcesContract.Presenter
     private var realm: Realm by Delegates.notNull()
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+    }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater?.inflate(R.layout.fragment_resources, container, false)
@@ -41,10 +50,9 @@ class ResourceFragment : Fragment(), AnkoLogger {
     override fun onStart() {
         super.onStart()
         //Analytics
-        val mFirebaseAnalytics = FirebaseAnalytics.getInstance(ctx)
         val bundle = Bundle()
         bundle.putString("content", "resources")
-        mFirebaseAnalytics.logEvent("content_opened", bundle)
+        fbAnalytics.logEvent("content_opened", bundle)
 
         realm = Realm.getDefaultInstance()
         val term = realm.where(TermModel::class.java).max("value")
@@ -60,22 +68,11 @@ class ResourceFragment : Fragment(), AnkoLogger {
             SyncManager.sync(ctx, SyncManager.RESOURCES, Action {
                 view?.snack("Success")
                 runOnUiThread {
-                    setRecycler(courseResourceSpinner.selectedView as TextView, courses)
+                    // setRecycler(courseResourceSpinner.selectedView as TextView, courses)
                 }
             }, Action {
                 view?.snack("Failed")
             }, courses)
-        }
-        val courseName = courses.map { it.courseName }.toSet()
-        val spinnerAdapter = ArrayAdapter(ctx, android.R.layout.simple_spinner_dropdown_item, courseName.toList())
-        courseResourceSpinner.adapter = spinnerAdapter
-        courseResourceSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-            }
-
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                setRecycler(p1, courses)
-            }
         }
     }
 

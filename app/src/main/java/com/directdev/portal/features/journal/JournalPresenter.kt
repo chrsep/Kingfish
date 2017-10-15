@@ -46,6 +46,7 @@ class JournalPresenter @Inject constructor(
         }.subscribe({
             view.showSuccess("Journal & Finance updated")
         }, {
+            authInteractor.resetLastSyncDate()
             view.showFailed(it.generateMessage())
         })
     }

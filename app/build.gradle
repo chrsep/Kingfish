@@ -3,7 +3,7 @@ buildscript {
     ext.anko_version = '0.10.1'
     ext.retrofit_version = '2.3.0'
     ext.support_library_version = '26.1.0'
-    ext.firebase_version = '11.4.0'
+    ext.firebase_version = '11.4.2'
     ext.dagger_version = '2.11'
 
     repositories {
@@ -32,7 +32,7 @@ apply plugin: 'com.getkeepsafe.dexcount'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.directdev.portal"
         minSdkVersion 17

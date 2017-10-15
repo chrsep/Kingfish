@@ -77,6 +77,7 @@ class GradesPresenter @Inject constructor(
                 switchTerm(credits.size)
             }
         }, {
+            authInteractor.resetLastSyncDate()
             view.showFailed(it.generateMessage())
         })
     }

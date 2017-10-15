@@ -63,7 +63,7 @@ class AuthInteractor @Inject constructor(
                 throw SigninException(redirectLocation)
 
             // Make sure user is logged in as student, not as a staff etc.
-            bimayApi.switchRole(cookie)
+            //bimayApi.switchRole(cookie)
         }.map {
             cookie
         }.doAfterSuccess {
@@ -76,6 +76,8 @@ class AuthInteractor @Inject constructor(
         isRequesting = true
         return request
     }
+
+    fun resetLastSyncDate() = timeStampRepo.resetLastSyncDate()
 
     /*----------------------------------------------------------------------------------------------
      * To sign in, 4 fields are required:
