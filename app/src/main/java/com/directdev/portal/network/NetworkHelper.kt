@@ -16,7 +16,7 @@ interface NetworkHelper {
     fun getIndexHtml(): Single<Response<ResponseBody>>
     fun getLoaderJs(cookie: String, serial: String): Single<Response<ResponseBody>>
     fun authenticate(cookie: String, fieldMap: HashMap<String, String>): Single<Response<String>>
-    fun switchRole(cookie: String): Completable
+    fun switchRole(cookie: String): Single<ResponseBody>
     fun getUserProfile(cookie: String): Single<ResponseBody>
     fun getJournalEntries(cookie: String, terms: List<Int>): Single<List<JournalModel>>
     fun getExams(cookie: String, terms: List<Int>): Single<List<ExamModel>>
