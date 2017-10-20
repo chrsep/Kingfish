@@ -61,9 +61,8 @@ class AuthInteractor @Inject constructor(
             val redirectLocation = it.headers().get("Location") ?: "none"
             if (redirectLocation != "https://binusmaya.binus.ac.id/block_user.php")
                 throw SigninException(redirectLocation)
-
-            // Make sure user is logged in as student, not as a staff etc.
-            //bimayApi.switchRole(cookie)
+        }.flatMap {
+            bimayApi.switchRole(cookie)
         }.map {
             cookie
         }.doAfterSuccess {
