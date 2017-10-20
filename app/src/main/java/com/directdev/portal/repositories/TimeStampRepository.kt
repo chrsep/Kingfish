@@ -24,4 +24,8 @@ abstract class TimeStampRepository(
         val lastSync = ctx.readPref(getId(), "")
         return if (lastSync != "") DateTime.parse(lastSync) else DateTime().minusYears(1)
     }
+
+    fun resetLastSyncDate() {
+        ctx.savePref(getId(), "")
+    }
 }

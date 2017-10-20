@@ -9,4 +9,7 @@
 .idea/kotlinc.xml
 .idea/markdown-navigator.xml
 .idea/markdown-navigator/
-app/app-release.apk
+
+*app-release.apk
+*output.json
+.idea/inspectionProfiles
