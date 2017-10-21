@@ -21,5 +21,10 @@ class ResourcesViewPagerAdapter(fm: FragmentManager?) : FragmentPagerAdapter(fm)
         fragmentTitleList.add(title)
     }
 
+    fun clear() {
+        fragmentTitleList.clear()
+        fragmentList.clear()
+    }
+
     override fun getPageTitle(position: Int): CharSequence = fragmentTitleList[position]
 }

@@ -2,6 +2,7 @@ package com.directdev.portal.features.resources
 
 import com.directdev.portal.interactors.CourseInteractor
 import com.directdev.portal.interactors.TermInteractor
+import com.directdev.portal.utils.getInitials
 import javax.inject.Inject
 
 /**
@@ -9,13 +10,20 @@ import javax.inject.Inject
  */
 class ResourcesPresenter @Inject constructor(
         private val termInteractor: TermInteractor,
-        private val courseInteractor: CourseInteractor
+        private val courseInteractor: CourseInteractor,
+        private val view: ResourcesContract.View
 ) : ResourcesContract.Presenter {
-    override fun getSemesters(): List<String> = termInteractor.getTerms().map {
-        termInteractor.getSemesterName(it)
+    override fun getSemesters(): List<Pair<Int, String>> {
+        val terms = termInteractor.getTerms()
+        val semesterNames = terms.map {
+            termInteractor.getSemesterName(it)
+        }
+        return terms.zip(semesterNames)
     }
 
-    override fun updateSelectedSemester(selectedTerm: String) {
+    override fun updateSelectedSemester(selectedTerm: Int) {
+        val courses = courseInteractor.getCourses(selectedTerm)
+        view.updateCourses(courses.map { Pair(it.first.getInitials(), it.second) })
     }
 
     override fun getCourses(term: String): List<String> = mutableListOf()

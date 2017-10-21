@@ -19,16 +19,31 @@ import org.jetbrains.anko.alert
 import javax.inject.Inject
 
 class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
+    override fun updateCourses(courses: List<Pair<String, String>>) {
+        adapter.clear()
+        courses.map {
+            adapter.addFrag(Fragment(), it.first)
+        }
+        adapter.notifyDataSetChanged()
+    }
+
     @Inject override lateinit var fbAnalytics: FirebaseAnalytics
     @Inject override lateinit var presenter: ResourcesContract.Presenter
+    lateinit var adapter: ResourcesViewPagerAdapter
 
     override fun onAttach(context: Context?) {
-        if (android.os.Build.VERSION.SDK_INT >= 23) AndroidInjection.inject(this)
+        if (android.os.Build.VERSION.SDK_INT >= 23) {
+            AndroidInjection.inject(this)
+            adapter = ResourcesViewPagerAdapter(fragmentManager)
+        }
         super.onAttach(context)
     }
 
     override fun onAttach(activity: Activity?) {
-        if (android.os.Build.VERSION.SDK_INT >= 23) AndroidInjection.inject(this)
+        if (android.os.Build.VERSION.SDK_INT >= 23) {
+            AndroidInjection.inject(this)
+            adapter = ResourcesViewPagerAdapter(fragmentManager)
+        }
         super.onAttach(activity)
     }
 
@@ -39,18 +54,15 @@ class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
         val tab = view.findViewById<TabLayout>(R.id.tabs)
         val viewPager = view.findViewById<ViewPager>(R.id.tabViewPager)
         val termList = presenter.getSemesters()
-
-        val adapter = ResourcesViewPagerAdapter(fragmentManager)
         viewPager.adapter = adapter
         tab.setupWithViewPager(viewPager)
-        toolbar.title = termList.last()
-        presenter.getCourses(termList.last()).forEach {
-            adapter.addFrag(Fragment(), it)
-        }
+        toolbar.title = termList.last().second
+        presenter.updateSelectedSemester(termList.last().first)
         semesterFab.setOnClickListener {
             alert {
-                items(termList) { _, o ->
-                    presenter.updateSelectedSemester(termList[o])
+                items(termList.map { it.second }) { _, o ->
+                    toolbar.title = termList[o].second
+                    presenter.updateSelectedSemester(termList[o].first)
                 }
             }.show()
         }
@@ -62,6 +74,7 @@ class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
         val bundle = Bundle()
         bundle.putString("content", "resources")
         fbAnalytics.logEvent("content_opened", bundle)
+
 
         /*realm = Realm.getDefaultInstance()
         val term = realm.where(TermModel::class.java).max("value")

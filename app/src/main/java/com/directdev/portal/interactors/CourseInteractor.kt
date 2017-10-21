@@ -25,4 +25,10 @@ class CourseInteractor @Inject constructor(
             cookie
         }
     }
+
+    fun getCourses(selectedTerm: Int): HashSet<Pair<String, String>> {
+        return courseRepo.getCourses(selectedTerm).map {
+            Pair(it.courseName, it.courseId)
+        }.toHashSet()
+    }
 }

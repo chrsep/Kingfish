@@ -184,3 +184,5 @@ fun getMessage(message: String): String = when (message) {
     "../login/?error=1" -> "Invalid username/password"
     else -> "We have no idea what went wrong, but we have received the error log, we'll look into this"
 }
+
+fun String.getInitials() = split(" ").fold("") { acc, s -> acc + s[0] }
