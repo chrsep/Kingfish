@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.directdev.portal.R
+import com.directdev.portal.utils.getInitials
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.android.AndroidInjection
 import org.jetbrains.anko.AnkoLogger
@@ -19,22 +20,14 @@ import org.jetbrains.anko.alert
 import javax.inject.Inject
 
 class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
-    override fun updateCourses(courses: List<Pair<String, String>>) {
-        adapter.clear()
-        courses.map {
-            adapter.addFrag(Fragment(), it.first)
-        }
-        adapter.notifyDataSetChanged()
-    }
-
     @Inject override lateinit var fbAnalytics: FirebaseAnalytics
     @Inject override lateinit var presenter: ResourcesContract.Presenter
-    lateinit var adapter: ResourcesViewPagerAdapter
+    lateinit var adapter: ResourcesFragmentPagerAdapter
 
     override fun onAttach(context: Context?) {
         if (android.os.Build.VERSION.SDK_INT >= 23) {
             AndroidInjection.inject(this)
-            adapter = ResourcesViewPagerAdapter(fragmentManager)
+            adapter = ResourcesFragmentPagerAdapter(fragmentManager)
         }
         super.onAttach(context)
     }
@@ -42,7 +35,7 @@ class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
     override fun onAttach(activity: Activity?) {
         if (android.os.Build.VERSION.SDK_INT >= 23) {
             AndroidInjection.inject(this)
-            adapter = ResourcesViewPagerAdapter(fragmentManager)
+            adapter = ResourcesFragmentPagerAdapter(childFragmentManager)
         }
         super.onAttach(activity)
     }
@@ -55,9 +48,9 @@ class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
         val viewPager = view.findViewById<ViewPager>(R.id.tabViewPager)
         val termList = presenter.getSemesters()
         viewPager.adapter = adapter
+        presenter.updateSelectedSemester(termList.last().first)
         tab.setupWithViewPager(viewPager)
         toolbar.title = termList.last().second
-        presenter.updateSelectedSemester(termList.last().first)
         semesterFab.setOnClickListener {
             alert {
                 items(termList.map { it.second }) { _, o ->
@@ -69,13 +62,21 @@ class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
         return view
     }
 
+    override fun updateCourses(courses: List<Pair<String, Int>>) {
+        adapter.clear()
+        courses.map {
+            adapter.addFrag(ResourcesListFragment.newInstance(it.first, it.second, presenter), it.first.getInitials())
+        }
+        adapter.notifyDataSetChanged()
+    }
+
     override fun onStart() {
         super.onStart()
         val bundle = Bundle()
         bundle.putString("content", "resources")
         fbAnalytics.logEvent("content_opened", bundle)
 
-
+        presenter.sync()
         /*realm = Realm.getDefaultInstance()
         val term = realm.where(TermModel::class.java).max("value")
         val courses = realm.where(CourseModel::class.java)

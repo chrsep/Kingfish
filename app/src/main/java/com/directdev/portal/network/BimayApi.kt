@@ -10,6 +10,16 @@ import javax.inject.Inject
 
 
 class BimayApi @Inject constructor(private val bimayService: BimayService) : NetworkHelper {
+    override fun getResources(cookies: String, course: CourseModel): Single<ResModelIntermidiary> = bimayService.getResources(
+            course.courseId,
+            course.crseId,
+            course.term.toString(),
+            course.ssrComponent,
+            course.classNumber.toString(),
+            cookies
+    )
+
+
     override fun getCourses(cookie: String, terms: List<Int>): Single<List<CourseModel>> =
             Single.zip(terms.map { term ->
                 bimayService.getCourse(term.toString(), cookie)
@@ -67,4 +77,5 @@ class BimayApi @Inject constructor(private val bimayService: BimayService) : Net
 
     override fun getUserProfile(cookie: String): Single<ResponseBody> =
             bimayService.getProfile(cookie).subscribeOn(Schedulers.io())
+
 }

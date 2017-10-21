@@ -1,10 +1,6 @@
 package com.directdev.portal.di
 
-import com.directdev.portal.network.AuthTimeStampRepository
-import com.directdev.portal.repositories.GradeTimeStampRepository
-import com.directdev.portal.repositories.JournalTimeStampRepository
-import com.directdev.portal.repositories.TermTimeStampRepository
-import com.directdev.portal.repositories.TimeStampRepository
+import com.directdev.portal.repositories.*
 import dagger.Module
 import dagger.Provides
 import javax.inject.Named

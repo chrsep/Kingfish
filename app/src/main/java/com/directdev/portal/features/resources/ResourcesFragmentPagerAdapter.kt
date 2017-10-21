@@ -2,13 +2,13 @@ package com.directdev.portal.features.resources
 
 import android.app.Fragment
 import android.app.FragmentManager
-import android.support.v13.app.FragmentPagerAdapter
+import android.support.v13.app.FragmentStatePagerAdapter
 
 /**-------------------------------------------------------------------------------------------------
  * Created by chris on 10/15/17.
  *------------------------------------------------------------------------------------------------*/
 //TODO: title might not be needed
-class ResourcesViewPagerAdapter(fm: FragmentManager?) : FragmentPagerAdapter(fm) {
+class ResourcesFragmentPagerAdapter(fm: FragmentManager?) : FragmentStatePagerAdapter(fm) {
     private val fragmentList = mutableListOf<Fragment>()
     private val fragmentTitleList = mutableListOf<String>()
 
@@ -25,6 +25,8 @@ class ResourcesViewPagerAdapter(fm: FragmentManager?) : FragmentPagerAdapter(fm)
         fragmentTitleList.clear()
         fragmentList.clear()
     }
+
+    override fun getItemPosition(`object`: Any?) = POSITION_NONE
 
     override fun getPageTitle(position: Int): CharSequence = fragmentTitleList[position]
 }

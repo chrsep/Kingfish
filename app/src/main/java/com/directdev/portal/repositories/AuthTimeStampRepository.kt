@@ -1,8 +1,7 @@
-package com.directdev.portal.network
+package com.directdev.portal.repositories
 
 import android.content.Context
 import com.directdev.portal.R
-import com.directdev.portal.repositories.TimeStampRepository
 import org.joda.time.format.DateTimeFormatter
 import javax.inject.Inject
 

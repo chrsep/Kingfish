@@ -14,11 +14,15 @@ class CourseRepository @Inject constructor(
 ) {
     fun getCourses(term: Int): RealmResults<CourseModel> = realm.where(CourseModel::class.java)
             .equalTo("term", term)
-            .findAll()
+            .findAllSorted("courseName")
 
     fun saveCourses(courses: List<CourseModel>) = Realm.getDefaultInstance().use {
         it.executeTransaction {
             it.insertOrUpdate(courses)
         }
     }
+
+    fun getCourse(classNumber: Int) = realm.where(CourseModel::class.java)
+            .equalTo("classNumber", classNumber)
+            .findFirst()
 }

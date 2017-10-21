@@ -43,7 +43,7 @@ import javax.net.ssl.SSLException
  * A singleton that handles all of Portal API calls, Using ReactiveX and Retrofit.
  *------------------------------------------------------------------------------------------------*/
 
-@Deprecated("User the BimayApi Network Helper")
+//@Deprecated("User the BimayApi Network Helper")
 object DataApi {
     var isActive = false
     private val baseUrl = "https://binusmaya.binus.ac.id/services/ci/index.php/"

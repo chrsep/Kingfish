@@ -26,9 +26,11 @@ class CourseInteractor @Inject constructor(
         }
     }
 
-    fun getCourses(selectedTerm: Int): HashSet<Pair<String, String>> {
+    fun getCourses(selectedTerm: Int): List<Pair<String, Int>> {
         return courseRepo.getCourses(selectedTerm).map {
-            Pair(it.courseName, it.courseId)
-        }.toHashSet()
+            Pair(it.courseName, it.classNumber)
+        }.distinctBy { it.first }
     }
+
+    fun getCourse(classNumber: Int) = courseRepo.getCourse(classNumber)
 }
