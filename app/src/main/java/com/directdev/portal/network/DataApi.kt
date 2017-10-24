@@ -217,41 +217,41 @@ object DataApi {
     }
 
 
-    fun getTokens(ctx: Context): Single<RandomTokens> {
-        val loaderPattern = "<script src=\".*login/loader.*\""
-        val usernamePattern = "<input type=\"text\" name=\".*placeholder=\"Username\""
-        val passPattern = "<input type=\"password\" name=\".*placeholder=\"Password\""
-        var loaderStr: String
-        var userStr: String = ""
-        var passStr: String = ""
-        var cookie: String = ""
-        if (DateTime.now().closeToLastUpdate(ctx)) return Single.just(RandomTokens())
-        return api.getIndexHtml().flatMap {
-            val body = it.body()?.string() ?: ""
-            val loader = Regex(loaderPattern).find(body)?.value ?: ""
-            val user = Regex(usernamePattern).find(body)?.value ?: ""
-            val pass = Regex(passPattern).find(body)?.value ?: ""
-            loaderStr = loader.substring(40, loader.length - 1).removeHtmlEncoding()
-            userStr = user.substring(25, user.length - 45).removeHtmlEncoding()
-            passStr = pass.substring(29, pass.length - 24).removeHtmlEncoding()
-            cookie = it.headers().get("Set-Cookie") ?: ""
-            api.getSerial(cookie, loaderStr)
-        }.map {
-            val pattern = "<input type=\"hidden\" name=\".*\" value=\".*\" />"
-            val body = it.body()?.string() ?: ""
-            val extraInputs = Regex(pattern).findAll(body).toList()
-            val fields = extraInputs[0].value.split(" ")
-            val pair1 = HashMap<String, String>()
-            val pair2 = HashMap<String, String>()
-            pair1.put(fields[2].substring(6, fields[2].length - 1).removeHtmlEncoding(),
-                    fields[3].substring(6, fields[3].length - 1).removeHtmlEncoding())
-            pair2.put(fields[6].substring(6, fields[6].length - 1).removeHtmlEncoding(),
-                    fields[7].substring(6, fields[7].length - 1).removeHtmlEncoding())
-            ctx.savePref(R.string.cookie, cookie)
-            RandomTokens(userStr, passStr, pair1, pair2)
-        }.defaultThreads()
-    }
-
+    /* fun getTokens(ctx: Context): Single<RandomTokens> {
+         val loaderPattern = "<script src=\".*login/loader.*\""
+         val usernamePattern = "<input type=\"text\" name=\".*placeholder=\"Username\""
+         val passPattern = "<input type=\"password\" name=\".*placeholder=\"Password\""
+         var loaderStr: String
+         var userStr: String = ""
+         var passStr: String = ""
+         var cookie: String = ""
+         if (DateTime.now().closeToLastUpdate(ctx)) return Single.just(RandomTokens())
+         return api.getIndexHtml().flatMap {
+             val body = it.body()?.string() ?: ""
+             val loader = Regex(loaderPattern).find(body)?.value ?: ""
+             val user = Regex(usernamePattern).find(body)?.value ?: ""
+             val pass = Regex(passPattern).find(body)?.value ?: ""
+             loaderStr = loader.substring(40, loader.length - 1).removeHtmlEncoding()
+             userStr = user.substring(25, user.length - 45).removeHtmlEncoding()
+             passStr = pass.substring(29, pass.length - 24).removeHtmlEncoding()
+             cookie = it.headers().get("Set-Cookie") ?: ""
+             api.getSerial(cookie, loaderStr)
+         }.map {
+             val pattern = "<input type=\"hidden\" name=\".*\" value=\".*\" />"
+             val body = it.body()?.string() ?: ""
+             val extraInputs = Regex(pattern).findAll(body).toList()
+             val fields = extraInputs[0].value.split(" ")
+             val pair1 = HashMap<String, String>()
+             val pair2 = HashMap<String, String>()
+             pair1.put(fields[2].substring(6, fields[2].length - 1).removeHtmlEncoding(),
+                     fields[3].substring(6, fields[3].length - 1).removeHtmlEncoding())
+             pair2.put(fields[6].substring(6, fields[6].length - 1).removeHtmlEncoding(),
+                     fields[7].substring(6, fields[7].length - 1).removeHtmlEncoding())
+             ctx.savePref(R.string.cookie, cookie)
+             RandomTokens(userStr, passStr, pair1, pair2)
+         }.defaultThreads()
+     }
+ */
 
 /*----------------------------------------------------------------------------------------------
  * Helper function for saving data to Realm

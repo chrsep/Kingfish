@@ -1,4 +1,4 @@
-package com.directdev.portal.network
+/*package com.directdev.portal.network
 
 import android.content.Context
 import android.os.Bundle
@@ -51,13 +51,13 @@ object SyncManager {
         params.putString("type", type)
         mFirebaseAnalytics.logEvent("data_update", params)
 
-       /* DataApi.signIn(ctx, tokens).flatMap {
+       *//* DataApi.signIn(ctx, tokens).flatMap {
             when (type) {
                 INIT -> DataApi.initializeApp(ctx)
                 COMMON -> DataApi.fetchData(ctx)
                 RESOURCES -> courses?.let { DataApi.fetchResources(ctx, it) }
                 else -> Single.error(NoSuchMethodException())
             }
-        }.subscribe(onSuccess, onFailure)*/
+        }.subscribe(onSuccess, onFailure)*//*
     }
-}
+}*/
