@@ -3,6 +3,7 @@ package com.directdev.portal.features.resources
 import com.directdev.portal.BasePresenter
 import com.directdev.portal.BaseView
 import com.directdev.portal.models.ResModel
+import io.reactivex.Single
 import java.io.Serializable
 
 /**
@@ -18,6 +19,6 @@ interface ResourcesContract {
         fun updateSelectedSemester(selectedTerm: Int)
         fun getCourses(term: String): List<String>
         fun getResources(classNumber: Int): ResModel?
-        fun sync(courseNumber: Int): Any
+        fun sync(courseNumber: List<Int>): Single<Unit>
     }
 }

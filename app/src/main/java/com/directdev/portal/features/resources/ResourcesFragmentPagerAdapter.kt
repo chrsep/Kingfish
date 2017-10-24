@@ -7,7 +7,6 @@ import android.support.v13.app.FragmentStatePagerAdapter
 /**-------------------------------------------------------------------------------------------------
  * Created by chris on 10/15/17.
  *------------------------------------------------------------------------------------------------*/
-//TODO: title might not be needed
 class ResourcesFragmentPagerAdapter(fm: FragmentManager?) : FragmentStatePagerAdapter(fm) {
     private val fragmentList = mutableListOf<Fragment>()
     private val fragmentTitleList = mutableListOf<String>()

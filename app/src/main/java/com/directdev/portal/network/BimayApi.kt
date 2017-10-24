@@ -17,7 +17,10 @@ class BimayApi @Inject constructor(private val bimayService: BimayService) : Net
             course.ssrComponent,
             course.classNumber.toString(),
             cookies
-    )
+    ).map { data ->
+        data.classNumber = course.classNumber
+        data
+    }
 
 
     override fun getCourses(cookie: String, terms: List<Int>): Single<List<CourseModel>> =

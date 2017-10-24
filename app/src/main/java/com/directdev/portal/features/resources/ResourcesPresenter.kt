@@ -5,6 +5,7 @@ import com.directdev.portal.interactors.CourseInteractor
 import com.directdev.portal.interactors.ResourceInteractor
 import com.directdev.portal.interactors.TermInteractor
 import com.directdev.portal.models.ResModel
+import io.reactivex.Single
 import javax.inject.Inject
 
 /**
@@ -17,8 +18,12 @@ class ResourcesPresenter @Inject constructor(
         private val authInteractor: AuthInteractor,
         private val view: ResourcesContract.View
 ) : ResourcesContract.Presenter {
-    override fun sync(courseNumber: Int) = authInteractor.execute().flatMap {
-        resourceInteractor.sync(it, courseInteractor.getCourse(courseNumber))
+    override fun sync(courseNumber: List<Int>): Single<Unit> = authInteractor.execute().flatMap { cookie ->
+        Single.zip(courseNumber.map {
+            resourceInteractor.sync(cookie, courseInteractor.getCourse(it))
+        }) {
+            // TODO: This empty funtion is bad, fix it
+        }
     }
 
     override fun getResources(classNumber: Int): ResModel? =

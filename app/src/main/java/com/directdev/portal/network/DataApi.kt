@@ -36,14 +36,12 @@ import javax.net.ssl.SSLException
  * time we use ReactiveX, this code has become quite a mess (at least that's how we feel). Further
  * refinement of this object will be required, any help will be appreciated :)
  *
- * TODO: REFACTOR | Reorganizes DataApi to create more readable code
- *
  *------------------------------------------------------------------------------------------------*/
 /**-------------------------------------------------------------------------------------------------
  * A singleton that handles all of Portal API calls, Using ReactiveX and Retrofit.
  *------------------------------------------------------------------------------------------------*/
 
-//@Deprecated("User the BimayApi Network Helper")
+@Deprecated("User the BimayApi Network Helper")
 object DataApi {
     var isActive = false
     private val baseUrl = "https://binusmaya.binus.ac.id/services/ci/index.php/"

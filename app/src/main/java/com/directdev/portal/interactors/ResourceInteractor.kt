@@ -18,7 +18,7 @@ class ResourceInteractor @Inject constructor(
         resourceRepo.save(it)
     }
 
-    //TODO: CLEAN THIS UP
+/* TODO: CLEAN THIS UP
     fun fetchResources(data: RealmResults<CourseModel>): Single<Unit> {
         isActive = true
         val cookie = ctx.readPref(R.string.cookie, "")
@@ -55,6 +55,6 @@ class ResourceInteractor @Inject constructor(
         }.doAfterTerminate {
             isActive = false
         }
-    }
+    }*/
 
 }

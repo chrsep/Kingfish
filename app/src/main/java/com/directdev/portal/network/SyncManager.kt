@@ -39,7 +39,6 @@ object SyncManager {
 
             Crashlytics.log("Get tokens failed: " + random_num)
             Crashlytics.logException(it)
-            // TODO: Another hack to get working with rxjava2
             // onFailure.call(it)
         })
     }

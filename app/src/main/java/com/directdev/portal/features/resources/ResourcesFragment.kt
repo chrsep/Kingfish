@@ -15,6 +15,7 @@ import com.directdev.portal.R
 import com.directdev.portal.utils.getInitials
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.android.AndroidInjection
+import kotlinx.android.synthetic.main.fragment_resources.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.alert
 import javax.inject.Inject
@@ -76,7 +77,7 @@ class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
         bundle.putString("content", "resources")
         fbAnalytics.logEvent("content_opened", bundle)
 
-        presenter.sync()
+        // presenter.sync(resourcesToolbar.title.toString())
         /*realm = Realm.getDefaultInstance()
         val term = realm.where(TermModel::class.java).max("value")
         val courses = realm.where(CourseModel::class.java)
