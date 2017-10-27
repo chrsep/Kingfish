@@ -126,6 +126,6 @@ class AuthInteractor @Inject constructor(
     // TODO: This is similar to the one from journalInteractor, might be able to be refactored out
     fun isSyncOverdue(): Boolean {
         val minutesInt = Minutes.minutesBetween(timeStampRepo.getLastSync(), timeStampRepo.today()).minutes
-        return Math.abs(minutesInt) > 25
+        return Math.abs(minutesInt) > 5
     }
 }
