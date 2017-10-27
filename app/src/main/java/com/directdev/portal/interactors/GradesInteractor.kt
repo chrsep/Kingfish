@@ -25,7 +25,9 @@ class GradesInteractor @Inject constructor(
     fun getTermCreditAndGpa(): RealmResults<CreditModel> =
             gradesRepo.getCreditAndGpa()
 
-    fun getAllGradesByTerm(term: Int) = courseRepo.getCourses(term).map {
+    fun getAllGradesByTerm(term: Int) = courseRepo.getCourses(term).toList().distinctBy {
+        it.courseId
+    }.map {
         gradesRepo.getGrades(it.courseId)
     }.filter {
         it.isNotEmpty()
