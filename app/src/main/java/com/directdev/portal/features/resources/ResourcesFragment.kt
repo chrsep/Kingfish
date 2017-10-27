@@ -95,7 +95,7 @@ class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
     override fun updateCourses(courses: List<Pair<String, Int>>) {
         adapter.clear()
         courses.map {
-            adapter.addFrag(ResourcesListFragment.newInstance(it.first, it.second, presenter), it.first.getInitials())
+            adapter.addFrag(ResourcesListFragment.newInstance(it.first, it.second), it.first.getInitials())
         }
         adapter.notifyDataSetChanged()
     }
@@ -105,52 +105,5 @@ class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
         val bundle = Bundle()
         bundle.putString("content", "resources")
         fbAnalytics.logEvent("content_opened", bundle)
-
-        // presenter.sync(resourcesToolbar.title.toString())
-        /*realm = Realm.getDefaultInstance()
-        val term = realm.where(TermModel::class.java).max("value")
-        val courses = realm.where(CourseModel::class.java)
-                .equalTo("term", term as Long)
-                .equalTo("ssrComponent", "LEC")
-                .findAll()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            refreshresourceButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(ctx.getString(R.color.colorAccent)))
-        }
-        refreshresourceButton.setOnClickListener {
-            view.snack("Refreshing data, please wait...", Snackbar.LENGTH_INDEFINITE)
-            SyncManager.sync(ctx, SyncManager.RESOURCES, Action {
-                view?.snack("Success")
-                runOnUiThread {
-                    // setRecycler(courseResourceSpinner.selectedView as TextView, courses)
-                }
-            }, Action {
-                view?.snack("Failed")
-            }, courses)
-        }*/
     }
-
-    /*private fun setRecycler(p1: View?, courses: RealmResults<CourseModel>) {
-        if (realm.isClosed) return
-        val selected = courses.filter { it.courseName == (p1 as TextView).text }
-        if (selected.isEmpty()) {
-            Crashlytics.setInt("course size", courses.size)
-            Crashlytics.log("setRecycler")
-            Crashlytics.log((p1 as TextView).text.toString())
-
-            resourceEmptyPlaceholder.visibility = View.VISIBLE
-            return
-        }
-        val resources = realm.where(ResModel::class.java)
-                .equalTo("classNumber", selected[0].classNumber)
-                .findFirst()
-        if (resources == null) {
-            resourceEmptyPlaceholder.visibility = View.VISIBLE
-            return
-        }
-        val outlineMap = resources.resources.map { it.courseOutlineTopicID }.toSet()
-        resourceEmptyPlaceholder.visibility = View.GONE
-        resourceRecycler.visibility = View.VISIBLE
-        resourceRecycler.layoutManager = LinearLayoutManager(ctx)
-        resourceRecycler.adapter = ResourcesRecyclerAdapter(ctx, outlineMap.toList(), resources)
-    }*/
 }

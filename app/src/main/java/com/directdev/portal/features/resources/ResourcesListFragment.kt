@@ -18,19 +18,19 @@ import org.jetbrains.anko.ctx
  *------------------------------------------------------------------------------------------------*/
 class ResourcesListFragment : Fragment() {
     companion object {
-        fun newInstance(courseName: String, classNumber: Int, presenter: ResourcesContract.Presenter): ResourcesListFragment {
+        fun newInstance(courseName: String, classNumber: Int): ResourcesListFragment {
             val fragment = ResourcesListFragment()
             val bundle = Bundle()
             bundle.putInt("classNumb", classNumber)
             bundle.putString("courseName", courseName)
-            bundle.putSerializable("presenter", presenter)
             fragment.arguments = bundle
             return fragment
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle?): View {
-        val presenter = arguments.getSerializable("presenter") as ResourcesContract.Presenter
+
+        val presenter = (parentFragment as ResourcesFragment).presenter
         val view = inflater.inflate(R.layout.fragment_resources_list, container, false)
         val recyclerView = view.findViewById<RecyclerView>(R.id.resourceRecyclerView)
         val resources = presenter.getResources(arguments.getInt("classNumb"))

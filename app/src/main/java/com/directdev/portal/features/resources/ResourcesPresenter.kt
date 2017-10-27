@@ -7,6 +7,7 @@ import com.directdev.portal.interactors.TermInteractor
 import com.directdev.portal.models.ResModel
 import com.directdev.portal.utils.generateMessage
 import io.reactivex.Single
+import java.io.Serializable
 import javax.inject.Inject
 
 class ResourcesPresenter @Inject constructor(
@@ -15,7 +16,7 @@ class ResourcesPresenter @Inject constructor(
         private val resourceInteractor: ResourceInteractor,
         private val authInteractor: AuthInteractor,
         private val view: ResourcesContract.View
-) : ResourcesContract.Presenter {
+) : ResourcesContract.Presenter, Serializable {
     private lateinit var courseNumbers: List<Int>
     private var isSyncing = false
     private var isStopped = false
