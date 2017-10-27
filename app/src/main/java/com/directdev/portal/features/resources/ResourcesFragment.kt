@@ -5,6 +5,7 @@ import android.app.Fragment
 import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
+import android.support.design.widget.Snackbar
 import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.Toolbar
@@ -13,14 +14,40 @@ import android.view.View
 import android.view.ViewGroup
 import com.directdev.portal.R
 import com.directdev.portal.utils.getInitials
+import com.directdev.portal.utils.snack
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.fragment_resources.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.alert
+import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject
 
 class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
+    override fun showFailed(message: String) {
+        runOnUiThread {
+            view?.snack(message, Snackbar.LENGTH_INDEFINITE)
+        }
+    }
+
+    override fun showLoading() {
+        runOnUiThread {
+            resourceSyncProgress.visibility = View.VISIBLE
+        }
+    }
+
+    override fun hideLoading() {
+        runOnUiThread {
+            resourceSyncProgress.visibility = View.GONE
+        }
+    }
+
+    override fun showSuccess(message: String) {
+        runOnUiThread {
+            view?.snack(resourcesToolbar.title.toString() + " " + message, Snackbar.LENGTH_SHORT)
+        }
+    }
+
     override fun getSemester(): String = resourcesToolbar.title.toString()
 
     @Inject override lateinit var fbAnalytics: FirebaseAnalytics

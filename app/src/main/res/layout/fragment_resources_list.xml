@@ -13,13 +13,18 @@
         android:textSize="20sp"
         android:textStyle="bold" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/courseName"
+        android:background="@color/toolbarBorder" />
+
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/resourceRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/courseName"
-        android:layout_margin="8dp"
         android:visibility="gone" />
 
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -27,9 +32,9 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/resourceEmptyPlaceholder"
         android:layout_width="match_parent"
-        android:layout_marginTop="8dp"
         android:layout_height="match_parent"
         android:layout_below="@+id/courseName"
+        android:layout_marginTop="8dp"
         android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 

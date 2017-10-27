@@ -21,6 +21,16 @@
 
         </android.support.v7.widget.Toolbar>
 
+        <ProgressBar
+            android:id="@+id/resourceSyncProgress"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="-7dp"
+            android:layout_marginTop="-10dp"
+            android:indeterminate="true"
+            android:visibility="invisible" />
+
         <android.support.design.widget.TabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"

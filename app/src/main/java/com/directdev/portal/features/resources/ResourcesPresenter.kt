@@ -5,12 +5,10 @@ import com.directdev.portal.interactors.CourseInteractor
 import com.directdev.portal.interactors.ResourceInteractor
 import com.directdev.portal.interactors.TermInteractor
 import com.directdev.portal.models.ResModel
+import com.directdev.portal.utils.generateMessage
 import io.reactivex.Single
 import javax.inject.Inject
 
-/**
- * Created by chris on 04/10/17.
- */
 class ResourcesPresenter @Inject constructor(
         private val termInteractor: TermInteractor,
         private val courseInteractor: CourseInteractor,
@@ -19,16 +17,36 @@ class ResourcesPresenter @Inject constructor(
         private val view: ResourcesContract.View
 ) : ResourcesContract.Presenter {
     private lateinit var courseNumbers: List<Int>
+    private var isSyncing = false
+    private var isStopped = false
     override fun sync() {
-        authInteractor.execute().flatMap { cookie ->
-            Single.zip(courseNumbers.map {
-                resourceInteractor.sync(cookie, courseInteractor.getCourse(it))
-            }) {
-                // TODO: This empty funtion is bad, fix it
-            }
-        }.subscribe({}, {
-            throw it
-        })
+        if (!isSyncing)
+            authInteractor.execute().flatMap { cookie ->
+                Single.zip(courseNumbers.map {
+                    resourceInteractor.sync(cookie, courseInteractor.getCourse(it))
+                }) {
+                    // TODO: This empty funtion is bad, fix it
+                }
+            }.doOnSubscribe {
+                if (!isStopped) view.showLoading()
+                isSyncing = true
+            }.doFinally {
+                if (!isStopped) view.hideLoading()
+                isSyncing = false
+            }.subscribe({
+                view.showSuccess("Resources Successfully updated")
+            }, {
+                view.showFailed(it.generateMessage())
+            })
+    }
+
+    override fun onStart() {
+        if (isSyncing) view.showLoading()
+        isStopped = false
+    }
+
+    override fun onStop() {
+        isStopped = true
     }
 
     override fun getResources(classNumber: Int): ResModel? =

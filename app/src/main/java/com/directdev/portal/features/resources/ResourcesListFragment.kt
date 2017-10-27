@@ -2,6 +2,7 @@ package com.directdev.portal.features.resources
 
 import android.app.Fragment
 import android.os.Bundle
+import android.support.constraint.ConstraintLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -34,10 +35,20 @@ class ResourcesListFragment : Fragment() {
         val recyclerView = view.findViewById<RecyclerView>(R.id.resourceRecyclerView)
         val resources = presenter.getResources(arguments.getInt("classNumb"))
         val outlineMap = resources?.resources?.map { it.courseOutlineTopicID }?.toSet()
+        val resourceEmptyPlaceholder = view.findViewById<ConstraintLayout>(R.id.resourceEmptyPlaceholder)
         view.findViewById<TextView>(R.id.courseName).text = arguments.getString("courseName")
         view.findViewById<Button>(R.id.refreshResourceButton).setOnClickListener {
             presenter.sync()
         }
+        resourceEmptyPlaceholder.visibility = if (outlineMap != null)
+            View.GONE
+        else
+            View.VISIBLE
+        recyclerView.visibility = if (outlineMap != null)
+            View.VISIBLE
+        else
+            View.GONE
+
         if (outlineMap != null) {
             recyclerView.layoutManager = LinearLayoutManager(ctx)
             recyclerView.adapter = ResourcesRecyclerAdapter(ctx, outlineMap.toList(), resources)

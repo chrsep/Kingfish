@@ -12,6 +12,10 @@ interface ResourcesContract {
     interface View : BaseView<Presenter> {
         fun updateCourses(courses: List<Pair<String, Int>>)
         fun getSemester(): String
+        fun showFailed(message: String)
+        fun showLoading()
+        fun hideLoading()
+        fun showSuccess(message: String)
     }
 
     interface Presenter : BasePresenter, Serializable {
@@ -20,5 +24,7 @@ interface ResourcesContract {
         fun getCourses(term: String): List<String>
         fun getResources(classNumber: Int): ResModel?
         fun sync()
+        fun onStart()
+        fun onStop()
     }
 }
