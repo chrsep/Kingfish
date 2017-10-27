@@ -13,16 +13,19 @@ class BimayApi @Inject constructor(private val bimayService: BimayService) : Net
     override fun getIndexHtmlToken(): Single<Response<ResponseBody>> =
             bimayService.getIndexHtmlToken().subscribeOn(Schedulers.io())
 
-    override fun getResources(cookies: String, course: CourseModel): Single<ResModelIntermidiary> = bimayService.getResources(
-            course.courseId,
-            course.crseId,
-            course.term.toString(),
-            course.ssrComponent,
-            course.classNumber.toString(),
-            cookies
-    ).map { data ->
-        data.classNumber = course.classNumber
-        data
+    override fun getResources(cookies: String, course: CourseModel): Single<ResModelIntermidiary> {
+        val classNumber = course.classNumber
+        return bimayService.getResources(
+                course.courseId,
+                course.crseId,
+                course.term.toString(),
+                course.ssrComponent,
+                course.classNumber.toString(),
+                cookies
+        ).map { data ->
+            data.classNumber = classNumber
+            data
+        }.subscribeOn(Schedulers.io())
     }
 
 

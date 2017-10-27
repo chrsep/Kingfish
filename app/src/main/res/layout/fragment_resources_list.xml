@@ -71,7 +71,7 @@
             tools:layout_constraintLeft_creator="1" />
 
         <Button
-            android:id="@+id/refreshresourceButton"
+            android:id="@+id/refreshResourceButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="3dp"

@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import com.directdev.portal.R
 import org.jetbrains.anko.ctx
@@ -34,6 +35,9 @@ class ResourcesListFragment : Fragment() {
         val resources = presenter.getResources(arguments.getInt("classNumb"))
         val outlineMap = resources?.resources?.map { it.courseOutlineTopicID }?.toSet()
         view.findViewById<TextView>(R.id.courseName).text = arguments.getString("courseName")
+        view.findViewById<Button>(R.id.refreshResourceButton).setOnClickListener {
+            presenter.sync()
+        }
         if (outlineMap != null) {
             recyclerView.layoutManager = LinearLayoutManager(ctx)
             recyclerView.adapter = ResourcesRecyclerAdapter(ctx, outlineMap.toList(), resources)

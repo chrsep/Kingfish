@@ -16,7 +16,7 @@ class ResourceRepository @Inject constructor(
             .findFirst()
 
     fun save(data: ResModelIntermidiary) = Realm.getDefaultInstance().use {
-        realm.executeTransaction { realm ->
+        it.executeTransaction { realm ->
             val resModel = ResModel()
             resModel.book.addAll(data.book)
             resModel.path.addAll(data.path)

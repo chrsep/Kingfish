@@ -21,6 +21,8 @@ import org.jetbrains.anko.alert
 import javax.inject.Inject
 
 class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
+    override fun getSemester(): String = resourcesToolbar.title.toString()
+
     @Inject override lateinit var fbAnalytics: FirebaseAnalytics
     @Inject override lateinit var presenter: ResourcesContract.Presenter
     lateinit var adapter: ResourcesFragmentPagerAdapter

@@ -18,12 +18,17 @@ class ResourcesPresenter @Inject constructor(
         private val authInteractor: AuthInteractor,
         private val view: ResourcesContract.View
 ) : ResourcesContract.Presenter {
-    override fun sync(courseNumber: List<Int>): Single<Unit> = authInteractor.execute().flatMap { cookie ->
-        Single.zip(courseNumber.map {
-            resourceInteractor.sync(cookie, courseInteractor.getCourse(it))
-        }) {
-            // TODO: This empty funtion is bad, fix it
-        }
+    private lateinit var courseNumbers: List<Int>
+    override fun sync() {
+        authInteractor.execute().flatMap { cookie ->
+            Single.zip(courseNumbers.map {
+                resourceInteractor.sync(cookie, courseInteractor.getCourse(it))
+            }) {
+                // TODO: This empty funtion is bad, fix it
+            }
+        }.subscribe({}, {
+            throw it
+        })
     }
 
     override fun getResources(classNumber: Int): ResModel? =
@@ -39,6 +44,7 @@ class ResourcesPresenter @Inject constructor(
 
     override fun updateSelectedSemester(selectedTerm: Int) {
         val courses = courseInteractor.getCourses(selectedTerm)
+        courseNumbers = courses.map { it.second }
         view.updateCourses(courses.toList())
     }
 
