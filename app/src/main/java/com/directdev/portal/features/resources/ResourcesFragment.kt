@@ -53,11 +53,15 @@ class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
     @Inject override lateinit var fbAnalytics: FirebaseAnalytics
     @Inject override lateinit var presenter: ResourcesContract.Presenter
     lateinit var adapter: ResourcesFragmentPagerAdapter
+    lateinit var termList: List<Pair<Int, String>>
+    var toolbarTitle = ""
 
     override fun onAttach(context: Context?) {
         if (android.os.Build.VERSION.SDK_INT >= 23) {
             AndroidInjection.inject(this)
-            adapter = ResourcesFragmentPagerAdapter(fragmentManager)
+            adapter = ResourcesFragmentPagerAdapter(childFragmentManager)
+            termList = presenter.getSemesters()
+            presenter.updateSelectedSemester(termList.last().first)
         }
         super.onAttach(context)
     }
@@ -66,6 +70,8 @@ class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
         if (android.os.Build.VERSION.SDK_INT >= 23) {
             AndroidInjection.inject(this)
             adapter = ResourcesFragmentPagerAdapter(childFragmentManager)
+            termList = presenter.getSemesters()
+            presenter.updateSelectedSemester(termList.last().first)
         }
         super.onAttach(activity)
     }
@@ -76,14 +82,14 @@ class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
         val toolbar = view.findViewById<Toolbar>(R.id.resourcesToolbar)
         val tab = view.findViewById<TabLayout>(R.id.tabs)
         val viewPager = view.findViewById<ViewPager>(R.id.tabViewPager)
-        val termList = presenter.getSemesters()
         viewPager.adapter = adapter
-        presenter.updateSelectedSemester(termList.last().first)
         tab.setupWithViewPager(viewPager)
-        toolbar.title = termList.last().second
+        if (toolbarTitle == "") toolbarTitle = termList.last().second
+        toolbar.title = toolbarTitle
         semesterFab.setOnClickListener {
             alert {
                 items(termList.map { it.second }) { _, o ->
+                    toolbarTitle = termList[o].second
                     toolbar.title = termList[o].second
                     presenter.updateSelectedSemester(termList[o].first)
                 }
