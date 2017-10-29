@@ -112,4 +112,9 @@ class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
         bundle.putString("content", "resources")
         fbAnalytics.logEvent("content_opened", bundle)
     }
+
+    override fun onStop() {
+        presenter.onStop()
+        super.onStop()
+    }
 }
