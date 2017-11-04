@@ -67,7 +67,7 @@ class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
     }
 
     override fun onAttach(activity: Activity?) {
-        if (android.os.Build.VERSION.SDK_INT >= 23) {
+        if (android.os.Build.VERSION.SDK_INT < 23) {
             AndroidInjection.inject(this)
             adapter = ResourcesFragmentPagerAdapter(childFragmentManager)
             termList = presenter.getSemesters()
