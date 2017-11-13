@@ -73,8 +73,8 @@ class BimayApi @Inject constructor(private val bimayService: BimayService) : Net
         bimayService.getGrades(it.toString(), cookie).subscribeOn(Schedulers.io())
     }, { it })
 
-    override fun getIndexHtml(cookie: String, token: String): Single<Response<ResponseBody>> =
-            bimayService.getIndexHtml(cookie = cookie, token = token).subscribeOn(Schedulers.io())
+    override fun getIndexHtml(): Single<Response<ResponseBody>> =
+            bimayService.getIndexHtml().subscribeOn(Schedulers.io())
 
     override fun getLoaderJs(cookie: String, serial: String, referrer: String): Single<Response<ResponseBody>> =
             bimayService.getSerial(cookie, serial, referrer).subscribeOn(Schedulers.io())

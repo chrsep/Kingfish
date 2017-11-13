@@ -13,10 +13,9 @@ import retrofit2.http.*
 
 interface BimayService {
 
-    @GET("https://binusmaya.binus.ac.id/login/{token}")
+    @GET("https://binusmaya.binus.ac.id/login/index.php")
     @Headers("User-Agent: Portal App/" + BuildConfig.VERSION_NAME)
-    fun getIndexHtml(@Header("Cookie") cookie: String = "",
-                     @Path("token", encoded = true) token: String): Single<Response<ResponseBody>>
+    fun getIndexHtml(): Single<Response<ResponseBody>>
 
     @GET("https://binusmaya.binus.ac.id/login/index.php")
     @Headers("User-Agent: Portal App/" + BuildConfig.VERSION_NAME)
@@ -26,10 +25,9 @@ interface BimayService {
     @Headers("Referer: https://binusmaya.binus.ac.id/login/",
             "Origin: https://binusmaya.binus.ac.id",
             "User-Agent: Portal App/" + BuildConfig.VERSION_NAME)
-    @POST("https://binusmaya.binus.ac.id/login/token/{submitLocation}")
+    @POST("https://binusmaya.binus.ac.id/login/sys_login.php")
     fun signIn2(@Header("Cookie") cookie: String,
                 @FieldMap fields: Map<String, String>,
-                @Path("submitLocation", encoded = true) submitLocation: String,
                 @Field("ctl00\$ContentPlaceHolder1\$SubmitButtonBM") button: String = "Login")
             : Single<Response<String>>
 

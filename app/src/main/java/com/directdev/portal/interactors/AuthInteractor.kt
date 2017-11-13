@@ -8,6 +8,7 @@ import com.directdev.portal.utils.SigninException
 import io.reactivex.Single
 import org.joda.time.Minutes
 import java.net.URLDecoder
+import java.net.URLEncoder
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -26,8 +27,6 @@ class AuthInteractor @Inject constructor(
 
     // Regex patterns to extract data from index.html and loader.js
     private val loaderPattern = "<script src=\".*login/loader.*\""
-    private val indexLinkPattern = "'.*'"
-    private val submitActionPattern = "<form class=\"custom-form\" action=\".*\""
     private val fieldsPattern = "<input type=\"hidden\" name=\".*\" value=\".*\" />"
     private val usernamePattern = "<input type=\"text\" name=\".*placeholder=\"Username\""
     private val passwordPattern = "<input type=\"password\" name=\".*placeholder=\"Password\""
@@ -40,34 +39,23 @@ class AuthInteractor @Inject constructor(
         if (!isSyncOverdue()) return Single.just(userCredRepo.getCookie())
         var indexHtml = ""
         var cookie = ""
-        var indexHtmlToken = ""
-        var submitLocation = ""
-        request = if (isRequesting) request else bimayApi.getIndexHtmlToken().flatMap {
-            cookie = it.headers().get("Set-Cookie") ?: ""
-            indexHtmlToken = Regex(indexLinkPattern)
-                    .find(it.body()?.string() ?: "")
-                    ?.value ?: ""
-            indexHtmlToken = indexHtmlToken.removeSurrounding("'")
-            bimayApi.getIndexHtml(cookie, indexHtmlToken)
-        }.flatMap {
+        request = if (isRequesting) request else bimayApi.getIndexHtml().flatMap {
             indexHtml = it.body()?.string() ?: ""
+            cookie = it.headers().get("Set-Cookie") ?: ""
 
             // Extracts the link to loader.php from index.html
             val result = Regex(loaderPattern).find(indexHtml)?.value ?: ""
-            val serial = decodeHtml(result.substring(43, result.length - 1))
-
-            val submitActionRegex = Regex(submitActionPattern).find(indexHtml)?.value ?: ""
-            submitLocation = decodeHtml(submitActionRegex.substring(33, submitActionRegex.length - 66).removeSurrounding("\""))
+            val serial = decodeHtml(result.substring(40, result.length - 1))
 
             // Retrieve loader.js from loader.php
-            bimayApi.getLoaderJs(cookie, serial, "https://binusmaya.binus.ac.id/login/" + indexHtmlToken)
+            bimayApi.getLoaderJs(cookie, serial, "https://binusmaya.binus.ac.id/login/")
         }.flatMap {
             val loaderJs = it.body()?.string() ?: ""
             val fieldsMap = constructFields(indexHtml, loaderJs, username, password)
 
             // Authenticate with Binusmaya using the extracted fields from index.html & loader.js as
             // the request parameter
-            bimayApi.authenticate(cookie, fieldsMap, submitLocation)
+            bimayApi.authenticate(cookie, fieldsMap, "")
         }.map {
             // Checks if login is successful
             val redirectLocation = it.headers().get("Location") ?: "none"
@@ -83,7 +71,7 @@ class AuthInteractor @Inject constructor(
             flagRepo.save(isLoggedIn = true)
         }.doAfterTerminate {
             isRequesting = false
-        }.doOnError { throw it }
+        }
         isRequesting = true
         return request
     }
@@ -126,6 +114,6 @@ class AuthInteractor @Inject constructor(
     // TODO: This is similar to the one from journalInteractor, might be able to be refactored out
     fun isSyncOverdue(): Boolean {
         val minutesInt = Minutes.minutesBetween(timeStampRepo.getLastSync(), timeStampRepo.today()).minutes
-        return Math.abs(minutesInt) > 5
+        return Math.abs(minutesInt) > 25
     }
 }
