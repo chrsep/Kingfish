@@ -14,17 +14,17 @@ import retrofit2.http.*
 interface BimayService {
 
     @GET("https://binusmaya.binus.ac.id/login/index.php")
-    @Headers("User-Agent: Portal App/" + BuildConfig.VERSION_NAME)
+    @Headers("User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3278.0 Mobile Safari/537.36")
     fun getIndexHtml(): Single<Response<ResponseBody>>
 
     @GET("https://binusmaya.binus.ac.id/login/index.php")
-    @Headers("User-Agent: Portal App/" + BuildConfig.VERSION_NAME)
+    @Headers("User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3278.0 Mobile Safari/537.36")
     fun getIndexHtmlToken(@Header("Cookie") cookie: String = ""): Single<Response<ResponseBody>>
 
     @FormUrlEncoded
     @Headers("Referer: https://binusmaya.binus.ac.id/login/",
             "Origin: https://binusmaya.binus.ac.id",
-            "User-Agent: Portal App/" + BuildConfig.VERSION_NAME)
+            "User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3278.0 Mobile Safari/537.36")
     @POST("https://binusmaya.binus.ac.id/login/sys_login.php")
     fun signIn2(@Header("Cookie") cookie: String,
                 @FieldMap fields: Map<String, String>,
@@ -34,7 +34,7 @@ interface BimayService {
     @FormUrlEncoded
     @Headers("Referer: https://binusmaya.binus.ac.id/login/",
             "Origin: https://binusmaya.binus.ac.id",
-            "User-Agent: Portal App/" + BuildConfig.VERSION_NAME)
+            "User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3278.0 Mobile Safari/537.36")
     @POST("https://binusmaya.binus.ac.id/login/sys_login.php")
     fun signIn(@Header("Cookie") cookie: String,
                @FieldMap uid: Map<String, String>,
@@ -46,7 +46,7 @@ interface BimayService {
 
     @Headers("Referer: https://binusmaya.binus.ac.id/newStaff/",
             "Origin: https://binusmaya.binus.ac.id",
-            "User-Agent: Portal App/" + BuildConfig.VERSION_NAME)
+            "User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3278.0 Mobile Safari/537.36")
     @POST("https://binusmaya.binus.ac.id/services/ci/index.php/login/switchrole/2/104")
     fun switchRole(@Header("Cookie") cookie: String): Single<ResponseBody>
 
@@ -56,42 +56,42 @@ interface BimayService {
     fun getProfile(@Header("Cookie") cookie: String): Single<ResponseBody>
 
     @Headers("Referer: https://binusmaya.binus.ac.id/newStudent/",
-            "User-Agent: Portal App/" + BuildConfig.VERSION_NAME)
+            "User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3278.0 Mobile Safari/537.36")
     @GET("financial/virtualaccount/")
     fun getFinanceSummary(@Header("Cookie") cookie: String): Single<ResponseBody>
 
     @Headers("Referer: https://binusmaya.binus.ac.id/newStudent/",
-            "User-Agent: Portal App/" + BuildConfig.VERSION_NAME)
+            "User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3278.0 Mobile Safari/537.36")
     @GET("financial/getFinancialSummary")
     fun getFinances(@Header("Cookie") cookie: String): Single<List<FinanceModel>>
 
     @Headers("Referer: https://binusmaya.binus.ac.id/newStudent/index.html",
-            "User-Agent: Portal App/" + BuildConfig.VERSION_NAME)
+            "User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3278.0 Mobile Safari/537.36")
     @GET("student/class_schedule/classScheduleGetStudentClassSchedule")
     fun getSessions(@Header("Cookie") cookie: String): Single<List<SessionModel>>
 
     @Headers("Referer: https://binusmaya.binus.ac.id/newstudent/",
-            "User-Agent: Portal App/" + BuildConfig.VERSION_NAME)
+            "User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3278.0 Mobile Safari/537.36")
     @POST("newExam/Schedule/getOwnScheduleStudent")
     fun getExams(@Header("Cookie") cookie: String, @Body body: ExamRequestBody): Single<List<ExamModel>>
 
     @Headers("Referer: https://binusmaya.binus.ac.id/newstudent/",
-            "User-Agent: Portal App/" + BuildConfig.VERSION_NAME)
+            "User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3278.0 Mobile Safari/537.36")
     @POST("scoring/ViewGrade/getStudentScore/{term}")
     fun getGrades(@Path("term") term: String, @Header("Cookie") cookie: String): Single<GradeModel>
 
     @Headers("Referer: https://binusmaya.binus.ac.id/newstudent/",
-            "User-Agent: Portal App/" + BuildConfig.VERSION_NAME)
+            "User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3278.0 Mobile Safari/537.36")
     @POST("https://binusmaya.binus.ac.id/services/ci/index.php/scoring/ViewGrade/getPeriodByBinusianId")
     fun getTerms(@Header("Cookie") cookie: String): Single<List<TermModel>>
 
     @Headers("Referer: https://binusmaya.binus.ac.id/newstudent/",
-            "User-Agent: Portal App/" + BuildConfig.VERSION_NAME)
+            "User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3278.0 Mobile Safari/537.36")
     @GET("student/init/getCoursesBySTRMAndAcad/{term}")
     fun getCourse(@Path("term") term: String, @Header("Cookie") cookie: String): Single<CourseWrapperModel>
 
     @Headers("Referer: https://binusmaya.binus.ac.id/newstudent/",
-            "User-Agent: Portal App/" + BuildConfig.VERSION_NAME)
+            "User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3278.0 Mobile Safari/537.36")
     @GET("student/classes/resources/{courseId}/{crseId}/{term}/{ssrComponent}/{classNumber}")
     fun getResources(@Path("courseId") courseId: String,
                      @Path("crseId") crseId: String,
@@ -101,7 +101,7 @@ interface BimayService {
                      @Header("Cookie") cookie: String): Single<ResModelIntermidiary>
 
     @Headers("Referer: https://binusmaya.binus.ac.id/newstudent/",
-            "User-Agent: Portal App/" + BuildConfig.VERSION_NAME)
+            "User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3278.0 Mobile Safari/537.36")
     @GET("student/classes/assignmentType/{courseId}/{crseId}/{term}/{ssrComponent}/{classNumber}/01")
     fun getAssignment(@Path("courseId") courseId: String,
                       @Path("crseId") crseId: String,
@@ -110,7 +110,7 @@ interface BimayService {
                       @Path("classNumber") classNumber: String,
                       @Header("Cookie") cookie: String): Single<List<AssignmentIndividualModel>>
 
-    @Headers("User-Agent: Portal App/" + BuildConfig.VERSION_NAME)
+    @Headers("User-Agent:Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3278.0 Mobile Safari/537.36")
     @GET("https://binusmaya.binus.ac.id/login/loader.php")
     fun getSerial(@Header("Cookie") cookie: String,
                   @Query(value = "serial") serial: String,
