@@ -1,6 +1,5 @@
 package com.directdev.portal.interactors
 
-import android.util.Log
 import com.directdev.portal.network.NetworkHelper
 import com.directdev.portal.repositories.FlagRepository
 import com.directdev.portal.repositories.TimeStampRepository
@@ -40,21 +39,22 @@ class AuthInteractor @Inject constructor(
         request = if (isRequesting) request else bimayApi.getIndexHtml().flatMap {
             indexHtml = it.body()?.string() ?: ""
             it.headers().toMultimap().get("Set-Cookie")?.forEach { s: String? ->
-//                cookie += s + "; "
-                if(cookie.length==0)
+                if(cookie.length == 0) {
                     cookie += s
+                }
+                else {
+                    cookie += ";" + s
+                }
             }
 
             // Extracts the link to loader.php from index.html
 
             val serial = loginRegex.find(indexHtml)?.groups?.get(1)?.value ?:""
-            Log.v("Test", "Cookie: " + cookie)
 
             // Retrieve loader.js from loader.php
             bimayApi.getLoaderJs(cookie, serial, "https://binusmaya.binus.ac.id/login/")
         }.flatMap {
             val loaderJs = it.body()?.string() ?: ""
-            Log.v("Loader", "Lod:" + loaderJs)
             val fieldsMap = constructFields(indexHtml, loaderJs, username, password)
 
             // Authenticate with Binusmaya using the extracted fields from index.html & loader.js as
@@ -63,7 +63,6 @@ class AuthInteractor @Inject constructor(
         }.map {
             // Checks if login is successful
             val redirectLocation = it.headers().get("Location") ?: "none"
-            Log.v("Test", "R: " + redirectLocation)
             if (redirectLocation != "https://binusmaya.binus.ac.id/block_user.php")
                 throw SigninException(redirectLocation)
         }.flatMap {
@@ -105,21 +104,13 @@ class AuthInteractor @Inject constructor(
         val passStr = loginMatches.elementAt(2)?.groups?.get(1)?.value ?:""
         val loginStr = loginMatches.elementAt(3)?.groups?.get(1)?.value ?:""
 
-        Log.v("Test", "User: " + userStr)
-        Log.v("Test", "Pass: " + passStr)
-        Log.v("Test", "Login: " + loginStr)
-
         val fieldsMap = HashMap<String, String>()
         fieldsMap.put(userStr, username)
         fieldsMap.put(passStr, password)
         fieldsMap.put(loginStr, "Login")
 
-        Log.v("Test", "username: " + username)
-        Log.v("Test", "password: " + password)
-
         extraFields.forEach { matchResult ->
             fieldsMap.put(matchResult.groups?.get(1)?.value ?:"", matchResult.groups?.get(2)?.value ?:"")
-            Log.v("Test", matchResult.groups?.get(1)?.value + "\n" + matchResult.groups?.get(2)?.value)
         }
 
         return fieldsMap
