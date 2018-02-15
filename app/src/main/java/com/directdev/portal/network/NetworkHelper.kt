@@ -10,7 +10,7 @@ import retrofit2.Response
  *------------------------------------------------------------------------------------------------*/
 interface NetworkHelper {
     fun getLoaderJs(cookie: String, serial: String, referrer: String): Single<Response<ResponseBody>>
-    fun authenticate(cookie: String, fieldMap: HashMap<String, String>, submitLocation: String): Single<Response<String>>
+    fun authenticate(cookie: String, fieldMap: HashMap<String, String>): Single<Response<String>>
     fun switchRole(cookie: String): Single<ResponseBody>
     fun getUserProfile(cookie: String): Single<ResponseBody>
     fun getJournalEntries(cookie: String, terms: List<Int>): Single<List<JournalModel>>

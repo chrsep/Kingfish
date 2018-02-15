@@ -28,7 +28,7 @@ interface BimayService {
     @POST("https://binusmaya.binus.ac.id/login/sys_login.php")
     fun signIn2(@Header("Cookie") cookie: String,
                 @FieldMap fields: Map<String, String>,
-                @Field("ctl00\$ContentPlaceHolder1\$SubmitButtonBM") button: String = "Login")
+                @Field("TWpWaUlVNTFKR3d3UnlGdTI1") button: String = "Login")
             : Single<Response<String>>
 
     @FormUrlEncoded
