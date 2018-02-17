@@ -68,8 +68,8 @@ class GradesRecyclerAdapter(
                 itemView.item_grades_cardview.visibility = gone
                 return
             }
-            itemView.course_name.text = score[0].courseName
-            itemView.course_grades.text = score[0].courseGradeTotal
+            itemView.course_name.text = score[0]?.courseName ?: ""
+            itemView.course_grades.text = score[0]?.courseGradeTotal ?: ""
             itemView.mid.visibility = gone
             itemView.fin.visibility = gone
             itemView.assignment.visibility = gone
@@ -136,7 +136,8 @@ class GradesRecyclerAdapter(
                     }
                 }
             }
-            val bgColor = when (score[0].courseGradeTotal[0]) {
+            // This uses !! because score empty check is already done above
+            val bgColor = when (score[0]!!.courseGradeTotal[0]) {
                 'A' -> "#1565c0"
                 'B' -> "#1b5e20"
                 'C' -> "#bf360c"

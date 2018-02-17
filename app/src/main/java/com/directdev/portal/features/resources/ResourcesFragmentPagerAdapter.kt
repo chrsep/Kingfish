@@ -3,6 +3,7 @@ package com.directdev.portal.features.resources
 import android.app.Fragment
 import android.app.FragmentManager
 import android.support.v13.app.FragmentStatePagerAdapter
+import android.support.v4.view.PagerAdapter
 
 /**-------------------------------------------------------------------------------------------------
  * Created by chris on 10/15/17.
@@ -25,7 +26,10 @@ class ResourcesFragmentPagerAdapter(fm: FragmentManager?) : FragmentStatePagerAd
         fragmentList.clear()
     }
 
-    override fun getItemPosition(`object`: Any?) = POSITION_NONE
+    // TODO: This might be the wrong POSITION_NONE
+    override fun getItemPosition(`object`: Any): Int {
+        return PagerAdapter.POSITION_NONE
+    }
 
     override fun getPageTitle(position: Int): CharSequence = fragmentTitleList[position]
 }

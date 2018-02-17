@@ -44,16 +44,19 @@ class GradesPresenter @Inject constructor(
             view.hideGradesRecycler()
             return
         }
-        val term = credits[creditIndex - 1].term
-        view.setToolbarTitle(termInteractor.getSemesterName(term))
+        // TODO: This null check might not work
+        credits[creditIndex - 1]?.let {
+            val term = it.term
+            view.setToolbarTitle(termInteractor.getSemesterName(term))
 
-        val grades = gradesInteractor.getAllGradesByTerm(term)
-        if (grades.isEmpty()) {
-            view.hideGradesRecycler()
-            return
+            val grades = gradesInteractor.getAllGradesByTerm(term)
+            if (grades.isEmpty()) {
+                view.hideGradesRecycler()
+                return
+            }
+            view.showGradesRecycler()
+            view.updateRecycler(grades, it)
         }
-        view.showGradesRecycler()
-        view.updateRecycler(grades, credits[creditIndex - 1])
     }
 
     override fun sync(bypass: Boolean) {

@@ -3,6 +3,7 @@ package com.directdev.portal.interactors
 import com.directdev.portal.models.CourseModel
 import com.directdev.portal.network.NetworkHelper
 import com.directdev.portal.repositories.ResourceRepository
+import io.reactivex.Single
 import javax.inject.Inject
 
 /**-------------------------------------------------------------------------------------------------
@@ -14,8 +15,11 @@ class ResourceInteractor @Inject constructor(
 ) {
     fun getResource(classNumber: Int) = resourceRepo.getResources(classNumber)
     //TODO: SYNC NEEDS TO HANDLE MULTIPLE COURSE AT ONCE
-    fun sync(cookies: String, course: CourseModel) = bimayApi.getResources(cookies, course).map {
-        resourceRepo.save(it)
+    fun sync(cookies: String, course: CourseModel?): Single<Unit>? {
+        return if (course != null)
+            bimayApi.getResources(cookies, course).map { resourceRepo.save(it) }
+        else
+            Single.fromCallable { Unit }
     }
 
 /* TODO: CLEAN THIS UP
