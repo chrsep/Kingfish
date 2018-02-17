@@ -8,7 +8,6 @@ import com.directdev.portal.utils.SigninException
 import io.reactivex.Single
 import org.joda.time.Minutes
 import java.net.URLDecoder
-import java.net.URLEncoder
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -26,10 +25,8 @@ class AuthInteractor @Inject constructor(
     private lateinit var request: Single<String>
 
     // Regex patterns to extract data from index.html and loader.js
-    private val loaderPattern = "<script src=\".*login/loader.*\""
-    private val fieldsPattern = "<input type=\"hidden\" name=\".*\" value=\".*\" />"
-    private val usernamePattern = "<input type=\"text\" name=\".*placeholder=\"Username\""
-    private val passwordPattern = "<input type=\"password\" name=\".*placeholder=\"Password\""
+    private val fieldsRegex = """<input type=\"hidden\" name=\"([^\"]*)\" value=\"([^\"]*)\"""".toRegex()
+    private val loginRegex = """document\.write\(\"([^\)]+)\"\)""".toRegex()
 
     // Returns a Single containing the authenticated cookie
     fun execute(
@@ -41,11 +38,18 @@ class AuthInteractor @Inject constructor(
         var cookie = ""
         request = if (isRequesting) request else bimayApi.getIndexHtml().flatMap {
             indexHtml = it.body()?.string() ?: ""
-            cookie = it.headers().get("Set-Cookie") ?: ""
+            it.headers().toMultimap().get("Set-Cookie")?.forEach { s: String? ->
+                if(cookie.length == 0) {
+                    cookie += s
+                }
+                else {
+                    cookie += ";" + s
+                }
+            }
 
             // Extracts the link to loader.php from index.html
-            val result = Regex(loaderPattern).find(indexHtml)?.value ?: ""
-            val serial = decodeHtml(result.substring(40, result.length - 1))
+
+            val serial = loginRegex.find(indexHtml)?.groups?.get(1)?.value ?:""
 
             // Retrieve loader.js from loader.php
             bimayApi.getLoaderJs(cookie, serial, "https://binusmaya.binus.ac.id/login/")
@@ -55,7 +59,7 @@ class AuthInteractor @Inject constructor(
 
             // Authenticate with Binusmaya using the extracted fields from index.html & loader.js as
             // the request parameter
-            bimayApi.authenticate(cookie, fieldsMap, "")
+            bimayApi.authenticate(cookie, fieldsMap)
         }.map {
             // Checks if login is successful
             val redirectLocation = it.headers().get("Location") ?: "none"
@@ -93,19 +97,22 @@ class AuthInteractor @Inject constructor(
             username: String,
             password: String
     ): HashMap<String, String> {
-        val user = Regex(usernamePattern).find(indexHtml)?.value ?: ""
-        val pass = Regex(passwordPattern).find(indexHtml)?.value ?: ""
-        val extraFields = Regex(fieldsPattern).findAll(loaderJs).toList()[0].value.split(" ")
-        val userStr = decodeHtml(user.substring(25, user.length - 45))
-        val passStr = decodeHtml(pass.substring(29, pass.length - 24))
+        val extraFields = fieldsRegex.findAll(loaderJs)
+        val loginMatches = loginRegex.findAll(indexHtml)
+
+        val userStr = loginMatches.elementAt(1)?.groups?.get(1)?.value ?:""
+        val passStr = loginMatches.elementAt(2)?.groups?.get(1)?.value ?:""
+        val loginStr = loginMatches.elementAt(3)?.groups?.get(1)?.value ?:""
 
         val fieldsMap = HashMap<String, String>()
-        fieldsMap.put(passStr, password)
         fieldsMap.put(userStr, username)
-        fieldsMap.put(decodeHtml(extraFields[2].substring(6, extraFields[2].length - 1)),
-                decodeHtml(extraFields[3].substring(6, extraFields[3].length - 1)))
-        fieldsMap.put(decodeHtml(extraFields[6].substring(6, extraFields[6].length - 1)),
-                decodeHtml(extraFields[7].substring(6, extraFields[7].length - 1)))
+        fieldsMap.put(passStr, password)
+        fieldsMap.put(loginStr, "Login")
+
+        extraFields.forEach { matchResult ->
+            fieldsMap.put(matchResult.groups?.get(1)?.value ?:"", matchResult.groups?.get(2)?.value ?:"")
+        }
+
         return fieldsMap
     }
 
