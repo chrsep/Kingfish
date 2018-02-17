@@ -1,6 +1,6 @@
 buildscript {
     ext.kotlin_version = '1.2.21'
-    ext.anko_version = '0.10.1'
+    ext.anko_version = '0.10.4'
     ext.retrofit_version = '2.3.0'
     ext.support_library_version = '27.0.2'
     ext.firebase_version = '11.8.0'
@@ -37,8 +37,8 @@ android {
         applicationId "com.directdev.portal"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 67
-        versionName "0.5.0e"
+        versionCode 69
+        versionName "0.5.1a"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -76,7 +76,7 @@ dependencies {
 
     // Set this dependency to build and run Espresso tests
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile('com.crashlytics.sdk.android:crashlytics:2.7.1@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.9.0@aar') {
         transitive = true
     }
     compile('com.crashlytics.sdk.android:answers:1.4.1@aar') {
