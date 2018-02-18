@@ -37,8 +37,8 @@ android {
         applicationId "com.directdev.portal"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 69
-        versionName "0.5.1a"
+        versionCode 70
+        versionName "0.5.1b"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
