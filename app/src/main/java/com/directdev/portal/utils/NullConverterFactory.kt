@@ -21,8 +21,12 @@ class NullConverterFactory : Converter.Factory() {
             type: Type,
             annotations: Array<out Annotation>,
             retrofit: Retrofit) = Converter<ResponseBody, Any> {
-        if (it.contentLength() != 0L)
-            retrofit.nextResponseBodyConverter<Any>(this, type, annotations).convert(it)
+        if (it.contentLength() != 0L) {
+            // TODO: This is used to prevent turn any null value returned by the server into empty value
+            // might not be the best idea tu replace all null
+            val nonNullResponse = ResponseBody.create(it.contentType(), it.string().replace(":null", ":\"\""))
+            retrofit.nextResponseBodyConverter<Any>(this, type, annotations).convert(nonNullResponse)
+        }
         else null
     }
 }

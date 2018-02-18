@@ -1,5 +1,7 @@
 package com.directdev.portal.repositories
 
+import android.util.Log
+import com.directdev.portal.models.ResBookModel
 import com.directdev.portal.models.ResModel
 import com.directdev.portal.models.ResModelIntermidiary
 import io.realm.Realm

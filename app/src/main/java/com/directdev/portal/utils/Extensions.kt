@@ -5,9 +5,11 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
+import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import com.crashlytics.android.Crashlytics
+import com.directdev.portal.BuildConfig
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -172,6 +174,7 @@ fun Throwable.generateMessage(): String {
             "We have no idea what went wrong, but we have received the error log, we'll look into this"
         }
     }
+    if (BuildConfig.DEBUG) Log.e("Network Error", this.toString())
     Crashlytics.logException(this)
     return message
 }

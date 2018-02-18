@@ -44,11 +44,13 @@ android {
     }
     buildTypes {
         release {
+            debuggable false
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             versionNameSuffix '-prod'
         }
         debug {
+            debuggable true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             versionNameSuffix '-dev'
@@ -112,7 +114,7 @@ dependencies {
 
     compile 'com.facebook.stetho:stetho:1.5.0'
     compile 'com.facebook.stetho:stetho-okhttp3:1.5.0'
-    compile 'com.uphyca:stetho_realm:2.1.0'
+    compile 'com.uphyca:stetho_realm:2.2.2'
     compile 'io.realm:android-adapters:2.1.1'
 
     compile 'net.danlew:android.joda:2.9.9'
@@ -141,7 +143,7 @@ repositories {
     maven { url "https://jitpack.io" }
     maven { url 'https://maven.fabric.io/public' }
     maven { url "http://repository.jetbrains.com/all" }
-    maven { url 'https://github.com/uPhyca/stetho-realm/raw/master/maven-repo' }
+    maven { url 'https://github.com/WickeDev/stetho-realm/raw/master/maven-repo' }
     maven { url 'https://maven.google.com' }
 }
 
