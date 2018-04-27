@@ -18,7 +18,6 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
-@Singleton
 @Module
 class NetworkModule {
     @Provides

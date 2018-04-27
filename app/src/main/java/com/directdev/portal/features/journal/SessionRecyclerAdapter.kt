@@ -19,8 +19,8 @@ class SessionRecyclerAdapter(
         autoUpdate: Boolean) :
         RealmRecyclerViewAdapter<SessionModel, SessionRecyclerAdapter.ViewHolder>(data, autoUpdate) {
 
-    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.bindData(data?.get(position) as SessionModel, context)
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bindData(data?.get(position) as SessionModel, context)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =

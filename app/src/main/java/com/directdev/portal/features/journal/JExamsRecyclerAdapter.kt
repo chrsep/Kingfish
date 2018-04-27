@@ -15,8 +15,8 @@ class JExamsRecyclerAdapter(
         autoUpdate: Boolean) :
         RealmRecyclerViewAdapter<ExamModel, JExamsRecyclerAdapter.ViewHolder>(data, autoUpdate) {
 
-    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.bindData(data?.get(position) as ExamModel)
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bindData(data?.get(position) as ExamModel)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =

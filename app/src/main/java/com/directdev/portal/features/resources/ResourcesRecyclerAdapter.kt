@@ -23,12 +23,12 @@ class ResourcesRecyclerAdapter(
         RecyclerView.Adapter<ResourcesRecyclerAdapter.ViewHolder>() {
     override fun getItemCount() = data.size
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) =
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             ViewHolder(context.layoutInflater.inflate(R.layout.item_resources, parent, false))
 
-    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val outlines = resources.resources.filter { it.courseOutlineTopicID == data[position] }
-        holder?.bindData(context, outlines, resources)
+        holder.bindData(context, outlines, resources)
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {

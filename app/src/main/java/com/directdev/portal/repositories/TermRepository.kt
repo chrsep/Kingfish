@@ -10,7 +10,7 @@ import javax.inject.Inject
 class TermRepository @Inject constructor() {
     fun getTerms(): List<Int> = Realm.getDefaultInstance().use {
         it.where(TermModel::class.java)
-                .findAllSorted("value")
+                .findAll().sort("value")
                 .map { term -> term.value }
     }
 
@@ -22,14 +22,14 @@ class TermRepository @Inject constructor() {
 
     fun getLatestTerm(): Int = Realm.getDefaultInstance().use {
         it.where(TermModel::class.java)
-                .findAllSorted("value")
+                .findAll().sort("value")
                 .map { it.value }
                 .last()
     }
 
     fun getFirstTerm(): Int = Realm.getDefaultInstance().use {
         it.where(TermModel::class.java)
-                .findAllSorted("value")
+                .findAll().sort("value")
                 .map { it.value }
                 .first()
     }

@@ -38,13 +38,8 @@ class AuthInteractor @Inject constructor(
         var cookie = ""
         request = if (isRequesting) request else bimayApi.getIndexHtml().flatMap {
             indexHtml = it.body()?.string() ?: ""
-            it.headers().toMultimap().get("Set-Cookie")?.forEach { s: String? ->
-                if(cookie.length == 0) {
-                    cookie += s
-                }
-                else {
-                    cookie += ";" + s
-                }
+            it.headers().toMultimap()["Set-Cookie"]?.forEach {
+                cookie += if(cookie.isEmpty()) it else ";$it"
             }
 
             // Extracts the link to loader.php from index.html
@@ -100,17 +95,17 @@ class AuthInteractor @Inject constructor(
         val extraFields = fieldsRegex.findAll(loaderJs)
         val loginMatches = loginRegex.findAll(indexHtml)
 
-        val userStr = loginMatches.elementAt(1)?.groups?.get(1)?.value ?:""
-        val passStr = loginMatches.elementAt(2)?.groups?.get(1)?.value ?:""
-        val loginStr = loginMatches.elementAt(3)?.groups?.get(1)?.value ?:""
+        val userStr = loginMatches.elementAt(1).groups[1]?.value ?:""
+        val passStr = loginMatches.elementAt(2).groups[1]?.value ?:""
+        val loginStr = loginMatches.elementAt(3).groups[1]?.value ?:""
 
         val fieldsMap = HashMap<String, String>()
-        fieldsMap.put(userStr, username)
-        fieldsMap.put(passStr, password)
-        fieldsMap.put(loginStr, "Login")
+        fieldsMap[userStr] = username
+        fieldsMap[passStr] = password
+        fieldsMap[loginStr] = "Login"
 
         extraFields.forEach { matchResult ->
-            fieldsMap.put(matchResult.groups?.get(1)?.value ?:"", matchResult.groups?.get(2)?.value ?:"")
+            fieldsMap[matchResult.groups[1]?.value ?:""] = matchResult.groups[2]?.value ?:""
         }
 
         return fieldsMap

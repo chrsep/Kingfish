@@ -47,11 +47,11 @@ class FinancesRecyclerAdapter(
             else
                 NormalViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_finances, parent, false))
 
-    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         if (position == data?.size)
-            holder?.bindData(getItem(position - 1) as FinanceModel)
+            holder.bindData(getItem(position - 1) as FinanceModel)
         else
-            holder?.bindData(getItem(position) as FinanceModel)
+            holder.bindData(getItem(position) as FinanceModel)
     }
 
     abstract class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {

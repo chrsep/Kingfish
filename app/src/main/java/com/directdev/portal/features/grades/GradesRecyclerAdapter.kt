@@ -46,8 +46,8 @@ class GradesRecyclerAdapter(
     }
 
     // Return the correct viewHolder based on the viewtype return by getItemViewType
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        val inflater = LayoutInflater.from(parent?.context)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
         return if (viewType == HEADER)
             HeaderViewHolder(inflater.inflate(R.layout.item_grades_header, parent, false))
         else

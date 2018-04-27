@@ -20,7 +20,8 @@ class TermInteractor @Inject constructor(
     fun getTerms(): List<Int> {
         val savedTerms = Realm.getDefaultInstance().use {
             it.where(TermModel::class.java)
-                    .findAllSorted("value")
+                    .findAll()
+                    .sort("value")
                     .map { term -> term.value }
         }
         return if (savedTerms.isEmpty()) calculateTerm() else savedTerms

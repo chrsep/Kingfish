@@ -18,7 +18,8 @@ class JournalRepository @Inject constructor(
 ) {
     fun getEntryFromDate(date: Date): RealmResults<JournalModel> = realm.where(JournalModel::class.java)
             .greaterThanOrEqualTo("date", date)
-            .findAllSortedAsync("date")
+            .findAllAsync()
+            .sort("date")
 
     fun save(journals: List<JournalModel>) = Realm.getDefaultInstance().use {
         it.executeTransaction {

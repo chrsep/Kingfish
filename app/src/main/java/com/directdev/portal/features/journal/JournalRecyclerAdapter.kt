@@ -23,8 +23,8 @@ class JournalRecyclerAdapter @Inject constructor(
             ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_journal, parent, false))
 
 
-    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.bindData(context, getItem(position) as JournalModel)
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bindData(context, getItem(position) as JournalModel)
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
