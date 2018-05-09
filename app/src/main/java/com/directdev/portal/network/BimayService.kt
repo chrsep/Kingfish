@@ -33,20 +33,7 @@ interface BimayService {
     @POST("https://binusmaya.binus.ac.id/login/sys_login.php")
     fun signIn2(@Header("Cookie") cookie: String,
                 @FieldMap fields: Map<String, String>,
-                @Field("TWpWaUlVNTFKR3d3UnlGdTI1") button: String = "Login")
-            : Single<Response<String>>
-
-    @FormUrlEncoded
-    @Headers("Referer: https://binusmaya.binus.ac.id/login/",
-            "Origin: https://binusmaya.binus.ac.id",
-            "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36")
-    @POST("https://binusmaya.binus.ac.id/login/sys_login.php")
-    fun signIn(@Header("Cookie") cookie: String,
-               @FieldMap uid: Map<String, String>,
-               @FieldMap pass: Map<String, String>,
-               @FieldMap extraPair1: Map<String, String>,
-               @FieldMap extraPair2: Map<String, String>,
-               @Field("ctl00\$ContentPlaceHolder1\$SubmitButtonBM") button: String = "Login")
+                @Field("TURsaUlVNTFKR3d3UnlGdTA5OjE3") button: String = "Login")
             : Single<Response<String>>
 
     @Headers("Referer: https://binusmaya.binus.ac.id/newStaff/",
