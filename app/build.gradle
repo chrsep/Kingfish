@@ -126,15 +126,14 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     kapt "com.google.dagger:dagger-android-processor:$dagger_version"
 
+    testImplementation 'joda-time:joda-time:2.9.9'
     testImplementation 'junit:junit:4.12'
-    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
-    testImplementation "org.mockito:mockito-core:2.8.47"
-    testImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test:rules:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    androidTestImplementation 'com.android.support:support-annotations:27.1.1'
-    androidTestImplementation 'com.google.code.findbugs:jsr305:3.0.2'
+    testImplementation 'androidx.test:runner:1.1.0-alpha1'
+    testImplementation 'androidx.test:rules:1.1.0-alpha1'
+    testImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha1'
+    testImplementation "org.robolectric:robolectric:4.0-alpha-1"
+    testImplementation "org.mockito:mockito-core:2.18.3"
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.0.0-alpha04"
 }
 repositories {
     mavenCentral()
