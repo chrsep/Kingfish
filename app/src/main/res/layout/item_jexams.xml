@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/journal_exam_name"
-        android:layout_toRigciwhtOf="@id/journal_exam_shift"
+        android:layout_toRightOf="@id/journal_exam_shift"
         android:layout_marginLeft="10dp"
         android:textColor="@color/secondary_white" />
 
