@@ -8,11 +8,11 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="Account">
         <Preference
-            android:title="Sign Out"
-            android:summary="Sign Out from Portal">
+            android:summary="Sign Out from Portal"
+            android:title="Sign Out">
             <intent
-                android:targetPackage="com.directdev.portal"
-                android:targetClass="com.directdev.portal.features.signIn.SignInActivity">
+                android:targetClass="com.directdev.portal.features.signIn.SignInActivity"
+                android:targetPackage="com.directdev.portal">
                 <extra
                     android:name="signout"
                     android:value="signout" />
@@ -21,12 +21,28 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="Support and Community">
         <Preference
-            android:summary="Bugs, problems and feature request discussions"
-            android:title="Issue Tracker"
-            android:icon="@drawable/ic_github_icon">
+            android:icon="@drawable/ic_github_icon"
+            android:summary="A place for reporting and discussing bugs, problems and feature request. Code contributions welcomed too."
+            android:title="Issue Tracker    ">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="https://goo.gl/93vrOc" />
         </Preference>
+
+        <Preference android:title="Join Beta Release">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://goo.gl/YYaiHk" />
+        </Preference>
+
+        <Preference android:title="Privacy Policy">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://portal-f044c.firebaseapp.com/privacy-policy/" />
+        </Preference>
+
+        <Preference
+            android:summary="Portal is not maintained by Binus. Portal is maintained by the community, out of goodwill and interest, so keeping Portal bug free is not easy. Campus data shown on Portal are not guaranteed to always be accurate. Report problems as soon as possible to the Issue Tracker above, not to Binus."
+            android:title="Disclaimer"/>
     </PreferenceCategory>
 </PreferenceScreen>
