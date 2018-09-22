@@ -30,6 +30,7 @@ class AuthInteractor @Inject constructor(
     private val fieldsPattern = "<input type=\"hidden\" name=\".*\" value=\".*\" />"
     private val usernamePattern = "<input type=\"text\" name=\".*placeholder=\"Username\""
     private val passwordPattern = "<input type=\"password\" name=\".*placeholder=\"Password\""
+    private val buttonPattern = "<input type=\"submit\" name=\".*value=\"Login\""
 
     // Returns a Single containing the authenticated cookie
     fun execute(
@@ -96,17 +97,18 @@ class AuthInteractor @Inject constructor(
     ): HashMap<String, String> {
         val user = Regex(usernamePattern).find(indexHtml)?.value ?: ""
         val pass = Regex(passwordPattern).find(indexHtml)?.value ?: ""
+        val button = Regex(buttonPattern).find(indexHtml)?.value ?: ""
         val extraFields = Regex(fieldsPattern).findAll(loaderJs).toList()[0].value.split(" ")
         val userStr = decodeHtml(user.substring(25, user.length - 45))
         val passStr = decodeHtml(pass.substring(29, pass.length - 24))
+        val buttonStr = decodeHtml(button.substring(27, button.length - 15))
 
         val fieldsMap = HashMap<String, String>()
-        fieldsMap.put(passStr, password)
-        fieldsMap.put(userStr, username)
-        fieldsMap.put(decodeHtml(extraFields[2].substring(6, extraFields[2].length - 1)),
-                decodeHtml(extraFields[3].substring(7, extraFields[3].length - 1)))
-        fieldsMap.put(decodeHtml(extraFields[6].substring(6, extraFields[6].length - 1)),
-                decodeHtml(extraFields[7].substring(7, extraFields[7].length - 1)))
+        fieldsMap[passStr] = password
+        fieldsMap[userStr] = username
+        fieldsMap[buttonStr] = "Login"
+        fieldsMap[decodeHtml(extraFields[2].substring(6, extraFields[2].length - 1))] = decodeHtml(extraFields[3].substring(7, extraFields[3].length - 1))
+        fieldsMap[decodeHtml(extraFields[6].substring(6, extraFields[6].length - 1))] = decodeHtml(extraFields[7].substring(7, extraFields[7].length - 1))
         return fieldsMap
     }
 
