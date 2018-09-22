@@ -29,7 +29,10 @@
                 android:data="https://goo.gl/93vrOc" />
         </Preference>
 
-        <Preference android:title="Join Beta Release">
+        <Preference android:title="Beta Release"
+            android:icon="@drawable/ic_child_care_black_24dp"
+            android:summary="Be on the bleeding edge and help test Portal's newest features. (more unstable)"
+            >
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="https://goo.gl/YYaiHk" />
