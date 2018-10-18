@@ -50,6 +50,7 @@ class ResourcesRecyclerAdapter(
                 if (selectedDownload.isEmpty()) return@setOnClickListener
                 try {
                     val path = (selectedDownload[0].path
+                            + "/"
                             + selectedDownload[0].location
                             + "/"
                             + selectedDownload[0].filename)
