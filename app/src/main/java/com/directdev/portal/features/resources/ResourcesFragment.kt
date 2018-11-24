@@ -98,10 +98,13 @@ class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
         return view
     }
 
-    override fun updateCourses(courses: List<Pair<String, Int>>) {
+    override fun updateCourses(courses: List<Triple<String, String, Int>>) {
         adapter.clear()
         courses.map {
-            adapter.addFrag(ResourcesListFragment.newInstance(it.first, it.second), it.first.getInitials())
+            adapter.addFrag(ResourcesListFragment.newInstance(
+                    "${it.first} (${it.second})", it.third),
+                    it.first.getInitials()
+            )
         }
         adapter.notifyDataSetChanged()
     }
