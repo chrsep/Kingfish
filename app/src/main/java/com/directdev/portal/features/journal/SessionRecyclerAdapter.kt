@@ -33,9 +33,11 @@ class SessionRecyclerAdapter(
             itemView.journalCourse.text = session.courseName
             itemView.journalRoom.text = session.room
             itemView.journalShift.text = session.startTime
+            itemView.journalCode.text = session.classId
             if (session.deliveryMode == "GSLC") {
                 itemView.journalMode.text = "GSLC"
                 itemView.journalShift.visibility = View.GONE
+                itemView.journalCode.visibility = View.GONE
                 color = "#f44336"
             } else {
                 if (!ctx.readPref(R.string.campus_setting, false, "com.directdev.portal_preferences")) {
