@@ -1,2 +1,5 @@
 /build
 fabric.properties
+default.realm.management
+default.realm.note
+default.realm.lock

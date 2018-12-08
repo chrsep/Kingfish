@@ -1,8 +1,8 @@
 # Kingfish
 
-*I will (at least I expect to) be graduating on 2018.
-From then in I won't be maintaining Portal anymore since I will no longer be studying on Binus.
-Let us know If you're interested in keeping Portal alive, well after 2018.*
+*I am no longer studying in Binus, this makes it hard for me to make sure that Portal works for
+everyone correctly and safely for every update. This also makes me constrained by time. Portal
+will still be maintained, but mostly on critical bugs. Contributions are still welcomed.*
 
 ---
 

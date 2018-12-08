@@ -47,6 +47,16 @@ class SignInActivity : Activity(), SignInContract.View, AnkoLogger {
         } else {
             Html.fromHtml("Having trouble? Visit <a href='https://goo.gl/93vrOc'> Github Issue </a>") // or for older api
         }
+
+        // Create link for textview
+        privacypolicy.movementMethod = LinkMovementMethod.getInstance()
+        privacypolicy.isClickable = true
+        privacypolicy.text = if (Build.VERSION.SDK_INT >= 24) {
+            Html.fromHtml("<a href='https://portal-f044c.firebaseapp.com/privacy-policy/'> Privacy Policy </a>", Html.FROM_HTML_MODE_LEGACY) // for 24 api and more
+        } else {
+            Html.fromHtml("Having trouble? Visit <a href='https://portal-f044c.firebaseapp.com/privacy-policy/'> Privacy Policy </a>") // or for older api
+        }
+
         mainBanner.typeface = Typeface.createFromAsset(assets, "fonts/SpaceMono-BoldItalic.ttf")
     }
 
