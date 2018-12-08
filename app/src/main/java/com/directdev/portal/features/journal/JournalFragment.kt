@@ -5,18 +5,16 @@ import android.app.Fragment
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
 import com.directdev.portal.R
 import com.directdev.portal.features.SettingsActivity
 import com.directdev.portal.models.JournalModel
 import com.directdev.portal.utils.action
 import com.directdev.portal.utils.snack
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.android.AndroidInjection
 import io.realm.RealmResults
@@ -43,10 +41,10 @@ class JournalFragment : Fragment(), JournalContract.View {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_journal, container, false)
         val toolbar = view.findViewById<Toolbar>(R.id.journalToolbar)
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerContent)
+        val recyclerView = view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recyclerContent)
         toolbar.inflateMenu(R.menu.menu_journal)
         toolbar.setOnMenuItemClickListener { presenter.onMenuItemClick(it.itemId) }
-        recyclerView.layoutManager = LinearLayoutManager(activity)
+        recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(activity)
         recyclerView.adapter = adapter
         presenter.onCreateView(toolbar)
         return view

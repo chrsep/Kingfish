@@ -3,13 +3,13 @@ package com.directdev.portal.utils
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
-import android.support.annotation.StringRes
-import android.support.design.widget.Snackbar
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
+import androidx.annotation.StringRes
 import com.crashlytics.android.Crashlytics
 import com.directdev.portal.BuildConfig
+import com.google.android.material.snackbar.Snackbar
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers

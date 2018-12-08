@@ -20,7 +20,7 @@
         android:layout_height="21dp"
         android:layout_marginRight="8dp" />
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilTitle"
         android:layout_width="0dp"
         android:layout_height="90dp"
@@ -28,7 +28,7 @@
         android:textColorHint="@color/white"
         app:hintTextAppearance="@style/TextAppearance.Design.Error">
 
-        <android.support.design.widget.TextInputEditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/assignmentTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,20 +37,20 @@
             android:textColorLink="?attr/colorButtonNormal"
             android:textColorHighlight="@color/cardview_shadow_start_color" />
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilDesc"
         android:layout_width="0dp"
         android:layout_height="65dp"
         android:layout_marginTop="8dp">
 
-        <android.support.design.widget.TextInputEditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/assignmentDesc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Description"
             android:inputType="textMultiLine" />
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 </RelativeLayout>

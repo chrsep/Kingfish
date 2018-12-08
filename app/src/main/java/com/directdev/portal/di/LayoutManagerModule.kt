@@ -1,7 +1,6 @@
 package com.directdev.portal.di
 
 import android.content.Context
-import android.support.v7.widget.LinearLayoutManager
 import dagger.Module
 import dagger.Provides
 
@@ -12,5 +11,5 @@ import dagger.Provides
 @Module
 class LayoutManagerModule {
     @Provides
-    fun providesLinearLayoutManager(ctx: Context): LinearLayoutManager = LinearLayoutManager(ctx)
+    fun providesLinearLayoutManager(ctx: Context): androidx.recyclerview.widget.LinearLayoutManager = androidx.recyclerview.widget.LinearLayoutManager(ctx)
 }

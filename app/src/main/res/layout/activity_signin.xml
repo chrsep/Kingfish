@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/signinActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.percent.PercentRelativeLayout
+    <androidx.percentlayout.widget.PercentRelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -70,7 +70,7 @@
             android:paddingBottom="16dp"
             android:textAlignment="center" />
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:id="@+id/signInCard"
             android:layout_width="400dp"
             android:layout_height="wrap_content"
@@ -87,7 +87,7 @@
                 android:orientation="vertical"
                 android:paddingTop="16dp">
 
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilFormUsername"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -97,16 +97,16 @@
                     android:layout_marginTop="8dp"
                     android:layout_toLeftOf="@+id/emailExtension">
 
-                    <android.support.design.widget.TextInputEditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/usernameField"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Username"
                         android:inputType="textEmailAddress" />
 
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilFormPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -115,14 +115,14 @@
                     android:layout_marginRight="16dp"
                     android:layout_marginTop="8dp">
 
-                    <android.support.design.widget.TextInputEditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/passwordField"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Password"
                         android:inputType="textPassword" />
 
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView
                     android:id="@+id/githubIssueLink"
@@ -218,6 +218,6 @@
                     android:textAlignment="center"
                     android:textSize="16sp" />
             </RelativeLayout>
-        </android.support.v7.widget.CardView>
-    </android.support.percent.PercentRelativeLayout>
-</android.support.design.widget.CoordinatorLayout>
+        </androidx.cardview.widget.CardView>
+    </androidx.percentlayout.widget.PercentRelativeLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

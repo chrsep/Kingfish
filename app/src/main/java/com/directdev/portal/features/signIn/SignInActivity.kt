@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.text.Html
 import android.text.method.LinkMovementMethod
 import com.crashlytics.android.answers.Answers
@@ -15,6 +14,7 @@ import com.directdev.portal.Portal
 import com.directdev.portal.R
 import com.directdev.portal.features.MainActivity
 import com.directdev.portal.utils.*
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_signin.*

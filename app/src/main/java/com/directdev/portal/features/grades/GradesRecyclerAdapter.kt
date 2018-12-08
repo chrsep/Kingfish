@@ -1,7 +1,6 @@
 package com.directdev.portal.features.grades
 
 import android.graphics.Color
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +21,7 @@ import kotlinx.android.synthetic.main.item_grades_header.view.*
 class GradesRecyclerAdapter(
         var grades: MutableList<RealmResults<ScoreModel>> = mutableListOf(),
         var credit: CreditModel = CreditModel()) :
-        RecyclerView.Adapter<GradesRecyclerAdapter.ViewHolder>() {
+        androidx.recyclerview.widget.RecyclerView.Adapter<GradesRecyclerAdapter.ViewHolder>() {
 
     private val HEADER = 1
 
@@ -54,7 +53,7 @@ class GradesRecyclerAdapter(
             NormalViewHolder(inflater.inflate(R.layout.item_grades, parent, false))
     }
 
-    abstract class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    abstract class ViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         abstract fun bindData(score: RealmResults<ScoreModel>, credit: CreditModel)
     }
 

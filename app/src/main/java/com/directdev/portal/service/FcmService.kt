@@ -1,7 +1,7 @@
 package com.directdev.portal.service
 
 import android.app.PendingIntent
-import android.support.v4.app.NotificationCompat
+import androidx.core.app.NotificationCompat
 import com.directdev.portal.R
 import com.directdev.portal.features.SplashActivity
 import com.google.firebase.messaging.FirebaseMessagingService

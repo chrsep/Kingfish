@@ -20,14 +20,14 @@
         android:background="@color/toolbarBorder" />
 
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/resourceRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/courseName"
         android:visibility="gone" />
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/resourceEmptyPlaceholder"
@@ -90,6 +90,6 @@
             app:layout_constraintTop_toTopOf="@+id/emptyResourceText"
             tools:layout_constraintBottom_creator="1"
             tools:layout_constraintTop_creator="1" />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </RelativeLayout>
