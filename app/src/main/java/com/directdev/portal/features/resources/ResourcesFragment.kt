@@ -100,9 +100,10 @@ class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
     override fun updateCourses(courses: List<Triple<String, String, Int>>) {
         adapter.clear()
         courses.map {
+            val tabName = it.first.getInitials() + if (it.second != "LEC") " (${it.second})" else ""
             adapter.addFrag(ResourcesListFragment.newInstance(
                     "${it.first} (${it.second})", it.third),
-                    it.first.getInitials()
+                    tabName
             )
         }
         adapter.notifyDataSetChanged()
