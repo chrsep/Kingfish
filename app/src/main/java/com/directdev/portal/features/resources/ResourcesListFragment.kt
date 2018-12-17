@@ -2,14 +2,12 @@ package com.directdev.portal.features.resources
 
 import android.app.Fragment
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.directdev.portal.R
 import org.jetbrains.anko.ctx
 
@@ -32,7 +30,7 @@ class ResourcesListFragment : Fragment() {
 
         val presenter = (parentFragment as ResourcesFragment).presenter
         val view = inflater.inflate(R.layout.fragment_resources_list, container, false)
-        val recyclerView = view.findViewById<RecyclerView>(R.id.resourceRecyclerView)
+        val recyclerView = view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.resourceRecyclerView)
         val resources = presenter.getResources(arguments.getInt("classNumb"))
         val outlineMap = resources?.resources?.map { it.courseOutlineTopicID }?.toSet()
         val resourceEmptyPlaceholder = view.findViewById<ConstraintLayout>(R.id.resourceEmptyPlaceholder)
@@ -50,7 +48,7 @@ class ResourcesListFragment : Fragment() {
             View.GONE
 
         if (outlineMap != null) {
-            recyclerView.layoutManager = LinearLayoutManager(ctx)
+            recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(ctx)
             recyclerView.adapter = ResourcesRecyclerAdapter(ctx, outlineMap.toList(), resources)
         }
         return view

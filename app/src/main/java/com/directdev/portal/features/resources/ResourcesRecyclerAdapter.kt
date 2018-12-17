@@ -1,12 +1,12 @@
 package com.directdev.portal.features.resources
 
+import android.annotation.SuppressLint
 import android.app.DownloadManager
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
-import android.os.Debug
-import android.support.v7.widget.RecyclerView
+import android.os.Build
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +22,7 @@ class ResourcesRecyclerAdapter(
         val context: Context,
         val data: List<String>,
         val resources: ResModel) :
-        RecyclerView.Adapter<ResourcesRecyclerAdapter.ViewHolder>() {
+        androidx.recyclerview.widget.RecyclerView.Adapter<ResourcesRecyclerAdapter.ViewHolder>() {
     override fun getItemCount() = data.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
@@ -33,14 +33,17 @@ class ResourcesRecyclerAdapter(
         holder.bindData(context, outlines, resources)
     }
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+        @SuppressLint("ResourceType")
         fun bindData(ctx: Context, item: List<ResResourcesModel>, resources: ResModel) {
             if (item.isEmpty()) return
             itemView.resSession.text = "Meeting " + item[0].sessionIDNUM
             itemView.resTopic.text = item[0].courseOutlineTopic
             try {
-                itemView.presentationDownload.backgroundTintList = ColorStateList
-                        .valueOf(Color.parseColor(ctx.getString(R.color.colorAccent)))
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    itemView.presentationDownload.backgroundTintList = ColorStateList
+                            .valueOf(Color.parseColor(ctx.getString(R.color.colorAccent)))
+                }
             } catch (e: NoSuchMethodError) {
             }
             itemView.presentationDownload.setOnClickListener {

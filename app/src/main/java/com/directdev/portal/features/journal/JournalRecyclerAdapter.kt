@@ -1,8 +1,6 @@
 package com.directdev.portal.features.journal
 
 import android.content.Context
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,18 +25,18 @@ class JournalRecyclerAdapter @Inject constructor(
         holder.bindData(context, getItem(position) as JournalModel)
     }
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         fun bindData(ctx: Context, item: JournalModel) {
             setHeader(item)
-            itemView.recyclerSchedule.layoutManager = LinearLayoutManager(ctx)
+            itemView.recyclerSchedule.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(ctx)
             itemView.recyclerSchedule.isNestedScrollingEnabled = false
             itemView.recyclerSchedule.adapter = SessionRecyclerAdapter(ctx, item.session, true)
 
-            itemView.recyclerJfinances.layoutManager = LinearLayoutManager(ctx)
+            itemView.recyclerJfinances.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(ctx)
             itemView.recyclerJfinances.isNestedScrollingEnabled = false
             itemView.recyclerJfinances.adapter = JFinanceRecyclerAdapter(item.finance, true)
 
-            itemView.recyclerJexams.layoutManager = LinearLayoutManager(ctx)
+            itemView.recyclerJexams.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(ctx)
             itemView.recyclerJexams.isNestedScrollingEnabled = false
             itemView.recyclerJexams.adapter = JExamsRecyclerAdapter(item.exam, true)
         }

@@ -2,7 +2,6 @@ package com.directdev.portal.features.finance
 
 import android.app.Fragment
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
 import android.view.*
 import com.directdev.portal.R
 import com.directdev.portal.features.MainActivity
@@ -31,7 +30,7 @@ class FinancesFragment : Fragment(), AnkoLogger {
 
         realm = Realm.getDefaultInstance()
         val data = realm.where(FinanceModel::class.java).findAll()
-        val layout = LinearLayoutManager(ctx)
+        val layout = androidx.recyclerview.widget.LinearLayoutManager(ctx)
         financeToolbar.title = "Billing"
         if (data.size > 0) {
             layout.stackFromEnd = true

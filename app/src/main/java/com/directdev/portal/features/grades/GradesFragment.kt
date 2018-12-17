@@ -5,18 +5,16 @@ import android.app.Fragment
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import com.directdev.portal.R
 import com.directdev.portal.models.CreditModel
 import com.directdev.portal.models.ScoreModel
 import com.directdev.portal.utils.action
 import com.directdev.portal.utils.snack
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.android.AndroidInjection
 import io.realm.RealmResults
@@ -47,8 +45,8 @@ class GradesFragment : Fragment(), AnkoLogger, LineChartOnValueSelectListener, G
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_grades, container, false)
-        val gradesRecycler = view.findViewById<RecyclerView>(R.id.gradesRecycler)
-        gradesRecycler.layoutManager = LinearLayoutManager(activity)
+        val gradesRecycler = view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.gradesRecycler)
+        gradesRecycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(activity)
         gradesRecycler.adapter = adapter
         return view
     }

@@ -4,17 +4,16 @@ import android.app.Activity
 import android.app.Fragment
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
-import android.support.design.widget.TabLayout
-import android.support.v4.view.ViewPager
-import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
 import com.directdev.portal.R
 import com.directdev.portal.utils.getInitials
 import com.directdev.portal.utils.snack
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.tabs.TabLayout
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.fragment_resources.*
@@ -81,7 +80,7 @@ class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
         val semesterFab = view.findViewById<FloatingActionButton>(R.id.semesterFab)
         val toolbar = view.findViewById<Toolbar>(R.id.resourcesToolbar)
         val tab = view.findViewById<TabLayout>(R.id.tabs)
-        val viewPager = view.findViewById<ViewPager>(R.id.tabViewPager)
+        val viewPager = view.findViewById<androidx.viewpager.widget.ViewPager>(R.id.tabViewPager)
         viewPager.adapter = adapter
         tab.setupWithViewPager(viewPager)
         if (toolbarTitle == "") toolbarTitle = termList.last().second
@@ -98,10 +97,14 @@ class ResourcesFragment : Fragment(), AnkoLogger, ResourcesContract.View {
         return view
     }
 
-    override fun updateCourses(courses: List<Pair<String, Int>>) {
+    override fun updateCourses(courses: List<Triple<String, String, Int>>) {
         adapter.clear()
         courses.map {
-            adapter.addFrag(ResourcesListFragment.newInstance(it.first, it.second), it.first.getInitials())
+            val tabName = it.first.getInitials() + if (it.second != "LEC") " (${it.second})" else ""
+            adapter.addFrag(ResourcesListFragment.newInstance(
+                    "${it.first} (${it.second})", it.third),
+                    tabName
+            )
         }
         adapter.notifyDataSetChanged()
     }

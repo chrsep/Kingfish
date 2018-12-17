@@ -1,6 +1,6 @@
 package com.directdev.portal.features.journal
 
-import android.support.v7.widget.Toolbar
+import androidx.appcompat.widget.Toolbar
 import com.directdev.portal.R
 import com.directdev.portal.interactors.AuthInteractor
 import com.directdev.portal.interactors.JournalInteractor

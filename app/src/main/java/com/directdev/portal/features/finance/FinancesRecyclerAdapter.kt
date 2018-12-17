@@ -1,6 +1,5 @@
 package com.directdev.portal.features.finance
 
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -54,7 +53,7 @@ class FinancesRecyclerAdapter(
             holder.bindData(getItem(position) as FinanceModel)
     }
 
-    abstract class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    abstract class ViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         abstract fun bindData(item: FinanceModel)
     }
 

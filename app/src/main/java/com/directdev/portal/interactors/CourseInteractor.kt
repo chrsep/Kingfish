@@ -26,10 +26,10 @@ class CourseInteractor @Inject constructor(
         }
     }
 
-    fun getCourses(selectedTerm: Int): List<Pair<String, Int>> {
+    fun getCourses(selectedTerm: Int): List<Triple<String, String, Int>> {
         return courseRepo.getCourses(selectedTerm).map {
-            Pair(it.courseName, it.classNumber)
-        }.distinctBy { it.first }
+            Triple(it.courseName, it.ssrComponent, it.classNumber)
+        }
     }
 
     fun getCourse(classNumber: Int) = courseRepo.getCourse(classNumber)

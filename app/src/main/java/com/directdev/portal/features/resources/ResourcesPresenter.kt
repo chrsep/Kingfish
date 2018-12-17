@@ -63,7 +63,7 @@ class ResourcesPresenter @Inject constructor(
 
     override fun updateSelectedSemester(selectedTerm: Int) {
         val courses = courseInteractor.getCourses(selectedTerm)
-        courseNumbers = courses.map { it.second }
+        courseNumbers = courses.map { it.third }
         view.updateCourses(courses.toList())
     }
 

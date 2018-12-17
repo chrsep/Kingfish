@@ -1,6 +1,6 @@
 package com.directdev.portal.features.journal
 
-import android.support.v7.widget.Toolbar
+import androidx.appcompat.widget.Toolbar
 import com.directdev.portal.BasePresenter
 import com.directdev.portal.BaseView
 import com.directdev.portal.models.JournalModel

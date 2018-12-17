@@ -10,7 +10,7 @@ import java.io.Serializable
  */
 interface ResourcesContract {
     interface View : BaseView<Presenter> {
-        fun updateCourses(courses: List<Pair<String, Int>>)
+        fun updateCourses(courses: List<Triple<String, String, Int>>)
         fun getSemester(): String
         fun showFailed(message: String)
         fun showLoading()
